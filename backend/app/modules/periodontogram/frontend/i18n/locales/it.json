@@ -78,7 +78,8 @@
     "errors": {
       "loadFailed": "Impossibile caricare il parodontogramma.",
       "saveFailed": "Impossibile salvare la modifica.",
-      "checkConnection": "Controlla la connessione e riprova."
+      "checkConnection": "Controlla la connessione e riprova.",
+      "closeAborted": "Alcune misurazioni non sono ancora salvate — la sessione non è stata chiusa. Controlla la connessione e riprova."
     }
   }
 }

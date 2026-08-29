@@ -282,7 +282,8 @@
       "drilldown": {
         "viewPayments": "Zahlungen im Zeitraum anzeigen",
         "viewPatients": "Patienten mit Schulden anzeigen"
-      }
+      },
+      "loadError": "Die Berichte konnten nicht geladen werden."
     },
     "target": {
       "label": "Zuordnen zu",
@@ -298,6 +299,10 @@
       "submit": "Zuordnen",
       "success": "Zahlung dem Kostenvoranschlag zugeordnet",
       "error": "Die Zahlung konnte nicht neu zugeordnet werden. Bitte versuchen Sie es erneut."
+    },
+    "followup": {
+      "collect": "Zahlung kassieren",
+      "collected": "Zahlung erfasst."
     }
   }
 }

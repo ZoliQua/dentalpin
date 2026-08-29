@@ -9,7 +9,11 @@
  * this makes it a test failure with an actionable list instead.
  *
  * Module-layer locales (`backend/app/modules/<name>/frontend/i18n/`)
- * are a separate set, deliberately out of scope here.
+ * are covered too since #322 moved the module namespaces out of the
+ * host files: every locale file a layer ships must mirror that layer's
+ * en file, and the files on disk must match what its nuxt.config
+ * declares. (Layers may ship fewer locales than the host — hu module
+ * coverage is an open follow-up — but never internally inconsistent.)
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -86,5 +90,46 @@ describe('core locale parity', () => {
       }
     }
     expect(problems, problems.join('\n')).toEqual([])
+  })
+})
+
+// ---- Module layers (#322) -------------------------------------------------
+
+const LAYERS_ROOT = join(__dirname, '../../module_layers')
+const layerDirs = readdirSync(LAYERS_ROOT).filter((m) => {
+  try {
+    readdirSync(join(LAYERS_ROOT, m, 'frontend/i18n/locales'))
+    return true
+  } catch {
+    return false
+  }
+})
+
+function layerFiles(mod: string): { dir: string, files: string[], enFile: string } {
+  const dir = join(LAYERS_ROOT, mod, 'frontend/i18n/locales')
+  const files = readdirSync(dir).filter(f => f.endsWith('.json')).sort()
+  const enFile = files.find(f => f === 'en.json' || f.endsWith('-en.json'))!
+  return { dir, files, enFile }
+}
+
+describe('module-layer locale parity', () => {
+  it.each(layerDirs)('%s locale files match its nuxt.config declaration', (mod) => {
+    const { files } = layerFiles(mod)
+    const config = readFileSync(join(LAYERS_ROOT, mod, 'frontend/nuxt.config.ts'), 'utf-8')
+    const declared = [...config.matchAll(/file:\s*'([^']+)'/g)].map(m => m[1]).sort()
+    expect(files, `files on disk vs i18n.locales in ${mod}/frontend/nuxt.config.ts`).toEqual(declared)
+  })
+
+  it.each(layerDirs)('%s locale files all mirror the layer en file', (mod) => {
+    const { dir, files, enFile } = layerFiles(mod)
+    const en = flatten(JSON.parse(readFileSync(join(dir, enFile), 'utf-8')))
+    const problems: string[] = []
+    for (const f of files) {
+      if (f === enFile) continue
+      const keys = flatten(JSON.parse(readFileSync(join(dir, f), 'utf-8')))
+      for (const k of en.keys()) if (!keys.has(k)) problems.push(`${mod}/${f} missing: ${k}`)
+      for (const k of keys.keys()) if (!en.has(k)) problems.push(`${mod}/${f} extra: ${k}`)
+    }
+    expect(problems, problems.slice(0, 20).join('\n')).toEqual([])
   })
 })

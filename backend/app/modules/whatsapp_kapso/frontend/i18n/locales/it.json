@@ -33,6 +33,21 @@
     "saved": "Impostazioni salvate",
     "saveError": "Impossibile salvare",
     "synced": "Sincronizzati {n} modelli",
-    "syncError": "Impossibile sincronizzare"
+    "syncError": "Impossibile sincronizzare",
+    "types": {
+      "appointment_confirmation": "Conferma appuntamento",
+      "appointment_reminder": "Promemoria appuntamento",
+      "appointment_cancelled": "Appuntamento annullato",
+      "budget_sent": "Preventivo inviato",
+      "budget_accepted": "Preventivo accettato",
+      "budget_reminder": "Promemoria preventivo",
+      "invoice_sent": "Fattura inviata",
+      "recall_reminder": "Promemoria richiamo",
+      "welcome": "Benvenuto"
+    },
+    "onboarding": {
+      "label": "Collega WhatsApp",
+      "description": "Lo studio preferisce WhatsApp, ma Kapso non è ancora collegato."
+    }
   }
 }

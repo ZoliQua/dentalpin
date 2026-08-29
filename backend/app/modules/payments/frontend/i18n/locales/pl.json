@@ -282,7 +282,8 @@
       "drilldown": {
         "viewPayments": "Zobacz płatności z okresu",
         "viewPatients": "Zobacz pacjentów z zadłużeniem"
-      }
+      },
+      "loadError": "Nie udało się wczytać raportów."
     },
     "target": {
       "label": "Zastosuj do",
@@ -298,6 +299,10 @@
       "submit": "Przypisz",
       "success": "Płatność przypisana do kosztorysu",
       "error": "Nie udało się ponownie przypisać płatności. Spróbuj ponownie."
+    },
+    "followup": {
+      "collect": "Przyjmij płatność",
+      "collected": "Płatność zarejestrowana."
     }
   }
 }

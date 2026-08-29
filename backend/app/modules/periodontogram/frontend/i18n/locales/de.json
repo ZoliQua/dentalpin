@@ -78,7 +78,8 @@
     "errors": {
       "loadFailed": "Der Parodontalbefund konnte nicht geladen werden.",
       "saveFailed": "Die Änderung konnte nicht gespeichert werden.",
-      "checkConnection": "Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+      "checkConnection": "Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "closeAborted": "Einige Messungen sind noch nicht gespeichert — die Sitzung wurde nicht geschlossen. Prüfen Sie die Verbindung und versuchen Sie es erneut."
     }
   }
 }

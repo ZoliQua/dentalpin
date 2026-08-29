@@ -124,6 +124,10 @@
       "body": "Nach dieser Behandlung empfehlen wir einen Recall im {month} ({reason}).",
       "create": "Recall anlegen",
       "dismiss": "Verwerfen"
+    },
+    "confirms": {
+      "cancel": "Diesen Recall stornieren? Der Zyklus wird beendet und kann nicht rückgängig gemacht werden.",
+      "done": "Diesen Recall als erledigt markieren? Damit wird er für diesen Zyklus abgeschlossen."
     }
   }
 }

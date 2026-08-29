@@ -33,6 +33,21 @@
     "saved": "Ustawienia zapisane",
     "saveError": "Nie udało się zapisać",
     "synced": "Zsynchronizowano {n} szablonów",
-    "syncError": "Nie udało się zsynchronizować"
+    "syncError": "Nie udało się zsynchronizować",
+    "types": {
+      "appointment_confirmation": "Potwierdzenie wizyty",
+      "appointment_reminder": "Przypomnienie o wizycie",
+      "appointment_cancelled": "Odwołanie wizyty",
+      "budget_sent": "Kosztorys wysłany",
+      "budget_accepted": "Kosztorys zaakceptowany",
+      "budget_reminder": "Przypomnienie o kosztorysie",
+      "invoice_sent": "Faktura wysłana",
+      "recall_reminder": "Przypomnienie o wizycie kontrolnej",
+      "welcome": "Powitanie"
+    },
+    "onboarding": {
+      "label": "Połącz WhatsApp",
+      "description": "Gabinet preferuje WhatsApp, ale Kapso nie jest jeszcze połączone."
+    }
   }
 }

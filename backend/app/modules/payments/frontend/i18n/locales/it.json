@@ -282,7 +282,8 @@
       "drilldown": {
         "viewPayments": "Vedi i pagamenti del periodo",
         "viewPatients": "Vedi i pazienti con debito"
-      }
+      },
+      "loadError": "Impossibile caricare i report."
     },
     "target": {
       "label": "Applica a",
@@ -298,6 +299,10 @@
       "submit": "Assegna",
       "success": "Pagamento assegnato al preventivo",
       "error": "Impossibile riassegnare il pagamento. Riprova."
+    },
+    "followup": {
+      "collect": "Incassa pagamento",
+      "collected": "Pagamento registrato."
     }
   }
 }

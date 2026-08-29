@@ -124,6 +124,10 @@
       "body": "Po tym zabiegu sugerujemy wizytę kontrolną w {month} ({reason}).",
       "create": "Utwórz wizytę kontrolną",
       "dismiss": "Odrzuć"
+    },
+    "confirms": {
+      "cancel": "Anulować tę wizytę kontrolną? Cykl zostanie zakończony i nie można tego cofnąć.",
+      "done": "Oznaczyć tę wizytę kontrolną jako wykonaną? Zamknie to bieżący cykl."
     }
   }
 }

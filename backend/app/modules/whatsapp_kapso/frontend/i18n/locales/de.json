@@ -33,6 +33,21 @@
     "saved": "Einstellungen gespeichert",
     "saveError": "Speichern nicht möglich",
     "synced": "{n} Vorlagen synchronisiert",
-    "syncError": "Synchronisierung nicht möglich"
+    "syncError": "Synchronisierung nicht möglich",
+    "types": {
+      "appointment_confirmation": "Terminbestätigung",
+      "appointment_reminder": "Terminerinnerung",
+      "appointment_cancelled": "Terminabsage",
+      "budget_sent": "Kostenvoranschlag gesendet",
+      "budget_accepted": "Kostenvoranschlag angenommen",
+      "budget_reminder": "Kostenvoranschlag-Erinnerung",
+      "invoice_sent": "Rechnung gesendet",
+      "recall_reminder": "Recall-Erinnerung",
+      "welcome": "Willkommen"
+    },
+    "onboarding": {
+      "label": "WhatsApp verbinden",
+      "description": "Die Praxis bevorzugt WhatsApp, aber Kapso ist noch nicht verbunden."
+    }
   }
 }
