@@ -84,5 +84,9 @@ class IntegrationsModule(BaseModule):
 
         return {
             EventType.PATIENT_CREATED: IntegrationsHandlers.on_patient_created,
+            EventType.APPOINTMENT_SCHEDULED: IntegrationsHandlers.on_appointment_scheduled,
             EventType.APPOINTMENT_COMPLETED: IntegrationsHandlers.on_appointment_completed,
+            EventType.APPOINTMENT_CANCELLED: IntegrationsHandlers.on_appointment_cancelled,
+            EventType.BUDGET_ACCEPTED: IntegrationsHandlers.on_budget_accepted,
+            EventType.INVOICE_SENT: IntegrationsHandlers.on_invoice_sent,
         }

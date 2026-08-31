@@ -50,6 +50,7 @@ class WebhookGateway:
         clinic_id: UUID,
         event_type: str,
         payload: dict[str, Any],
+        event_id: UUID | None = None,
     ) -> list[WebhookDelivery]:
         """Queue one delivery per active subscription matching ``event_type``.
 
@@ -73,6 +74,7 @@ class WebhookGateway:
                 subscription_id=sub.id,
                 clinic_id=clinic_id,
                 event_type=event_type,
+                event_id=event_id,
                 payload=payload,
                 status="queued",
                 next_attempt_at=datetime.now(UTC),
@@ -146,6 +148,10 @@ class WebhookGateway:
         body = json.dumps(
             {
                 "event": delivery.event_type,
+                # Stable across subscribers of the same event — the dedupe
+                # key (#65 §1). Pre-int_0003 rows fall back to the
+                # per-delivery id, which is still stable across retries.
+                "event_id": str(delivery.event_id or delivery.id),
                 "delivery_id": str(delivery.id),
                 "data": delivery.payload,
             },

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- feat(#65): the three flagged Phase-1 follow-ups — (1) **public read API** under `/api/v1/integrations/public/` consuming the `dp_` bearer tokens with per-scope authorization (`/ping` introspection for Zapier auth tests, patient search by phone/email/NIF/name + read, curated response shape, rate-limited); (2) **stable `event_id`** generated once per event and shared across every subscriber's delivery (payload top-level field; `int_0003` column, legacy rows fall back to the delivery id); (3) **trigger catalog expanded** to 6 events (`appointment.scheduled`/`.cancelled`, `budget.accepted`, `invoice.sent` join the original two), each with a frozen sample payload served by `GET /webhooks/triggers` and pinned by test.
+
 - Initial module (Phase 1 of issue #65): webhook subscription CRUD,
   outbox-backed delivery with retry/backoff/auto-disable, Stripe-style
   HMAC-SHA256 signing, and one working trigger (`patient.created`).

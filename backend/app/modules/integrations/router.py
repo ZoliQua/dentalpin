@@ -23,15 +23,24 @@ from .schemas import (
     ApiTokenCreate,
     ApiTokenCreated,
     ApiTokenResponse,
+    TriggerInfo,
     WebhookSubscriptionCreate,
     WebhookSubscriptionCreated,
     WebhookSubscriptionResponse,
     WebhookSubscriptionUpdate,
 )
 from .service import IntegrationsService
+from .triggers import SAMPLE_PAYLOADS
 from .url_safety import UnsafeWebhookURLError
 
 router = APIRouter()
+
+# Token-authenticated public read surface (issue #65 §2/§5) — a separate
+# file because its auth model (dp_ bearer tokens) is different from the
+# JWT-gated admin CRUD below.
+from .public_router import public_router  # noqa: E402
+
+router.include_router(public_router, prefix="/public")
 
 
 async def _get_owned_subscription(db: AsyncSession, clinic_id: UUID, subscription_id: UUID):
@@ -167,3 +176,21 @@ async def revoke_token(
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Token already revoked")
     token = await IntegrationsService.revoke_token(db, token)
     return ApiResponse(data=ApiTokenResponse.model_validate(token))
+
+
+@router.get("/webhooks/triggers", response_model=ApiResponse[list[TriggerInfo]])
+async def list_triggers(
+    ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
+    _: Annotated[None, Depends(require_permission("integrations.subscriptions.read"))],
+) -> ApiResponse[list[TriggerInfo]]:
+    """The subscribable trigger catalog with its frozen sample payloads.
+
+    What a Zapier/Make app (or the admin UI's picker) reads to know
+    which events exist and what fields each one carries.
+    """
+    return ApiResponse(
+        data=[
+            TriggerInfo(event_type=event_type, sample_payload=sample)
+            for event_type, sample in sorted(SAMPLE_PAYLOADS.items())
+        ]
+    )

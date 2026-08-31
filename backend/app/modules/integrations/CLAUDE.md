@@ -1,12 +1,12 @@
 # integrations module
 
-Webhook subscriptions (REST Hooks) for third-party automations — issue
-#65. Phase 1: subscription CRUD, outbox-backed delivery with
-retry/backoff/auto-disable, Stripe-style HMAC signing, two working
-triggers (`patient.created`, `appointment.completed`), and API
-tokens. The public data-read API that will authenticate with those
-tokens, the full trigger catalog, and the Zapier/Make/n8n
-integrations are follow-up PRs, not in this module yet.
+Webhook subscriptions (REST Hooks) + the token-authenticated public
+read API for third-party automations — issue #65. Subscription CRUD,
+outbox-backed delivery with retry/backoff/auto-disable, Stripe-style
+HMAC signing, six triggers with frozen sample payloads, API tokens,
+and `/api/v1/integrations/public/*` consuming those tokens. The
+Zapier/Make/n8n apps themselves are follow-up work outside this
+module.
 
 ## What it does
 
@@ -17,12 +17,31 @@ subscriptions` and `/api/v1/integrations/tokens` (JWT +
 to one or more event types with a target URL; the module signs and
 delivers a JSON payload to that URL whenever a subscribed event fires.
 A clinic can also issue bearer API tokens (name + scopes), shown once
-on creation, revocable — no endpoint consumes them yet.
+on creation, revocable — consumed by the public read API below.
 
-Every payload carries `occurred_at`, but there's no frozen sample
-payload per trigger yet and no event id stable across subscribers
-(`WebhookDelivery.id` is per-subscription) — both are follow-up work
-(issue #65 §3), not in Phase 1.
+Every payload carries `occurred_at` and a top-level `event_id` that is
+**stable across subscribers** of the same event (generated once in
+`handlers._enqueue`; `WebhookDelivery.event_id`, `int_0003`) — the
+receiver's dedupe key. Each supported trigger has a frozen sample
+payload in `triggers.SAMPLE_PAYLOADS`, served by
+`GET /webhooks/triggers` and pinned to the catalog by test; treat the
+sample keys as a public contract (renames are breaking).
+
+## Public read API
+
+`public_router.py`, mounted at `/api/v1/integrations/public/`. Auth is
+`Authorization: Bearer dp_…` (SHA-256 hash lookup, revoked check,
+`last_used_at` stamped) — **not** JWT, so `require_permission` never
+applies; the token's `scopes` list authorizes instead
+(`patients:read`). Endpoints: `/ping` (introspection — Zapier's auth
+test), `/patients` search (phone/email/NIF format-tolerant match, `q`
+name substring — powers find-or-create), `/patients/{id}`. Responses
+use a curated `PublicPatientResponse`, narrower than the internal
+shape, and are rate-limited (120/minute). Importing
+`patients.models` is legal — `patients` is in `manifest.depends`.
+A trigger may only be added for an event whose publisher passes
+`db=` (the bus hard-raises otherwise, ADR 0019) — that is why
+`patient.updated` / `payment.recorded` are still out.
 
 ## Outbox
 

@@ -12,16 +12,16 @@ Maintained by `backend/scripts/generate_catalogs.py`.
 |-------|----------|------------|-------------|
 | `agenda.visit_note_updated` | `EventType.AGENDA_VISIT_NOTE_UPDATED` | `agenda` | `patient_timeline` |
 | `appointment.cabinet_changed` | `EventType.APPOINTMENT_CABINET_CHANGED` | `agenda` | — |
-| `appointment.cancelled` | `EventType.APPOINTMENT_CANCELLED` | `agenda` | `activity_journal`, `copilot`, `notifications`, `patient_timeline`, `recalls`, `schedules` |
+| `appointment.cancelled` | `EventType.APPOINTMENT_CANCELLED` | `agenda` | `activity_journal`, `copilot`, `integrations`, `notifications`, `patient_timeline`, `recalls`, `schedules` |
 | `appointment.checked_in` | `EventType.APPOINTMENT_CHECKED_IN` | `agenda` | `activity_journal`, `patient_timeline` |
 | `appointment.completed` | `EventType.APPOINTMENT_COMPLETED` | `agenda` | `activity_journal`, `integrations`, `patient_timeline`, `recalls`, `treatment_plan` |
 | `appointment.confirmed` | `EventType.APPOINTMENT_CONFIRMED` | `agenda` | `activity_journal`, `patient_timeline` |
 | `appointment.in_treatment` | `EventType.APPOINTMENT_IN_TREATMENT` | `agenda` | `activity_journal`, `patient_timeline` |
 | `appointment.no_show` | `EventType.APPOINTMENT_NO_SHOW` | `agenda` | `activity_journal`, `patient_timeline` |
-| `appointment.scheduled` | `EventType.APPOINTMENT_SCHEDULED` | `agenda` | `activity_journal`, `notifications`, `patient_timeline`, `recalls`, `schedules` |
+| `appointment.scheduled` | `EventType.APPOINTMENT_SCHEDULED` | `agenda` | `activity_journal`, `integrations`, `notifications`, `patient_timeline`, `recalls`, `schedules` |
 | `appointment.status_changed` | `EventType.APPOINTMENT_STATUS_CHANGED` | `agenda` | — |
 | `appointment.updated` | `EventType.APPOINTMENT_UPDATED` | `agenda` | `schedules` |
-| `budget.accepted` | `EventType.BUDGET_ACCEPTED` | `budget` | `activity_journal`, `notifications`, `patient_timeline`, `treatment_plan` |
+| `budget.accepted` | `EventType.BUDGET_ACCEPTED` | `budget` | `activity_journal`, `integrations`, `notifications`, `patient_timeline`, `treatment_plan` |
 | `budget.cancelled` | `EventType.BUDGET_CANCELLED` | `budget` | `activity_journal`, `treatment_plan` |
 | `budget.created` | `EventType.BUDGET_CREATED` | — | — |
 | `budget.expired` | `EventType.BUDGET_EXPIRED` | `budget` | `patient_timeline` |
@@ -55,7 +55,7 @@ Maintained by `backend/scripts/generate_catalogs.py`.
 | `invoice.issued` | `EventType.INVOICE_ISSUED` | `billing` | `patient_timeline` |
 | `invoice.paid` | `EventType.INVOICE_PAID` | `billing` | `patient_timeline`, `verifactu` |
 | `invoice.partial_paid` | `EventType.INVOICE_PARTIAL_PAID` | — | — |
-| `invoice.sent` | `EventType.INVOICE_SENT` | `billing` | `activity_journal`, `notifications` |
+| `invoice.sent` | `EventType.INVOICE_SENT` | `billing` | `activity_journal`, `integrations`, `notifications` |
 | `invoice.voided` | `EventType.INVOICE_VOIDED` | — | — |
 | `lab_order.status_changed` | `EventType.LAB_ORDER_STATUS_CHANGED` | `lab_orders` | `activity_journal` |
 | `media.attachment_linked` | `EventType.ATTACHMENT_LINKED` | `media` | — |
@@ -137,6 +137,7 @@ Maintained by `backend/scripts/generate_catalogs.py`.
 - **Subscribers:**
   - `activity_journal`
   - `copilot`
+  - `integrations`
   - `notifications`
   - `patient_timeline`
   - `recalls`
@@ -197,6 +198,7 @@ Maintained by `backend/scripts/generate_catalogs.py`.
   - `agenda` — `backend/app/modules/agenda/service.py:483`
 - **Subscribers:**
   - `activity_journal`
+  - `integrations`
   - `notifications`
   - `patient_timeline`
   - `recalls`
@@ -224,6 +226,7 @@ Maintained by `backend/scripts/generate_catalogs.py`.
   - `budget` — `backend/app/modules/budget/workflow.py:324`
 - **Subscribers:**
   - `activity_journal`
+  - `integrations`
   - `notifications`
   - `patient_timeline`
   - `treatment_plan`
@@ -488,6 +491,7 @@ Maintained by `backend/scripts/generate_catalogs.py`.
   - `billing` — `backend/app/modules/billing/router.py:712`
 - **Subscribers:**
   - `activity_journal`
+  - `integrations`
   - `notifications`
 
 ### `invoice.voided`

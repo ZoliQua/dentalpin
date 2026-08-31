@@ -11,7 +11,7 @@ resolver (see ``url_safety.py``). It's validated in ``service.py``
 instead, at create/update, before the row is written.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
@@ -107,3 +107,34 @@ class ApiTokenCreated(ApiTokenResponse):
     """Create response only — carries the plaintext token exactly once."""
 
     token: str = Field(description="Shown once. Store it now; it cannot be retrieved again.")
+
+
+class TriggerInfo(BaseModel):
+    """One row of the public trigger catalog (issue #65 §3)."""
+
+    event_type: str
+    sample_payload: dict
+
+
+class PublicTokenInfo(BaseModel):
+    """Token introspection for /public/ping (Zapier's auth test)."""
+
+    clinic_id: UUID
+    token_name: str
+    scopes: list[str]
+
+
+class PublicPatientResponse(BaseModel):
+    """Curated public shape — deliberately narrower than the internal
+    PatientResponse. Adding a field is fine; renaming/removing one is a
+    breaking change to every integration in the wild."""
+
+    id: UUID
+    first_name: str
+    last_name: str
+    phone: str | None
+    email: str | None
+    national_id: str | None
+    date_of_birth: date | None
+    status: str
+    created_at: datetime

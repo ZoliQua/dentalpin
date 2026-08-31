@@ -81,6 +81,11 @@ class WebhookDelivery(Base, TimestampMixin):
     clinic_id: Mapped[UUID] = mapped_column(ForeignKey("clinics.id"), index=True)
 
     event_type: Mapped[str] = mapped_column(String(100), index=True)
+    # One id per *event*, shared across every subscription's delivery row
+    # for that event, so receivers can dedupe (issue #65 §1). Nullable:
+    # rows queued before int_0003 have none — the dispatcher falls back
+    # to the per-delivery id for those.
+    event_id: Mapped[UUID | None] = mapped_column(UUID(as_uuid=True), default=None, index=True)
     payload: Mapped[dict] = mapped_column(JSONB)
 
     status: Mapped[str] = mapped_column(

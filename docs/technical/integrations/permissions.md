@@ -30,3 +30,17 @@ See `backend/app/core/auth/permissions.py` for the canonical role table.
 3. Add a row to the table above.
 4. Annotate the endpoint(s) with `Depends(require_permission(...))`.
 5. Update `frontend/app/config/permissions.ts` if it gates UI.
+
+## Trigger catalog
+
+`GET /api/v1/integrations/webhooks/triggers` is gated by
+`integrations.subscriptions.read` and serves the supported event types
+with their frozen sample payloads.
+
+## Public API (token-authenticated, no RBAC permission)
+
+`/api/v1/integrations/public/*` authenticates with `dp_` bearer tokens
+(`Authorization: Bearer dp_…`), not JWT — RBAC permissions do not apply.
+Authorization is the token's `scopes` list (`patients:read` gates the
+patient search/read endpoints; `/public/ping` needs a valid token only).
+Rate-limited per client (120/minute).
