@@ -37,6 +37,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `patients_clinical` | 0.1.0 | official | patients | auto | no | 4 | 1 | 0 | yes |
 | `payments` | 0.1.0 | official | patients, budget | auto | no | 4 | 3 | 2 | yes |
 | `periodontogram` | 0.1.0 | official | patients, odontogram | manual | yes | 2 | 1 | 2 | yes |
+| `purchase_orders` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 3 | 0 | no |
 | `recall_reminders` | 0.1.0 | community | recalls, notifications, patients | manual | yes | 0 | 0 | 1 | yes |
 | `recalls` | 0.1.0 | official | patients, agenda | auto | yes | 3 | 4 | 5 | yes |
 | `reports` | 0.1.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 3 | 0 | 0 | yes |
@@ -698,6 +699,26 @@ SEPA periodontal charting — snapshots, probing sites, BoP/PI/CAL indices.
   - `odontogram.treatment.performed`
   - `patient.archived`
 - **Module CLAUDE.md:** [`backend/app/modules/periodontogram/CLAUDE.md`](../backend/app/modules/periodontogram/CLAUDE.md)
+
+### `purchase_orders` — v0.1.0
+
+Purchase orders with receiving, quality checks and PDF export.
+
+- **Author:** lamanji
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `contacts`, `inventory`, `suppliers`
+- **Frontend layer:** —
+- **Permissions:**
+  - `purchase_orders.read`
+  - `purchase_orders.write`
+- **Events emitted:**
+  - `purchase_order.created`
+  - `purchase_order.received`
+  - `purchase_order.status_changed`
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/purchase_orders/CLAUDE.md`](../backend/app/modules/purchase_orders/CLAUDE.md)
 
 ### `recall_reminders` — v0.1.0
 
