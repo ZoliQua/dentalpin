@@ -19,6 +19,7 @@ import asyncpg
 import pytest
 
 from app.config import settings
+from tests.modules._roundtrip_depends import dependent_tables
 
 pytestmark = pytest.mark.alembic_roundtrip
 
@@ -31,6 +32,7 @@ PO_TABLES = {
     "purchase_receipts",
     "purchase_receipt_lines",
 }
+PO_HEAD = "po_0001"
 
 
 def _alembic(*args: str) -> None:
@@ -70,8 +72,11 @@ def test_purchase_orders_uninstall_roundtrip_is_branch_scoped() -> None:
     after_down = _list_tables()
     assert PO_TABLES.isdisjoint(after_down), "purchase_orders tables still present after downgrade"
 
-    other_tables = before - PO_TABLES
-    assert other_tables.issubset(after_down), "downgrade leaked beyond purchase_orders branch"
+    expected_gone = PO_TABLES | dependent_tables(PO_HEAD)
+    baseline = before - expected_gone
+    assert baseline <= after_down, (
+        f"downgrade leaked beyond purchase_orders branch (missing: {baseline - after_down})"
+    )
 
     _alembic("upgrade", "heads")
     after_up = _list_tables()
