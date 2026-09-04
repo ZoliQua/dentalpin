@@ -10,8 +10,8 @@ Returned by `PurchaseOrdersModule.get_permissions()`
 
 | Permission | Allows | Required by |
 |------------|--------|-------------|
-| `purchase_orders.read` | List and view purchase orders, their receipts, and the PDF export | `GET /api/v1/purchase-orders`, `GET /api/v1/purchase-orders/{id}`, `GET /api/v1/purchase-orders/{id}/receipts`, `GET /api/v1/purchase-orders/{id}/receipts/{rid}`, `GET /api/v1/purchase-orders/{id}/pdf` |
-| `purchase_orders.write` | Create, edit, transition status, or receive a purchase order | `POST /api/v1/purchase-orders`, `PATCH /api/v1/purchase-orders/{id}`, `POST /api/v1/purchase-orders/{id}/status`, `POST /api/v1/purchase-orders/{id}/receive` |
+| `purchase_orders.read` | List and view purchase orders, their receipts, and the PDF export | `GET /api/v1/purchase_orders`, `GET /api/v1/purchase_orders/{id}`, `GET /api/v1/purchase_orders/{id}/receipts`, `GET /api/v1/purchase_orders/{id}/receipts/{rid}`, `GET /api/v1/purchase_orders/{id}/pdf` |
+| `purchase_orders.write` | Create, edit, transition status, or receive a purchase order | `POST /api/v1/purchase_orders`, `PATCH /api/v1/purchase_orders/{id}`, `POST /api/v1/purchase_orders/{id}/status`, `POST /api/v1/purchase_orders/{id}/receive` |
 
 ## Role assignment
 

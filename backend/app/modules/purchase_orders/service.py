@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -305,11 +305,15 @@ class PurchaseOrderService:
         payload: PurchaseReceiptCreate,
         received_by: UUID | None,
     ) -> PurchaseOrder:
-        """Batch-receive a delivery; only ``good`` lines move stock.
+        """Batch-receive a delivery; only ``good`` units move stock and fulfil.
+
+        ``rejected`` units are recorded on the receipt (audit trail) but do
+        not count towards ``quantity_received``: the line stays open so the
+        replacement can be received later.
 
         The whole batch is one transaction: the receipt rows, the per-line
         good stock movements (``reason='purchase_receipt'`` through
-        ``InventoryService._apply_movement``) and the auto-transition to
+        ``InventoryService.apply_movement``) and the auto-transition to
         ``received`` when every line fulfils all commit or roll back
         together.
         """
@@ -358,9 +362,9 @@ class PurchaseOrderService:
                     quality=entry.quality,
                 )
             )
-            line.quantity_received += entry.quantity_received
             if entry.quality == "good":
-                updated, _applied = await InventoryService._apply_movement(
+                line.quantity_received += entry.quantity_received
+                updated, _applied = await InventoryService.apply_movement(
                     db,
                     clinic_id=clinic_id,
                     item_id=line.inventory_item_id,
@@ -390,7 +394,7 @@ class PurchaseOrderService:
         old_status = order.status
         if fully_received:
             order.status = "received"
-            order.received_at = datetime.utcnow()
+            order.received_at = datetime.now(UTC)
 
         await db.flush()
         await event_bus.publish(

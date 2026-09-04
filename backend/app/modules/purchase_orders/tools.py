@@ -114,9 +114,8 @@ async def _create_purchase_order(ctx: AgentContext, params: CreatePurchaseOrderA
             for item_id, quantity in zip(params.line_item_ids, params.line_quantities)
         ],
     )
-    order = await PurchaseOrderService.create_order(
-        ctx.db, ctx.clinic_id, payload, created_by=ctx.user_id
-    )
+    # AgentContext carries no acting user (agent_id/session_id only).
+    order = await PurchaseOrderService.create_order(ctx.db, ctx.clinic_id, payload, created_by=None)
     return _order_summary(await _get_response(ctx, order.id))
 
 
@@ -146,7 +145,7 @@ async def _receive_purchase_order(ctx: AgentContext, params: ReceivePurchaseOrde
         ]
     )
     order = await PurchaseOrderService.receive_order(
-        ctx.db, ctx.clinic_id, UUID(params.order_id), payload, received_by=ctx.user_id
+        ctx.db, ctx.clinic_id, UUID(params.order_id), payload, received_by=None
     )
     return _order_summary(await _get_response(ctx, order.id))
 

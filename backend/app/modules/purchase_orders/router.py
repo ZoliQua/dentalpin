@@ -1,4 +1,4 @@
-"""purchase_orders HTTP surface — mounted at ``/api/v1/purchase-orders/``."""
+"""purchase_orders HTTP surface — mounted at ``/api/v1/purchase_orders/``."""
 
 from __future__ import annotations
 

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Review fixes: rejected units no longer count towards `quantity_received`
+  (the line stays open for the replacement); PDF shows supplier name and
+  PO reference and escapes user text; agent tools no longer read a
+  `user_id` that `AgentContext` does not carry; `received_at` is tz-aware.
+
 - Initial module (roadmap issue #227-3): procurement purchase orders with
   a full lifecycle (`draft -> sent -> confirmed -> received|cancelled`) and
   batch receiving.
@@ -12,14 +17,14 @@
   validation at creation, duplicate-item guard, explicit status
   transitions with an allowed-matrix (409 on invalid moves), batch
   receiving where only `good` lines move stock (via
-  `InventoryService._apply_movement`, `reason='purchase_receipt'`,
+  `InventoryService.apply_movement`, `reason='purchase_receipt'`,
   idempotent per receipt), over-receipt guard, auto-stamp of
   `received_at` when every line fulfils, and a lock on editing received
   orders.
 - Batch receive is one transaction: receipt rows, good-line stock
   movements and the auto-transition commit or roll back together
   (ADR 0019).
-- Self-contained WeasyPrint PDF export (`GET /purchase-orders/{id}/pdf`,
+- Self-contained WeasyPrint PDF export (`GET /purchase_orders/{id}/pdf`,
   en/es labels, clinic currency, DRAFT watermark for draft orders).
 - RBAC mirrors `suppliers`: admin wildcard; dentist/hygienist
   read-only; assistant/receptionist read+write.

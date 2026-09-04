@@ -7,17 +7,17 @@ deliveries with quality checks, and exports PDFs. Consumed by
 
 ## Public API
 
-Routes mounted at `/api/v1/purchase-orders/`.
+Routes mounted at `/api/v1/purchase_orders/`.
 
-- `GET    /purchase-orders`           — list, filterable by `order_status` / `supplier_id`, paginated; `purchase_orders.read`
-- `GET    /purchase-orders/{id}`      — order + lines + supplier/item names; `purchase_orders.read`
-- `POST   /purchase-orders`           — create a `draft` order (201); `purchase_orders.write`
-- `PATCH  /purchase-orders/{id}`      — edit `expected_date` / `notes` (lock: 409 once received); `purchase_orders.write`
-- `POST   /purchase-orders/{id}/status` — explicit transition; 409 on invalid moves; `purchase_orders.write`
-- `POST   /purchase-orders/{id}/receive` — batch receive; only `good` lines move stock; `purchase_orders.write`
-- `GET    /purchase-orders/{id}/receipts`          — receipt batches; `purchase_orders.read`
-- `GET    /purchase-orders/{id}/receipts/{rid}`    — one batch with line quality; `purchase_orders.read`
-- `GET    /purchase-orders/{id}/pdf`   — WeasyPrint PDF (self-contained, en/es, clinic currency); `purchase_orders.read`
+- `GET    /purchase_orders`           — list, filterable by `order_status` / `supplier_id`, paginated; `purchase_orders.read`
+- `GET    /purchase_orders/{id}`      — order + lines + supplier/item names; `purchase_orders.read`
+- `POST   /purchase_orders`           — create a `draft` order (201); `purchase_orders.write`
+- `PATCH  /purchase_orders/{id}`      — edit `expected_date` / `notes` (lock: 409 once received); `purchase_orders.write`
+- `POST   /purchase_orders/{id}/status` — explicit transition; 409 on invalid moves; `purchase_orders.write`
+- `POST   /purchase_orders/{id}/receive` — batch receive; only `good` lines move stock; `purchase_orders.write`
+- `GET    /purchase_orders/{id}/receipts`          — receipt batches; `purchase_orders.read`
+- `GET    /purchase_orders/{id}/receipts/{rid}`    — one batch with line quality; `purchase_orders.read`
+- `GET    /purchase_orders/{id}/pdf`   — WeasyPrint PDF (self-contained, en/es, clinic currency); `purchase_orders.read`
 
 ### Status lifecycle
 
@@ -53,14 +53,16 @@ depending on `contacts@con_0001` + `inventory@inv_0002`.
 
 ## Stock integration
 
-Receiving calls `InventoryService._apply_movement` directly (the single
+Receiving calls `InventoryService.apply_movement` directly (the single
 quantity-change write path in inventory, which appends the
 `stock_movements` ledger row under the same row lock):
 
 - `reason='purchase_receipt'`, `reference_type='purchase_receipt'`,
   `reference_id=<receipt.id>` — the ledger back-references the batch.
-- Only `quality='good'` quantities are applied. `rejected` quantifies
-  nothing yet; supplier_ratings (#227-5) is the venue for deductions.
+- Only `quality='good'` units move stock **and** count towards the line's
+  `quantity_received`. `rejected` units are recorded on the receipt line
+  (audit trail) but leave the line open, so the replacement delivery can be
+  received; supplier_ratings (#227-5) is the venue for deductions.
 - The whole batch is one transaction: receipt + lines + stock movements +
   the auto `received` transition commit or roll back together (ADR 0019).
 
@@ -68,7 +70,7 @@ quantity-change write path in inventory, which appends the
 
 `manifest.depends = ["contacts", "inventory", "suppliers"]` — imports
 `Contact` (supplier validation + name denormalization), `InventoryItem`
-and `InventoryService._apply_movement`.
+and `InventoryService.apply_movement`.
 
 ## Permissions
 

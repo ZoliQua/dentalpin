@@ -52,6 +52,8 @@ class PurchaseOrderLine(Base):
     )
 
     quantity_ordered: Mapped[Decimal] = mapped_column(Numeric(12, 2))
+    # Accepted (quality='good') units only; rejected units live on the
+    # receipt lines and keep the line open for a replacement delivery.
     quantity_received: Mapped[Decimal] = mapped_column(
         Numeric(12, 2), default=0, server_default="0"
     )

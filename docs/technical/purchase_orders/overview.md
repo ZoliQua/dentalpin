@@ -11,21 +11,21 @@ receives partial deliveries with quality checks, and exports PDFs.
 
 ## What it is
 
-Authenticated endpoints under `/api/v1/purchase-orders/` (JWT + RBAC). A
+Authenticated endpoints under `/api/v1/purchase_orders/` (JWT + RBAC). A
 clinic places an order for inventory items, moves it through
 `draft -> sent -> confirmed -> received|cancelled`, and receives delivery
 batches where only `good` lines move stock.
 
 Routes:
-- `GET /api/v1/purchase-orders` — list, filterable by `order_status`/`supplier_id`
-- `GET /api/v1/purchase-orders/{id}` — order + lines + supplier/item names
-- `POST /api/v1/purchase-orders` — create a `draft` order (201)
-- `PATCH /api/v1/purchase-orders/{id}` — edit `expected_date`/`notes` (409 once received)
-- `POST /api/v1/purchase-orders/{id}/status` — explicit status transition (409 on invalid moves)
-- `POST /api/v1/purchase-orders/{id}/receive` — batch receive; only `good` lines move stock
-- `GET /api/v1/purchase-orders/{id}/receipts` — receipt batches
-- `GET /api/v1/purchase-orders/{id}/receipts/{rid}` — one batch with line quality
-- `GET /api/v1/purchase-orders/{id}/pdf` — WeasyPrint PDF (en/es, clinic currency)
+- `GET /api/v1/purchase_orders` — list, filterable by `order_status`/`supplier_id`
+- `GET /api/v1/purchase_orders/{id}` — order + lines + supplier/item names
+- `POST /api/v1/purchase_orders` — create a `draft` order (201)
+- `PATCH /api/v1/purchase_orders/{id}` — edit `expected_date`/`notes` (409 once received)
+- `POST /api/v1/purchase_orders/{id}/status` — explicit status transition (409 on invalid moves)
+- `POST /api/v1/purchase_orders/{id}/receive` — batch receive; only `good` lines move stock
+- `GET /api/v1/purchase_orders/{id}/receipts` — receipt batches
+- `GET /api/v1/purchase_orders/{id}/receipts/{rid}` — one batch with line quality
+- `GET /api/v1/purchase_orders/{id}/pdf` — WeasyPrint PDF (en/es, clinic currency)
 
 ### Status lifecycle
 
@@ -50,7 +50,8 @@ manual "mark received" escape hatch.
 - `purchase_receipts` — a delivery batch against a PO (partial receives
   supported; `received_at` server-stamped, `received_by`).
 - `purchase_receipt_lines` — per-line `quantity_received` + `quality`
-  (`good` | `rejected`). Rejected units never touch the inventory ledger.
+  (`good` | `rejected`). Rejected units never touch the inventory ledger
+  and do not fulfil the PO line: the order stays open for the replacement.
 
 Migration: `po_0001_initial` on own Alembic branch (`purchase_orders`),
 depending on `contacts@con_0001` + `inventory@inv_0002`.

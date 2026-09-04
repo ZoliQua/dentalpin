@@ -86,7 +86,8 @@ async def test_lifecycle_and_receiving(db_session: AsyncSession, test_clinic: Cl
     )
     assert order.status == "confirmed"
 
-    # Full receipt: good moves stock; rejected does not; order auto-completes.
+    # 7 good + 3 rejected: good moves stock, rejected neither moves stock nor
+    # fulfils the line, so the order stays open for the replacement.
     line = await _line_of(db_session, test_clinic.id, order.id)
     item_before = await InventoryService.get_item(db_session, test_clinic.id, item.id)
     assert item_before.stock_quantity == 0
@@ -111,14 +112,14 @@ async def test_lifecycle_and_receiving(db_session: AsyncSession, test_clinic: Cl
         ),
         received_by=None,
     )
-    assert order.status == "received"
-    assert order.received_at is not None
+    assert order.status == "confirmed"  # 3 rejected units still outstanding
+    assert order.received_at is None
 
     item_after = await InventoryService.get_item(db_session, test_clinic.id, item.id)
     assert item_after.stock_quantity == 7  # only the good 7 hit stock
 
     line = await _line_of(db_session, test_clinic.id, order.id)
-    assert line.quantity_received == 10
+    assert line.quantity_received == 7  # accepted units only
 
     receipts = await PurchaseOrderService.list_receipts(db_session, test_clinic.id, order.id)
     assert len(receipts) == 1
@@ -126,6 +127,29 @@ async def test_lifecycle_and_receiving(db_session: AsyncSession, test_clinic: Cl
         db_session, test_clinic.id, receipts[0].id
     )
     assert len(receipt_response["lines"]) == 2
+    assert {ln["quality"] for ln in receipt_response["lines"]} == {"good", "rejected"}
+
+    # Replacement for the rejected units completes the order.
+    order = await PurchaseOrderService.receive_order(
+        db_session,
+        test_clinic.id,
+        order.id,
+        PurchaseReceiptCreate(
+            lines=[
+                ReceiptLineCreate(
+                    purchase_order_line_id=line.id,
+                    quantity_received=Decimal("3"),
+                    quality="good",
+                )
+            ]
+        ),
+        received_by=None,
+    )
+    assert order.status == "received"
+    assert order.received_at is not None
+    assert order.received_at.tzinfo is not None
+    item_final = await InventoryService.get_item(db_session, test_clinic.id, item.id)
+    assert item_final.stock_quantity == 10
 
 
 @pytest.mark.asyncio

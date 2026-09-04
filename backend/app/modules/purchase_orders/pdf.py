@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime
 from decimal import Decimal
+from html import escape
 from io import BytesIO
 from typing import TYPE_CHECKING
 
@@ -89,7 +90,7 @@ class PurchaseOrderPDFService:
             rows += f"""
                 <tr>
                     <td class="number">{idx}</td>
-                    <td>{line["item_name"]}</td>
+                    <td>{escape(line["item_name"])}</td>
                     <td class="qty">{line["quantity_ordered"]}</td>
                     <td class="qty">{line["quantity_received"]}</td>
                     <td class="price">{money(line["unit_price"] or Decimal("0"))}</td>
@@ -108,7 +109,7 @@ class PurchaseOrderPDFService:
 
         note_block = (
             f'<div class="notes-section"><div class="section-title">{labels["notes"]}</div>'
-            f'<div class="notes-content">{response["notes"]}</div></div>'
+            f'<div class="notes-content">{escape(response["notes"])}</div></div>'
             if response.get("notes")
             else ""
         )
@@ -181,11 +182,11 @@ class PurchaseOrderPDFService:
             {watermark}
             <div class="header">
                 <div class="clinic-info">
-                    <div class="clinic-name">{clinic.name if clinic else "Dental Clinic"}</div>
-                    <div class="clinic-details">{clinic.phone or ""}</div>
+                    <div class="clinic-name">{escape(clinic.name) if clinic else "Dental Clinic"}</div>
+                    <div class="clinic-details">{escape(clinic.phone or "")}</div>
                 </div>
                 <div class="po-info">
-                    <div class="po-number">{labels["po"]}</div>
+                    <div class="po-number">{labels["po"]} {str(response["id"])[:8].upper()}</div>
                     <div class="po-meta">
                         {labels["created_at"]}: {created}
                     </div>
@@ -196,6 +197,7 @@ class PurchaseOrderPDFService:
             <div class="section">
                 <div class="section-title">{labels["supplier"]}</div>
                 <div class="supplier">
+                    <div class="info-value">{escape(response["supplier_name"])}</div>
                     <div class="info-label">{labels["expected_date"]}</div>
                     <div class="info-value">{expected}</div>
                 </div>
