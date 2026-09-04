@@ -1,0 +1,24 @@
+{
+  "contacts": {
+    "title": "Kapcsolatok",
+    "add": "Kapcsolat hozzáadása",
+    "edit": "Kapcsolat szerkesztése",
+    "delete": "Kapcsolat törlése",
+    "deleteConfirm": "Inaktiválja a következőt: \"{name}\"? Eltűnik a címtárból, de a korábbi rekordokhoz kapcsolva marad.",
+    "name": "Név",
+    "type": "Típus",
+    "phone": "Telefon",
+    "email": "E-mail",
+    "address": "Cím",
+    "notes": "Megjegyzések",
+    "search": "Keresés a kapcsolatok között",
+    "filterByType": "Szűrés típus szerint",
+    "allTypes": "Minden típus",
+    "types": {
+      "lab": "Labor",
+      "supplier": "Beszállító",
+      "other": "Egyéb",
+      "delegate": "Képviselő"
+    }
+  }
+}

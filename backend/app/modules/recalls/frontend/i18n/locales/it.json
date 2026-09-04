@@ -126,8 +126,8 @@
       "dismiss": "Ignora"
     },
     "confirms": {
-      "cancel": "Annullare questo richiamo? Il ciclo verrà terminato e non potrà essere annullato.",
-      "done": "Contrassegnare questo richiamo come completato? Il ciclo verrà chiuso."
+      "cancel": "Annullare il richiamo per {name}? L'azione non può essere annullata.",
+      "done": "Segnare il richiamo per {name} come completato? Questo lo chiude per questo ciclo."
     }
   }
 }

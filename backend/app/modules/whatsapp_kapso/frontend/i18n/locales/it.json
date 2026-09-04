@@ -34,20 +34,20 @@
     "saveError": "Impossibile salvare",
     "synced": "Sincronizzati {n} modelli",
     "syncError": "Impossibile sincronizzare",
+    "onboarding": {
+      "label": "Invio WhatsApp",
+      "description": "WhatsApp è il canale preferito della clinica ma Kapso non è ancora connesso. Collegalo per permettere l'invio automatico dei messaggi."
+    },
     "types": {
       "appointment_confirmation": "Conferma appuntamento",
       "appointment_reminder": "Promemoria appuntamento",
-      "appointment_cancelled": "Appuntamento annullato",
+      "appointment_cancelled": "Cancellazione appuntamento",
       "budget_sent": "Preventivo inviato",
       "budget_accepted": "Preventivo accettato",
       "budget_reminder": "Promemoria preventivo",
       "invoice_sent": "Fattura inviata",
       "recall_reminder": "Promemoria richiamo",
       "welcome": "Benvenuto"
-    },
-    "onboarding": {
-      "label": "Collega WhatsApp",
-      "description": "Lo studio preferisce WhatsApp, ma Kapso non è ancora collegato."
     }
   }
 }

@@ -48,6 +48,13 @@ _CLINIC_CONCURRENCY = 5
 _SUBJECT = {
     "es": "Briefing del día — {clinic_name}",
     "en": "Daily briefing — {clinic_name}",
+    "fr": "Briefing du jour — {clinic_name}",
+    "pt": "Briefing do dia — {clinic_name}",
+    "ta": "இன்றைய சுருக்கம் — {clinic_name}",
+    "de": "Tagesbriefing — {clinic_name}",
+    "hu": "Napi összefoglaló — {clinic_name}",
+    "pl": "Poranne podsumowanie — {clinic_name}",
+    "it": "Briefing del giorno — {clinic_name}",
 }
 
 

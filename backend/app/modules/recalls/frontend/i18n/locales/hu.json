@@ -1,0 +1,133 @@
+{
+  "recalls": {
+    "title": "Visszahívások",
+    "callList": "Hívási lista",
+    "noRecallsThisMonth": "Ebben a hónapban nincs függőben lévő visszahívás",
+    "filters": {
+      "month": "Hónap",
+      "reason": "Ok",
+      "professional": "Kezelőorvos",
+      "status": "Állapot",
+      "priority": "Prioritás",
+      "overdue": "Lejártak mutatása",
+      "any": "Bármelyik",
+      "thisMonth": "Ez a hónap"
+    },
+    "counters": {
+      "due_this_week": "Ezen a héten esedékes",
+      "due_this_month": "Ebben a hónapban esedékes",
+      "overdue": "Lejárt",
+      "scheduled_this_month": "Beütemezve ebben a hónapban",
+      "completed_this_month": "Befejezve ebben a hónapban",
+      "conversion_rate": "Konverzió"
+    },
+    "setRecall": "Visszahívás beállítása",
+    "setRecallShort": "Visszahívás",
+    "history": "Visszahívási előzmények",
+    "viewAll": "Összes megtekintése",
+    "pillNext": "Következő visszahívás: {month} · {reason}",
+    "pillNone": "Nincs aktív visszahívás",
+    "reasons": {
+      "hygiene": "Szájhigiénia",
+      "checkup": "Kontrollvizsgálat",
+      "ortho_review": "Fogszabályozási kontroll",
+      "implant_review": "Implantátum-kontroll",
+      "post_op": "Posztoperatív kontroll",
+      "treatment_followup": "Kezelés utánkövetése",
+      "other": "Egyéb"
+    },
+    "priority": {
+      "low": "Alacsony",
+      "normal": "Normál",
+      "high": "Magas"
+    },
+    "status": {
+      "pending": "Függőben",
+      "contacted_no_answer": "Nem vette fel",
+      "contacted_scheduled": "Beütemezve",
+      "contacted_declined": "Elutasította",
+      "done": "Kész",
+      "cancelled": "Lemondva",
+      "needs_review": "Ellenőrzendő"
+    },
+    "confirms": {
+      "cancel": "Lemondja {name} visszahívását? Ez nem vonható vissza.",
+      "done": "Késznek jelöli {name} visszahívását? Ezzel lezárja erre a ciklusra."
+    },
+    "actions": {
+      "call": "Hívás",
+      "logAttempt": "Próbálkozás rögzítése",
+      "noAnswer": "Nem vette fel",
+      "book": "Időpont foglalása",
+      "snooze": "Elhalasztás",
+      "cancel": "Lemondás",
+      "markDone": "Késznek jelölés",
+      "exportCsv": "CSV exportálása",
+      "save": "Mentés"
+    },
+    "closeoutPrompt": {
+      "title": "Ütemezzünk visszahívást?",
+      "subtitle": "A páciens épp végzett — mikor hívjuk vissza?",
+      "skip": "Most nem"
+    },
+    "modal": {
+      "title": "Visszahívás beállítása",
+      "subtitle": "Jelölje meg a pácienst egy későbbi visszahíváshoz",
+      "patient": "Páciens",
+      "reason": "Ok",
+      "when": "Mikor",
+      "month": "Célhónap",
+      "targetMonth": "Célhónap",
+      "preciseDate": "Konkrét nap kiválasztása",
+      "priority": "Prioritás",
+      "assigned": "Hozzárendelt kezelőorvos",
+      "note": "Belső jegyzet",
+      "notePlaceholder": "Opcionális részlet (pl. „Tömés ellenőrzése a 47-esen”)",
+      "optional": "opcionális",
+      "duplicateGuard": "Ehhez a pácienshez és okhoz már létezik függőben lévő visszahívás. Az kerül frissítésre."
+    },
+    "doNotContact": {
+      "cannotSchedule": "A páciens „Nem kereshető” jelölést kapott. Visszahívás nem ütemezhető. A kapcsolatfelvétel újraengedélyezéséhez módosítsa a beállítást a páciens adatainál."
+    },
+    "activeRecallHint": "Aktív visszahívás · koppintson a kezeléséhez",
+    "logAttempt": {
+      "channel": "Csatorna",
+      "outcome": "Eredmény",
+      "note": "Jegyzet",
+      "submit": "Próbálkozás rögzítése"
+    },
+    "channel": {
+      "phone": "Telefon",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS",
+      "email": "E-mail"
+    },
+    "outcome": {
+      "no_answer": "Nem vette fel",
+      "voicemail": "Hangposta",
+      "scheduled": "Időpont lefoglalva",
+      "declined": "Elutasította",
+      "wrong_number": "Téves szám"
+    },
+    "snoozePrompt": "Hány hónappal halasztja el?",
+    "settings": {
+      "title": "Visszahívások",
+      "description": "Alapértelmezett időközök + kezeléskategóriák hozzárendelése",
+      "intervals": "Alapértelmezett időközök (hónap)",
+      "categoryMap": "Kezelés → ok",
+      "categoryKeyPlaceholder": "katalóguskategória kulcsa",
+      "autoSuggest": "Visszahívás javaslata kezelés befejezésekor",
+      "autoLink": "Beütemezett időpont összekapcsolása függőben lévő visszahívással",
+      "saved": "Beállítások elmentve"
+    },
+    "dashboard": {
+      "title": "Visszahívások"
+    },
+    "suggestion": {
+      "title": "Javasolt visszahívás",
+      "body": "E kezelés után visszahívást javaslunk ekkor: {month} ({reason}).",
+      "create": "Visszahívás létrehozása",
+      "dismiss": "Elvetés"
+    }
+  }
+}

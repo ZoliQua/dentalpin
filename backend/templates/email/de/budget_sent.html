@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Kostenvoranschlag - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ patient_name }},</h2>
+
+<p>anbei erhalten Sie den detaillierten Kostenvoranschlag für Ihre Zahnbehandlung.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Kostenvoranschlag Nr.</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Datum</div>
+            <div class="value">{{ budget_date }}</div>
+        </div>
+    </div>
+</div>
+
+{% if treatments %}
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+    <thead>
+        <tr style="border-bottom: 2px solid #e4e4e7;">
+            <th style="text-align: left; padding: 12px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #71717a;">Behandlung</th>
+            <th style="text-align: right; padding: 12px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #71717a;">Betrag</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for treatment in treatments %}
+        <tr style="border-bottom: 1px solid #f4f4f5;">
+            <td style="padding: 12px 0;">
+                <div style="font-weight: 500;">{{ treatment.name }}</div>
+                {% if treatment.tooth %}
+                <div style="font-size: 14px; color: #71717a;">Zahn: {{ treatment.tooth }}</div>
+                {% endif %}
+            </td>
+            <td style="text-align: right; padding: 12px 0;">{{ treatment.price }} €</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        {% if subtotal and total != subtotal %}
+        <tr>
+            <td style="padding: 12px 0; text-align: right; font-weight: 500;">Zwischensumme:</td>
+            <td style="padding: 12px 0; text-align: right;">{{ subtotal }} €</td>
+        </tr>
+        {% endif %}
+        {% if discount_amount %}
+        <tr>
+            <td style="padding: 12px 0; text-align: right; font-weight: 500; color: #22c55e;">Rabatt:</td>
+            <td style="padding: 12px 0; text-align: right; color: #22c55e;">-{{ discount_amount }} €</td>
+        </tr>
+        {% endif %}
+        <tr style="border-top: 2px solid #18181b;">
+            <td style="padding: 16px 0; text-align: right; font-size: 18px; font-weight: 600;">Gesamtbetrag:</td>
+            <td style="padding: 16px 0; text-align: right; font-size: 18px; font-weight: 600;">{{ total }} €</td>
+        </tr>
+    </tfoot>
+</table>
+{% endif %}
+
+{% if validity_days %}
+<div class="alert alert-info">
+    <strong>Gültigkeit:</strong> Dieser Kostenvoranschlag ist ab dem Ausstellungsdatum {{ validity_days }} Tage gültig.
+</div>
+{% endif %}
+
+{% if notes %}
+<p><strong>Anmerkungen:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Wenn Sie Fragen zum Kostenvoranschlag haben oder einen Behandlungstermin vereinbaren möchten, kontaktieren Sie uns gerne.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Kontakt aufnehmen</a>
+</div>
+{% endif %}
+
+<p>Wir stehen Ihnen gerne zur Verfügung.</p>
+{% endblock %}

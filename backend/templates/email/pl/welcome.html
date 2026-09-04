@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Witamy w {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Witamy, {{ patient_name }}!</h2>
+
+<p>Dziękujemy za rejestrację w {{ clinic_name }}. Cieszymy się, że możemy pomóc Ci zadbać o zdrowie jamy ustnej.</p>
+
+<div class="alert alert-success">
+    Twoja karta pacjenta została pomyślnie utworzona w naszym systemie.
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Co możesz teraz zrobić?</h3>
+
+<ul style="padding-left: 20px; color: #3f3f46;">
+    <li style="margin-bottom: 8px;">Umówić pierwszą wizytę konsultacyjną</li>
+    <li style="margin-bottom: 8px;">Zapoznać się z naszymi usługami i zabiegami</li>
+    <li style="margin-bottom: 8px;">Skontaktować się z nami w razie jakichkolwiek pytań</li>
+</ul>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Umów pierwszą wizytę</a>
+</div>
+{% endif %}
+
+<div class="info-box">
+    <div class="label">Godziny przyjęć</div>
+    <div class="value">{{ clinic_hours | default('Poniedziałek - piątek: 9:00 - 20:00') }}</div>
+</div>
+
+<p>W razie pytań skontaktuj się z nami. Jesteśmy tu, aby pomóc.</p>
+
+<p>Do zobaczenia!</p>
+{% endblock %}

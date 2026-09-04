@@ -1,0 +1,27 @@
+Tisztelt {{ admin_name }}!
+
+Az AEAT ELUTASÍTOTTA a(z) "{{ clinic_name }}" rendelő {{ invoice_number }} számú számlájának Verifactu rekordját.
+Amíg nem rendezi a hibát, nem tud új számlákat kiállítani (a lenyomatlánc sérülne).
+
+Számla: {{ invoice_number }}
+AEAT hibakód: {{ codigo_error or '—' }}
+Ok: {{ friendly_message }}
+
+Lépések:
+{% if suggested_cta == 'edit_clinic' -%}
+1. Nyissa meg a Beállítások → Rendelő menüpontot, és ellenőrizze a CIF/NIF azonosítót.
+2. Térjen vissza a Beállítások → Verifactu → Várólista oldalra, és kattintson az "Újragenerálás és újraküldés" gombra.
+{% elif suggested_cta == 'edit_billing_party' -%}
+1. Nyissa meg a(z) {{ invoice_number }} számú számlát, és kattintson a sávban az "Ügyféladatok szerkesztése" gombra.
+2. Mentés után a rekord automatikusan újraküldésre kerül.
+{% elif suggested_cta == 'edit_lines' -%}
+1. Ellenőrizze az ÁFA-hozzárendelést és a számla összegeit.
+2. Állítson ki helyesbítő számlát, ha a számla már ki volt fizetve.
+{% else -%}
+1. Nyissa meg a Beállítások → Verifactu → Várólista menüpontot a részletekért.
+2. Ha az ok nem egyértelmű, forduljon az ügyfélszolgálathoz, és mellékelje a hibakódot.
+{% endif %}
+
+{% if queue_url -%}
+Verifactu várólista: {{ queue_url }}
+{%- endif %}

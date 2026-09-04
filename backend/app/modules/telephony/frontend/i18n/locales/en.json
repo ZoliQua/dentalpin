@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Calls"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telephony (CTI)",
+      "description": "Pop incoming calls on screen and keep a call log — any PBX via webhook."
+    },
+    "gateway": "Gateway",
+    "receiving": "Receiving events",
+    "defaultCountry": "Default country",
+    "defaultCountryHelp": "Two-letter country code used to interpret local phone numbers (e.g. ES).",
+    "active": "Enabled",
+    "rotateSecret": "Rotate secret",
+    "webhook": "Event webhook",
+    "webhookHelp": "Configure your PBX or Zapier to POST normalized call events to this URL, signed with the secret.",
+    "secret": "Signing secret",
+    "secretShownOnce": "Copy this secret now — it is shown only once. Your PBX/automation signs each event with it (X-DentalPin-Signature).",
+    "copy": "Copy",
+    "copied": "Copied to clipboard",
+    "saved": "Settings saved",
+    "saveError": "Could not save the settings",
+    "calls": {
+      "title": "Call log",
+      "allStatuses": "All statuses",
+      "status": {
+        "ringing": "Ringing",
+        "answered": "Answered",
+        "ended": "Ended",
+        "missed": "Missed"
+      },
+      "unknownCaller": "Unknown caller",
+      "openRecord": "Open record",
+      "searchPatient": "Search patient",
+      "empty": "No calls yet.",
+      "when": "When",
+      "caller": "Caller",
+      "number": "Number",
+      "statusCol": "Status",
+      "duration": "Duration"
+    },
+    "pop": {
+      "incoming": "Incoming call"
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "nav": {
+    "indiaGst": "India GST"
+  },
+  "indiaGst": {
+    "badge": {
+      "gst": "GST",
+      "irnGenerated": "IRN létrehozva",
+      "einvoiceIssue": "E-számla probléma",
+      "needsAttention": "Figyelmet igényel",
+      "missingGst": "Hiányzó GST-adatok — a GST-adatok létrehozásához állítsa ki újra a számlát"
+    },
+    "banner": {
+      "unregisteredTitle": "Nincs beállítva GSTIN",
+      "unregisteredDescription": "Addig is folytathatja a páciensek számlázását — a normál számlák GSTIN nélkül is működnek.",
+      "configureAction": "GST beállítása"
+    },
+    "listFilter": {
+      "needsAttention": "Figyelmet igényel"
+    },
+    "panel": {
+      "title": "GST és e-számla",
+      "correctsDocument": "Helyesbített bizonylat",
+      "documentNumber": "GST-bizonylatszám",
+      "placeOfSupply": "Teljesítés helye",
+      "gstinOnInvoice": "GSTIN a számlán",
+      "notProvided": "Nincs megadva",
+      "calculation": "GST-számítás",
+      "intraState": "Államon belüli · CGST + SGST",
+      "interState": "Államok közötti · IGST",
+      "einvoiceStatus": "E-számla állapota"
+    },
+    "einvoice": {
+      "notRequired": "Nem szükséges",
+      "notConfigured": "Nincs beállítva",
+      "pending": "Függőben",
+      "generated": "IRN létrehozva",
+      "rejected": "Elutasítva",
+      "error": "Kapcsolódási hiba",
+      "notRequiredHint": "A rendelő a beállításokban megadott árbevételi küszöb alatt van, ezért ez a számla nem kerül beküldésre az e-számla portálra.",
+      "notConfiguredHint": "Az e-számlázás az India GST beállításokban megadott árbevételi küszöb feletti rendelőkre vonatkozik. Ehhez a számlához semmi nem kerül elküldésre.",
+      "reviewSettings": "E-számla-beállítások áttekintése"
+    },
+    "form": {
+      "title": "A számla GST-adatai",
+      "clinicGstDetails": "A rendelő GST-adatai",
+      "placeOfSupply": "Teljesítés helye",
+      "placeOfSupplyHint": "Ez határozza meg, hogy CGST+SGST vagy IGST alkalmazandó",
+      "selectState": "Válasszon államot",
+      "selectPlaceOfSupplyHint": "A GST kiszámításához válassza ki a teljesítés helyét",
+      "sacCodes": "SAC-kódok",
+      "sacCode": "SAC-kód",
+      "sacOverrideHint": "A SAC-kódok a kezeléskatalógusból származnak. Csak akkor módosítsa valamelyiket, ha a könyvelője javasolja.",
+      "save": "GST-adatok mentése",
+      "saved": "GST-adatok elmentve",
+      "saveError": "A GST-adatok mentése nem sikerült"
+    },
+    "settingsCards": {
+      "title": "India GST",
+      "description": "GSTIN, a teljesítés helyének alapértelmezései és SAC-kódok beállítása indiai rendelők számára.",
+      "open": "Beállítások megnyitása"
+    },
+    "settings": {
+      "title": "India GST beállítások",
+      "description": "GST-adatok és számlázási alapértelmezések beállítása ehhez a rendelőhöz.",
+      "loadError": "A GST-beállítások betöltése nem sikerült",
+      "saved": "Beállítások elmentve",
+      "saveError": "A beállítások mentése nem sikerült",
+      "clinicDetails": "A rendelő GST-adatai",
+      "nonRegularNotice": "Ennél a regisztrációtípusnál a GST-számítás inaktív a számlázásban.",
+      "tradeName": "Kereskedelmi név",
+      "gstin": "GSTIN",
+      "gstinHint": "A rendelő saját (szállítói) GSTIN-je — soha nem a vevőé",
+      "registrationType": "Regisztráció típusa",
+      "registrationRegular": "Normál",
+      "registrationComposition": "Composition",
+      "registrationUnregistered": "Nem regisztrált",
+      "registrationExempt": "Mentes",
+      "clinicState": "A rendelő állama",
+      "gstinStateMismatch": "A GSTIN első két számjegye olyan államkód, amely nem egyezik a rendelő kiválasztott államával — ez minden számla államon belüli/államok közötti GST-besorolását megfordítja. Ellenőrizze mindkettőt.",
+      "catalogDefaults": "A katalógus GST-alapértelmezései",
+      "allSacConfigured": "Minden kezeléshez be van állítva SAC-kód.",
+      "missingSacCount": "{count} kezeléshez szükséges SAC-kód és adókulcs megadása.",
+      "autoconfigure": "Automatikus beállítás",
+      "autoconfigureHint": "Az automatikus beállítás a fenti összes kezeléshez a 999312-es SAC-kódot (humán-egészségügyi szolgáltatások) rendeli, a GST-kulcsot pedig az egyes kezelések adótípusára hagyja. A már SAC-kóddal rendelkező kezelések érintetlenek maradnak.",
+      "autoconfigureDone": "{count} kezelés beállítva a(z) {sac} SAC-kódra.",
+      "autoconfigureError": "A SAC-kódok automatikus beállítása nem sikerült",
+      "einvoiceIntegration": "E-számla-integráció",
+      "einvoiceProfessionalNotice": "Az e-számlázás engedélyezése előtt egyeztesse a jogosultságot és a szabályozási kötelezettségeket egy képzett indiai adószakértővel. A Dentalpin nem dönti el, hogy az e-számlázás vonatkozik-e az Ön rendelőjére.",
+      "turnoverThreshold": "Árbevételi küszöb",
+      "turnoverThresholdHint": "Az e küszöb feletti rendelők számára kötelező az e-számlázás",
+      "einvoiceNotConfigured": "Nincs beállítva",
+      "displayOptions": "Megjelenítési beállítások",
+      "showGstin": "GSTIN megjelenítése a számlán",
+      "showSac": "SAC-kódok megjelenítése a számlán",
+      "creditNoteWorkflow": "Jóváíró számla munkafolyamat",
+      "creditNoteWorkflowDescription": "A kiállított számlák bármely helyesbítése sztornózással vagy jóváíró számlával történik, és visszakövethető marad a módosítást végző felhasználóig."
+    },
+    "reports": {
+      "title": "GST-riportok",
+      "description": "Összesítések és tranzakciórészletek az egyeztetéshez és a bevallás támogatásához.",
+      "export": "CSV exportálása",
+      "creditNotes": "Jóváíró számlák",
+      "byPlaceOfSupply": "Teljesítés helye szerint",
+      "transactions": "Tranzakciók",
+      "taxableValue": "Adóalap",
+      "empty": "Ebben az időszakban nincs tranzakció."
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Willkommen bei {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Willkommen, {{ patient_name }}!</h2>
+
+<p>Vielen Dank für Ihre Anmeldung bei {{ clinic_name }}. Wir freuen uns, Sie bei der Pflege Ihrer Zahngesundheit begleiten zu dürfen.</p>
+
+<div class="alert alert-success">
+    Ihre Patientenakte wurde erfolgreich in unserem System angelegt.
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Was können Sie jetzt tun?</h3>
+
+<ul style="padding-left: 20px; color: #3f3f46;">
+    <li style="margin-bottom: 8px;">Ihren ersten Untersuchungstermin vereinbaren</li>
+    <li style="margin-bottom: 8px;">Unsere Leistungen und Behandlungen kennenlernen</li>
+    <li style="margin-bottom: 8px;">Uns bei Fragen jederzeit kontaktieren</li>
+</ul>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Meinen ersten Termin vereinbaren</a>
+</div>
+{% endif %}
+
+<div class="info-box">
+    <div class="label">Unsere Öffnungszeiten</div>
+    <div class="value">{{ clinic_hours | default('Montag bis Freitag: 9:00 - 20:00') }}</div>
+</div>
+
+<p>Zögern Sie nicht, uns bei Fragen zu kontaktieren. Wir sind gerne für Sie da.</p>
+
+<p>Wir freuen uns auf Sie!</p>
+{% endblock %}

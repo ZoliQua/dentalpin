@@ -22,6 +22,7 @@ re-run it whenever adding events.
 | `odontogram.*` | `treatment.performed` |
 | `lab_order.*` | `status_changed` |
 | `treatment_plan.*` | `treatment_added`, `treatment_removed`, `item_session_completed`, `budget_sync_requested` |
+| `document.*` | `generated` |
 
 ## Deliberately NOT subscribed
 
@@ -33,7 +34,7 @@ Two reasons, both hard constraints rather than choices:
    `appointment.updated/status_changed/cabinet_changed`,
    `agenda.visit_note_updated`, all `budget.viewed/expired/reminder_sent`,
    `invoice.issued/paid`, `payment.recorded`, `patient.updated/medical_updated`,
-   `recall.completed/cancelled/snoozed`, `document.*`, `media.*`,
+   `recall.completed/cancelled/snoozed`, `media.*`,
    `email.*`, `notification.*`, `copilot.*`, `migration.*`,
    `clinic.created`, `verifactu.record.rejected`,
    `periodontogram.snapshot.closed`,

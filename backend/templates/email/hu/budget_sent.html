@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Árajánlat - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Kedves {{ patient_name }}!</h2>
+
+<p>Elküldjük Önnek fogászati kezelésének részletes árajánlatát.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Árajánlat száma</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Dátum</div>
+            <div class="value">{{ budget_date }}</div>
+        </div>
+    </div>
+</div>
+
+{% if treatments %}
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+    <thead>
+        <tr style="border-bottom: 2px solid #e4e4e7;">
+            <th style="text-align: left; padding: 12px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #71717a;">Kezelés</th>
+            <th style="text-align: right; padding: 12px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #71717a;">Összeg</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for treatment in treatments %}
+        <tr style="border-bottom: 1px solid #f4f4f5;">
+            <td style="padding: 12px 0;">
+                <div style="font-weight: 500;">{{ treatment.name }}</div>
+                {% if treatment.tooth %}
+                <div style="font-size: 14px; color: #71717a;">Fog: {{ treatment.tooth }}</div>
+                {% endif %}
+            </td>
+            <td style="text-align: right; padding: 12px 0;">{{ treatment.price }} €</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        {% if subtotal and total != subtotal %}
+        <tr>
+            <td style="padding: 12px 0; text-align: right; font-weight: 500;">Részösszeg:</td>
+            <td style="padding: 12px 0; text-align: right;">{{ subtotal }} €</td>
+        </tr>
+        {% endif %}
+        {% if discount_amount %}
+        <tr>
+            <td style="padding: 12px 0; text-align: right; font-weight: 500; color: #22c55e;">Kedvezmény:</td>
+            <td style="padding: 12px 0; text-align: right; color: #22c55e;">-{{ discount_amount }} €</td>
+        </tr>
+        {% endif %}
+        <tr style="border-top: 2px solid #18181b;">
+            <td style="padding: 16px 0; text-align: right; font-size: 18px; font-weight: 600;">Összesen:</td>
+            <td style="padding: 16px 0; text-align: right; font-size: 18px; font-weight: 600;">{{ total }} €</td>
+        </tr>
+    </tfoot>
+</table>
+{% endif %}
+
+{% if validity_days %}
+<div class="alert alert-info">
+    <strong>Érvényesség:</strong> Az árajánlat a kiállítás dátumától számított {{ validity_days }} napig érvényes.
+</div>
+{% endif %}
+
+{% if notes %}
+<p><strong>Megjegyzések:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Ha kérdése van az árajánlattal kapcsolatban, vagy szeretne időpontot foglalni a kezelésre, forduljon hozzánk bizalommal.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Kapcsolatfelvétel</a>
+</div>
+{% endif %}
+
+<p>Állunk rendelkezésére.</p>
+{% endblock %}

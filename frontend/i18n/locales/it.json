@@ -35,7 +35,8 @@
     "menu": "Menu",
     "openMenu": "Apri menu",
     "close": "Chiudi",
-    "toggleSidebar": "Mostra/nascondi barra laterale"
+    "toggleSidebar": "Mostra/nascondi barra laterale",
+    "documents": "Documenti"
   },
   "auth": {
     "login": "Accedi",

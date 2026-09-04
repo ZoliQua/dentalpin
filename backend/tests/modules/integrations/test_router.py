@@ -35,7 +35,7 @@ async def test_create_returns_secret_once(client: AsyncClient, auth_headers, tes
 async def test_unsupported_event_type_rejected(client: AsyncClient, auth_headers, test_clinic):
     resp = await client.post(
         BASE,
-        json={"target_url": "https://example.com/hook", "event_types": ["budget.sent"]},
+        json={"target_url": "https://example.com/hook", "event_types": ["invoice.issued"]},
         headers=auth_headers,
     )
     assert resp.status_code == 422

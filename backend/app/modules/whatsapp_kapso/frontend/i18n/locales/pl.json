@@ -34,6 +34,10 @@
     "saveError": "Nie udało się zapisać",
     "synced": "Zsynchronizowano {n} szablonów",
     "syncError": "Nie udało się zsynchronizować",
+    "onboarding": {
+      "label": "Wysyłanie WhatsApp",
+      "description": "WhatsApp jest preferowanym kanałem kliniki, ale Kapso nie jest jeszcze połączone. Połącz je, aby automatyczne wiadomości mogły być wysyłane."
+    },
     "types": {
       "appointment_confirmation": "Potwierdzenie wizyty",
       "appointment_reminder": "Przypomnienie o wizycie",
@@ -42,12 +46,8 @@
       "budget_accepted": "Kosztorys zaakceptowany",
       "budget_reminder": "Przypomnienie o kosztorysie",
       "invoice_sent": "Faktura wysłana",
-      "recall_reminder": "Przypomnienie o wizycie kontrolnej",
-      "welcome": "Powitanie"
-    },
-    "onboarding": {
-      "label": "Połącz WhatsApp",
-      "description": "Gabinet preferuje WhatsApp, ale Kapso nie jest jeszcze połączone."
+      "recall_reminder": "Przypomnienie o kontrolce",
+      "welcome": "Witamy"
     }
   }
 }

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Il Suo preventivo è ancora in attesa - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Gentile {{ patient_name }},</h2>
+
+<p>Il Suo preventivo <strong>#{{ budget_number }}</strong> di <strong>{{ clinic_name | default('DentalPin') }}</strong> è ancora in attesa di una Sua risposta.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">N. preventivo</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        {% if total %}
+        <div style="flex: 1; text-align: right;">
+            <div class="label">Totale</div>
+            <div class="value">{{ total }} €</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if valid_until %}
+<div class="alert alert-warning">
+    <strong>Validità:</strong> questo preventivo è valido fino al {{ valid_until }}.
+</div>
+{% endif %}
+
+{% if public_url %}
+<div class="button-container">
+    <a href="{{ public_url }}" class="button">Consultare il mio preventivo</a>
+</div>
+{% endif %}
+
+<p>Se ha già preso una decisione o ha qualsiasi dubbio, ci contatti pure: saremo lieti di aiutarLa.</p>
+
+<p>Restiamo a Sua disposizione.</p>
+{% endblock %}

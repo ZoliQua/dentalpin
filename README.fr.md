@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Logiciel open source de gestion de cliniques dentaires.** Patients, odontogramme,
+**Logiciel de gestion de cliniques dentaires à code source disponible (BSL 1.1), passant sous Apache 2.0 quatre ans après sa publication.** Patients, odontogramme,
 agenda, plans de traitement, facturation et un copilote IA intégré — modulaire,
 auto-hébergé, API-first.
 
@@ -33,11 +33,11 @@ DentalPin repose sur un principe simple : **une plateforme ouverte pour les clin
 
 ### Pourquoi maintenant ?
 
-L'IA a fondamentalement changé ce que les petites équipes peuvent construire. Des fonctionnalités qui nécessitaient autrefois de grands départements de développement peuvent désormais être implémentées en quelques jours. C'est notre fenêtre pour créer le logiciel dentaire open source qui aurait dû exister il y a des années — avant que les cliniques ne soient enfermées dans des systèmes hérités dont elles ne peuvent plus s'extraire.
+L'IA a fondamentalement changé ce que les petites équipes peuvent construire. Des fonctionnalités qui nécessitaient autrefois de grands départements de développement peuvent désormais être implémentées en quelques jours. C'est notre fenêtre pour créer le logiciel dentaire à code source disponible (BSL 1.1, passant sous Apache 2.0 quatre ans après sa publication) qui aurait dû exister il y a des années — avant que les cliniques ne soient enfermées dans des systèmes hérités dont elles ne peuvent plus s'extraire.
 
 ### Nos principes
 
-- **Open Source** — Les données de votre clinique vous appartiennent. Votre logiciel aussi.
+- **Code source disponible (BSL 1.1)** — Les données de votre clinique vous appartiennent. Votre logiciel aussi.
 - **Modulaire** — Commencez simplement, ajoutez ce dont vous avez besoin. Ne payez pas pour des fonctionnalités que vous n'utiliserez jamais.
 - **Global dès la conception** — Conçu pour la localisation dès le premier jour. Même cœur, n'importe quelle langue, n'importe quel pays.
 - **API-First** — Chaque fonctionnalité est une API. Intégrez tout, automatisez tout.
@@ -159,7 +159,7 @@ Voir [docs/user-manual/en/demo.md](docs/user-manual/en/demo.md) pour les détail
 | Couche | Technologie |
 |--------|-------------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Base de données | PostgreSQL 15 |
 | Authentification | JWT avec refresh tokens |
 

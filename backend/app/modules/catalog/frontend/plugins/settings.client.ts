@@ -18,6 +18,7 @@ export default defineNuxtPlugin(() => {
     descriptionKey: 'catalog.onboarding.description',
     icon: 'i-lucide-list-checks',
     to: '/settings/catalog',
+    permission: 'catalog.read',
     modal: () => import('../components/catalog/CatalogSeedQuickModal.vue'),
     order: 50,
     severity: 'warning',

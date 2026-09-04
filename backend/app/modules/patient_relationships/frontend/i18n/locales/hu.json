@@ -1,0 +1,22 @@
+{
+  "patientRelationships": {
+    "title": "Család",
+    "emptyHint": "Nincs rögzített családi kapcsolat.",
+    "relationships": {
+      "title": "Családi kapcsolatok",
+      "searchPatient": "Páciens keresése az összekapcsoláshoz…",
+      "addSuccess": "Kapcsolat hozzáadva",
+      "addError": "Nem sikerült hozzáadni a kapcsolatot",
+      "removeError": "Nem sikerült eltávolítani a kapcsolatot",
+      "types": {
+        "parent": "Szülő",
+        "child": "Gyermek",
+        "spouse": "Házastárs",
+        "sibling": "Testvér",
+        "guardian": "Gondviselő",
+        "ward": "Gondozott",
+        "other": "Egyéb"
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ class CountryPreset:
     code: str  # ISO2, "" for the generic fallback
     currency: str  # ISO 4217
     timezone: str  # IANA — main zone of the country
-    language: str  # es | en | fr | pt | ta — communication_language default
+    language: str  # es|en|fr|pt|ta|de|hu|pl|it — communication_language default
     vat_preset: str = "generic"  # consumed by catalog: "es" | "generic"
     tax_id_label: str = "Tax ID"
     tax_id_pattern: str | None = None  # server-side format check (normalized upper, no separators)
@@ -40,7 +40,7 @@ class CountryPreset:
 # country needs real fiscal logic; until then ES is the only "rich" row.
 _ROWS: list[tuple[str, str, str, str]] = [
     # EU
-    ("AT", "EUR", "Europe/Vienna", "en"),
+    ("AT", "EUR", "Europe/Vienna", "de"),
     ("BE", "EUR", "Europe/Brussels", "fr"),
     ("BG", "BGN", "Europe/Sofia", "en"),
     ("HR", "EUR", "Europe/Zagreb", "en"),
@@ -50,17 +50,17 @@ _ROWS: list[tuple[str, str, str, str]] = [
     ("EE", "EUR", "Europe/Tallinn", "en"),
     ("FI", "EUR", "Europe/Helsinki", "en"),
     ("FR", "EUR", "Europe/Paris", "fr"),
-    ("DE", "EUR", "Europe/Berlin", "en"),
+    ("DE", "EUR", "Europe/Berlin", "de"),
     ("GR", "EUR", "Europe/Athens", "en"),
-    ("HU", "HUF", "Europe/Budapest", "en"),
+    ("HU", "HUF", "Europe/Budapest", "hu"),
     ("IE", "EUR", "Europe/Dublin", "en"),
-    ("IT", "EUR", "Europe/Rome", "en"),
+    ("IT", "EUR", "Europe/Rome", "it"),
     ("LV", "EUR", "Europe/Riga", "en"),
     ("LT", "EUR", "Europe/Vilnius", "en"),
     ("LU", "EUR", "Europe/Luxembourg", "fr"),
     ("MT", "EUR", "Europe/Malta", "en"),
     ("NL", "EUR", "Europe/Amsterdam", "en"),
-    ("PL", "PLN", "Europe/Warsaw", "en"),
+    ("PL", "PLN", "Europe/Warsaw", "pl"),
     ("PT", "EUR", "Europe/Lisbon", "pt"),
     ("RO", "RON", "Europe/Bucharest", "en"),
     ("SK", "EUR", "Europe/Bratislava", "en"),

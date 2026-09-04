@@ -25,6 +25,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.i18n_names import catalog_name
 from app.modules.agenda.models import Appointment
 from app.modules.billing.models import Invoice
 from app.modules.budget.models import Budget
@@ -171,14 +172,8 @@ async def seed_timeline_demo(db: AsyncSession, clinic_id: UUID) -> dict[str, int
             if item.treatment and item.treatment.catalog_item
             else {}
         ) or {}
-        item_name = (
-            names.get("es")
-            or names.get("en")
-            or names.get("fr")
-            or names.get("pt")
-            or names.get("ta")
-            or next((v for v in names.values() if v), None)
-            or t({"es": "tratamiento", "en": "treatment", "fr": "traitement", "ta": "சிகிச்சை"})
+        item_name = catalog_name(names) or t(
+            {"es": "tratamiento", "en": "treatment", "fr": "traitement", "ta": "சிகிச்சை"}
         )
         patient_id = item.treatment.patient_id if item.treatment else None
         if not patient_id:
@@ -208,12 +203,7 @@ async def seed_timeline_demo(db: AsyncSession, clinic_id: UUID) -> dict[str, int
     for treatment in performed.scalars().all():
         names = (treatment.catalog_item.names if treatment.catalog_item else {}) or {}
         name = (
-            names.get("es")
-            or names.get("en")
-            or names.get("fr")
-            or names.get("pt")
-            or names.get("ta")
-            or next((v for v in names.values() if v), None)
+            catalog_name(names)
             or treatment.clinical_type
             or t({"es": "tratamiento", "en": "treatment", "fr": "traitement", "ta": "சிகிச்சை"})
         )

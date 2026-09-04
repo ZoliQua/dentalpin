@@ -32,13 +32,13 @@ The whole point of this sub-package is that **the orchestrator never knows which
   - `ProviderMessage` — vendor-agnostic turn: `role (system|user|assistant|tool)` + a list of content blocks (`text`, `tool_use{id,name,input}`, `tool_result{tool_call_id,content}`). Each provider serializes these to its own shape (Anthropic content blocks vs OpenAI `tool_calls`/`role:"tool"` messages).
   - `class Provider(Protocol)`: `async def complete(self, *, system: str, messages: list[ProviderMessage], tools: list[dict], model: str, max_tokens: int) -> AsyncIterator[ProviderEvent]`.
   - `ProviderEvent` union (vendor-agnostic): `TextDelta`, `ToolUse(id, name, input)`, `Usage(input_tokens, output_tokens)`, `Done(stop_reason)`.
-- `openai_provider.py` — **v1: the only live provider.** `OpenAIProvider` over the `openai` SDK (`client.chat.completions.create(..., stream=True)` or the Responses API). Tool schemas via `tool_to_openai_schema()` (`app/core/agents/tools/schema.py:28`). Maps OpenAI streaming deltas → `ProviderEvent`: assembles fragmented `tool_calls` deltas (id/name/arguments arrive in pieces) into a single `ToolUse`; reads usage from the final chunk (`stream_options={"include_usage": True}`).
-- `anthropic_provider.py` — **deferred.** When added: `AnthropicProvider` over the `anthropic` SDK (`client.messages.stream(...)`), tool schemas via `tool_to_anthropic_schema()` (`app/core/agents/tools/schema.py:19`). The serializer already exists, so this is a self-contained add — no orchestrator/redaction/budget changes.
-- `factory.py` — `get_provider(name: str) -> Provider` resolving `"openai"` in v1 (raise a clear "unsupported provider" error for anything else; `"anthropic"`/`"ollama"` slot in later). The orchestrator/bridge passes `dialect = "openai"` to `registry.schemas_for(...)` and the chosen `model` string.
-- **Resolution order:** per-clinic `copilot_settings.provider` (defaults to `"openai"`) + `.model` override the global defaults in `app/config.py`. The provider reads `OPENAI_API_KEY`; a provider with no key configured is rejected at settings-save time so a clinic can't select a provider the deployment can't serve.
-- Deps: add `openai>=1.40` to `backend/pyproject.toml`.
+- `openai_provider.py` — `OpenAIProvider` over the `openai` SDK (`client.chat.completions.create(..., stream=True)` or the Responses API). Tool schemas via `tool_to_openai_schema()` (`app/core/agents/tools/schema.py:28`). Maps OpenAI streaming deltas → `ProviderEvent`: assembles fragmented `tool_calls` deltas (id/name/arguments arrive in pieces) into a single `ToolUse`; reads usage from the final chunk (`stream_options={"include_usage": True}`).
+- `anthropic_provider.py` — `AnthropicProvider` over the `anthropic` SDK (`client.messages.create(..., stream=True)`), tool schemas via `tool_to_anthropic_schema()` (`app/core/agents/tools/schema.py:19`). Same single-tool posture (`disable_parallel_tool_use`); tool results are serialized as `tool_result` blocks merged into the next `user` turn; dotted tool names map `.` ↔ `-` (Anthropic's name charset, same trick as OpenAI).
+- `factory.py` — `get_provider(name: str) -> Provider` resolving `"openai"` and `"anthropic"` (raise a clear "unsupported provider" error for anything else; further vendors slot in later). The bridge passes the provider-matching `dialect` to `registry.schemas_for(...)` and the chosen `model` string.
+- **Resolution order:** per-clinic `copilot_settings.provider` (defaults to `"openai"`) + `.model` override the global defaults in `app/config.py`. The providers read `OPENAI_API_KEY` / `ANTHROPIC_API_KEY`; a provider with no key configured is rejected at settings-save time so a clinic can't select a provider the deployment can't serve.
+- Deps: `openai>=1.40` and `anthropic>=0.40` in `backend/pyproject.toml`.
 
-Redaction, budget, audit, and the inline-confirm pause are all **upstream of the provider** and therefore vendor-agnostic — adding Anthropic later changes nothing below `app/core/llm/`.
+Redaction, budget, audit, and the inline-confirm pause are all **upstream of the provider** and therefore vendor-agnostic — adding Anthropic changed nothing outside `app/core/llm/` beyond the dialect hint and settings validation.
 
 ### 2.2 Orchestrator (`app/core/agents/orchestrator.py`)
 The reusable tool-use loop. **No HTTP / SSE / copilot knowledge.** Signature sketch:
@@ -279,3 +279,88 @@ New module ⇒ `app/modules/copilot/{CLAUDE.md, CHANGELOG.md}`; `docs/technical/
 - **Turn resume correctness** — resuming from `copilot_messages` must reconstruct the exact `tool_use`/`tool_result` ordering the provider expects; cover with the inline-confirm test.
 - **SSE session lifetime** (§8) — verify the generator-scoped session under load; no reliance on `Depends(get_db)` during streaming.
 - **`agenda.book_appointment` validation** — the tool must surface the service's conflict/validation errors as a structured `tool_result` so the model can explain failures rather than the stream 500-ing.
+
+## 15. Redaction guarantees and limits
+
+The PHI boundary in `app/core/agents/redaction.py` tokenizes patient
+identifiers before any payload reaches a cloud LLM provider.  This
+section states precisely what is guaranteed, what is not, and what the
+tokenization means under GDPR.
+
+### What is guaranteed
+
+1. **Structured fields** — any JSON key matching the PII denylist
+   (`first_name`, `last_name`, `full_name`, `name`, `patient_name`,
+   `phone`, `mobile`, `telephone`, `phone_number`, `email`,
+   `email_address`, `dni`, `nif`, `tax_id`, `national_id`) is replaced
+   with a deterministic token (`NAME_<hash>`, `PHONE_<hash>`, etc.)
+   before the payload leaves the server.  UUID-valued reference keys
+   (`id`, `patient_id`, `appointment_id`) are tokenized when the value
+   is a valid UUID.
+
+2. **Seeded context entities** — names and IDs from the conversation's
+   `context_jsonb` blob are pre-loaded into the per-session symbol table
+   at session start, so they are redacted even if they appear as
+   free-text later in the conversation.
+
+3. **Known-entity free text** — substring replacement of every value
+   already present in the symbol table.  If "María García" was loaded
+   as a structured field, any subsequent user-typed occurrence of that
+   exact string is tokenized.
+
+4. **Free-text-returning tools excluded** — tools carrying
+   `Tool.exposes_free_text=True` are filtered out of the tool list
+   offered to the cloud provider when redaction is enabled.  Today
+   that flag is set by tools in `recalls`, `activity_journal` and
+   `expenses` (grep `exposes_free_text=True`); those tools are simply
+   unavailable to the model while redaction is on.
+
+5. **Deterministic tokens** — the same real value always maps to the
+   same token (`SHA-1(real)[:6]`, unsalted), within a session *and*
+   across sessions, so the model can reason about "the same patient"
+   across turns without seeing the real value, and a resumed
+   conversation can rebuild its symbol table by re-redacting history.
+
+### What is NOT guaranteed
+
+1. **Unknown free-text PII** — a name, phone number, or identifier
+   typed by the user as free text for an entity **not yet loaded** into
+   the symbol table cannot be caught without named-entity recognition
+   (NER).  The orchestrator performs substring replacement of *known*
+   values only; novel identifiers pass through to the provider in
+   cleartext.  NER is deferred to a later milestone.
+
+2. **Anonymization** — tokens are deterministic short hashes, not
+   random nonces.  This is **pseudonymization** under GDPR Article
+   4(5), not anonymization.  A party that possesses the symbol table
+   (i.e. the DentalPin server) can reverse every token.  There is no
+   secret or salt in the hash: the cloud provider receives only the
+   tokenized form and holds no table, but a party with a candidate
+   list (common names, phone-number ranges) can confirm a guess by
+   hashing it.  Tokens reduce identifiability; they do not remove it.
+
+3. **Cross-session correlation** — because tokens are unsalted and
+   deterministic, the same patient yields the same token in every
+   conversation, every session and every clinic on the server.  A cloud
+   provider observing many sessions can therefore link a token across
+   conversations and build frequency patterns.  The per-session symbol
+   table bounds what the server rehydrates, not what the provider can
+   correlate.  A per-clinic salt would confine correlation to one
+   clinic without breaking resume; it is not implemented.
+
+### GDPR and deployment guidance
+
+- The redaction boundary implements **pseudonymization** (GDPR Art.
+  4(5)) as a technical measure under Art. 25 (data protection by
+  design) and Art. 32 (security of processing).
+- Deployments processing health data at scale (which dental records
+  are) should include the copilot's data flow in their **Data
+  Protection Impact Assessment** (DPIA, Art. 35) — specifically the
+  pseudonymization scope, the free-text gap, and the cloud provider's
+  data-processing agreement.
+- The gap is acceptable for v1 because: (a) the primary interaction
+  pattern is structured tool calls (search/book/cancel), not free-text
+  clinical notes; (b) rehydration is server-side, so the model only
+  ever sees and emits tokens; (c) free-text tools are excluded from the
+  cloud path.  Revisit if real transcripts show free-text PII leakage
+  is common.

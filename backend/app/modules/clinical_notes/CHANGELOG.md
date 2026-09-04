@@ -2,12 +2,19 @@
 
 ## Unreleased
 
+- chore(#337): imports `AppointmentTreatment` from its new home in treatment_plan (a declared dependency).
+
+- refactor(#126): linked-treatment labels resolve catalog names through the shared `app.core.i18n_names.catalog_name` helper.
+
+- fix(#325): the attachment-owner registration moved from import time to `on_activate()` (ADR 0020).
+
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
 - fix(#101): the note composer keeps typed text and attachments when a save fails (teardown only on success); the three unconfirmed delete surfaces now confirm like the other two.
 
 - feat(#131): German (de) locale for the module's frontend layer.
 - feat(#144, #132): Polish (pl) and Italian (it) locales for the module's frontend layer.
+- feat(#334): Hungarian (hu) locale for the module's frontend layer.
 
 - i18n(#131/#275): `_resolve_label` falls back to any non-empty catalog
   name after `es→en→fr→pt→ta` (items created under core-only locales

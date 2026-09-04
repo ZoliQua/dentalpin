@@ -287,7 +287,7 @@ def test_redactor_replaces_known_entity_in_free_text() -> None:
 
 def test_factory_rejects_unsupported_provider() -> None:
     with pytest.raises(LLMConfigError):
-        get_provider("anthropic")
+        get_provider("gemini")
 
 
 def test_openai_name_roundtrip() -> None:
@@ -307,3 +307,125 @@ def test_openai_provider_requires_key() -> None:
 
     with pytest.raises(LLMConfigError):
         OpenAIProvider(api_key="")
+
+
+# --- anthropic provider --------------------------------------------------
+
+
+def test_anthropic_name_roundtrip() -> None:
+    # Anthropic rejects dots in tool names; the provider maps . <-> -.
+    from app.core.llm.anthropic_provider import _from_anthropic_name, _to_anthropic_name
+
+    for qualified in ("patients.search_patients", "agenda.get_day_overview"):
+        safe = _to_anthropic_name(qualified)
+        assert "." not in safe
+        assert _from_anthropic_name(safe) == qualified
+
+
+def test_anthropic_provider_requires_key() -> None:
+    from app.core.llm.anthropic_provider import AnthropicProvider
+
+    with pytest.raises(LLMConfigError):
+        AnthropicProvider(api_key="")
+
+
+def test_anthropic_message_mapping_merges_tool_results_into_user_turn() -> None:
+    from app.core.llm.anthropic_provider import _to_anthropic_messages
+    from app.core.llm.base import ToolUseBlock
+
+    wire = _to_anthropic_messages(
+        [
+            ProviderMessage(Role.USER, [TextBlock("busca a ana")]),
+            ProviderMessage(
+                Role.ASSISTANT,
+                [
+                    TextBlock("Buscando…"),
+                    ToolUseBlock("toolu_1", "patients.search_patients", {"q": "ana"}),
+                ],
+            ),
+            ProviderMessage(Role.TOOL, [ToolResultBlock("toolu_1", {"hits": 2}, is_error=False)]),
+            ProviderMessage(Role.USER, [TextBlock("y su teléfono?")]),
+        ]
+    )
+
+    assert [m["role"] for m in wire] == ["user", "assistant", "user"]
+    tool_use = wire[1]["content"][1]
+    assert tool_use["type"] == "tool_use"
+    assert tool_use["name"] == "patients-search_patients"
+    # The tool_result turn and the follow-up user text merge into one
+    # user message, tool_result blocks first.
+    merged = wire[2]["content"]
+    assert merged[0]["type"] == "tool_result"
+    assert merged[0]["tool_use_id"] == "toolu_1"
+    assert "is_error" not in merged[0]
+    assert merged[1] == {"type": "text", "text": "y su teléfono?"}
+
+
+def test_anthropic_message_mapping_flags_error_results() -> None:
+    from app.core.llm.anthropic_provider import _to_anthropic_messages
+
+    wire = _to_anthropic_messages(
+        [ProviderMessage(Role.TOOL, [ToolResultBlock("toolu_9", {"error": "boom"}, is_error=True)])]
+    )
+    assert wire[0]["content"][0]["is_error"] is True
+
+
+@pytest.mark.asyncio
+async def test_anthropic_stream_maps_events_to_neutral_types() -> None:
+    from types import SimpleNamespace
+
+    from app.core.llm.anthropic_provider import AnthropicProvider
+
+    ns = SimpleNamespace
+
+    events = [
+        ns(type="message_start", message=ns(usage=ns(input_tokens=12))),
+        ns(type="content_block_start", index=0, content_block=ns(type="text")),
+        ns(type="content_block_delta", index=0, delta=ns(type="text_delta", text="Hola")),
+        ns(type="content_block_stop", index=0),
+        ns(
+            type="content_block_start",
+            index=1,
+            content_block=ns(type="tool_use", id="toolu_1", name="patients-search_patients"),
+        ),
+        ns(
+            type="content_block_delta",
+            index=1,
+            delta=ns(type="input_json_delta", partial_json='{"q":'),
+        ),
+        ns(
+            type="content_block_delta",
+            index=1,
+            delta=ns(type="input_json_delta", partial_json='"ana"}'),
+        ),
+        ns(type="content_block_stop", index=1),
+        ns(type="message_delta", delta=ns(stop_reason="tool_use"), usage=ns(output_tokens=7)),
+        ns(type="message_stop"),
+    ]
+
+    async def _stream():
+        for ev in events:
+            yield ev
+
+    class _Messages:
+        async def create(self, **kwargs):
+            return _stream()
+
+    # Bypass __init__ so the test needs neither an API key nor the SDK.
+    provider = AnthropicProvider.__new__(AnthropicProvider)
+    provider._client = ns(messages=_Messages())
+
+    out = []
+    async for ev in provider.complete(
+        system="sys",
+        messages=[ProviderMessage(Role.USER, [TextBlock("hola")])],
+        tools=[],
+        model="claude-sonnet-5",
+        max_tokens=64,
+    ):
+        out.append(ev)
+
+    assert out[0] == TextDelta(text="Hola")
+    assert out[1] == Usage(input_tokens=12, output_tokens=7)
+    assert out[2] == ToolUse(id="toolu_1", name="patients.search_patients", input={"q": "ana"})
+    assert out[3] == Done(stop_reason="tool_use")

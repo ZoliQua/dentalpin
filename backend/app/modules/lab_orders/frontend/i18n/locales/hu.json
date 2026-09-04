@@ -1,0 +1,27 @@
+{
+  "labOrders": {
+    "title": "Laborrendelések",
+    "add": "Új laborrendelés",
+    "patient": "Páciens",
+    "lab": "Fogtechnikai labor",
+    "loading": "Betöltés…",
+    "selectPatient": "Válasszon pácienst",
+    "selectLab": "Válasszon labort",
+    "workType": "Munka típusa",
+    "tooth": "Fog / referencia",
+    "impressionType": "Lenyomat",
+    "antagonistInfo": "Antagonista adatai",
+    "shade": "Fogszín",
+    "sentDate": "Elküldés dátuma",
+    "expectedDate": "Várható dátum",
+    "status": "Állapot",
+    "notes": "Megjegyzések",
+    "save": "Megrendelés elküldése",
+    "cancel": "Mégse",
+    "noLabsHint": "Először hozzon létre labor típusú kapcsolatot a Kapcsolatok között.",
+    "workTypes": {"crown":"Korona","bridge":"Híd","denture":"Protézis","implant":"Implantátum","veneer":"Héj","orthodontic":"Fogszabályozás","repair":"Javítás","other":"Egyéb"},
+    "impressionTypes": {"alginate":"Alginát","pvs_silicone":"PVS / szilikon","digital_scan":"Digitális szkennelés","other":"Egyéb"},
+    "statuses": {"sent":"Elküldve","in_progress":"Folyamatban","ready":"Elkészült","received":"Beérkezett","cancelled":"Törölve"}
+  },
+  "nav": {"labOrdersForm":"Új laborrendelés","labOrdersStatus":"Laborrendelések"}
+}

@@ -408,7 +408,7 @@ Al reiniciar:
 
 En el `lifespan` de FastAPI, antes de aceptar tráfico:
 
-1. **Discover**: cargar todos los manifests (sin ejecutar código del módulo). Validar schema, `min_core_version`, que todas las `depends` existan como manifests descubiertos.
+1. **Discover**: cargar todos los manifests. Validar schema, `min_core_version`, que todas las `depends` existan como manifests descubiertos. *Nota (#323): hoy el manifest es un atributo de la clase `BaseModule`, así que discover **importa e instancia** cada módulo (instalado o no) para leerlo; los modelos de todos los módulos entran en `Base.metadata` en el arranque. El contrato estático original ("sin ejecutar código del módulo") es la dirección futura acordada — manifest fuera del código como única fuente de verdad e import diferido al mount — pendiente de un trigger real (primer módulo third-party vía PyPI).*
 2. **Reconciliar con DB**:
    - Módulo en disk y no en DB → insert como `uninstalled`.
    - Módulo en DB como `installed` pero no en disk → **error crítico, no arrancar**. Log explícito. Admin debe restaurar el paquete o marcar manualmente `uninstalled` con `python -m app.cli modules orphan <name>`.

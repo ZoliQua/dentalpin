@@ -75,7 +75,26 @@ def test_build_payload_shape() -> None:
     payload = build_payload(entries)
     assert payload["version"] == MODULES_JSON_SCHEMA_VERSION
     assert payload["layers"] == ["/abs/foo/frontend"]
-    assert payload["modules"] == [{"name": "foo", "path": "/abs/foo/frontend"}]
+    assert payload["modules"] == [{"name": "foo", "path": "/abs/foo/frontend", "routes": []}]
+
+
+def test_layer_routes_mirror_the_frontend_generator(tmp_path: Path) -> None:
+    """#326: same traversal as scripts/modules-json.mjs — sorted walk,
+    index.vue → parent path, [param] → :param."""
+    from app.core.plugins.frontend_layers import _layer_routes
+
+    pages = tmp_path / "pages"
+    (pages / "widgets" / "[id]").mkdir(parents=True)
+    (pages / "widgets" / "index.vue").write_text("")
+    (pages / "widgets" / "[id]" / "edit.vue").write_text("")
+    (pages / "widgets" / "[id]" / "index.vue").write_text("")
+    (pages / "about.vue").write_text("")
+    assert list(_layer_routes(tmp_path)) == [
+        "/about",
+        "/widgets/:id/edit",
+        "/widgets/:id",
+        "/widgets",
+    ]
 
 
 def test_write_modules_json_is_atomic_and_idempotent(tmp_path: Path) -> None:

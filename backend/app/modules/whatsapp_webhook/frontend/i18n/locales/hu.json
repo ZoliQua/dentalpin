@@ -1,0 +1,26 @@
+{
+  "whatsapp_webhook": {
+    "settings": {
+      "title": "WhatsApp webhookon át",
+      "description": "WhatsApp-értesítések küldése Zapier / Make / n8n hookon keresztül — szolgáltatói fiók nélkül."
+    },
+    "connection": "Kapcsolat",
+    "targetUrl": "Hook URL",
+    "targetUrlHelp": "HTTPS URL, amely minden értesítést aláírt JSON-ként kap meg (Zapier, Make, n8n…).",
+    "active": "Bekapcsolva",
+    "delivering": "Kézbesítés folyamatban",
+    "lastErrorBadge": "Kézbesítési hiba",
+    "secret": "Aláíró titok",
+    "secretShownOnce": "Másolja ki ezt a titkot most — csak egyszer jelenik meg. Ezzel ellenőrizheti az X-DentalPin-Signature fejlécet az automatizációjában.",
+    "rotateSecret": "Titok cseréje",
+    "copy": "Másolás",
+    "copied": "Vágólapra másolva",
+    "saved": "Beállítások mentve",
+    "saveError": "A beállításokat nem sikerült menteni",
+    "test": "Tesztküldés",
+    "testHelp": "Aláírt tesztcsomagot küld a hookjára az automatizáció beállításához.",
+    "sendTest": "Teszt küldése",
+    "testOk": "Tesztcsomag kézbesítve",
+    "testFail": "A tesztküldés nem sikerült"
+  }
+}

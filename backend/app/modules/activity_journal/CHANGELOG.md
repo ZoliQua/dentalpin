@@ -1,5 +1,11 @@
 # Changelog — activity_journal module
 
+## Unreleased
+
+- Subscribe to `document.generated` (the documents module publishes it
+  transactionally with `db=db`), so generated PDFs land in the journal
+  with the acting user (`created_by`) when known.
+
 ## 0.1.0 — initial release
 
 - Append-only journal of transactionally-published events (25 event

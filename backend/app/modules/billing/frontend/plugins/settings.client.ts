@@ -17,6 +17,7 @@ export default defineNuxtPlugin(() => {
     descriptionKey: 'invoiceSeries.onboarding.description',
     icon: 'i-lucide-receipt-text',
     to: '/settings/invoice-series',
+    permission: 'billing.read',
     order: 60,
     severity: 'warning',
     load: async (api) => {

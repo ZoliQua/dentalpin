@@ -36,3 +36,4 @@ See [`./permissions.md`](./permissions.md) for the full role mapping.
 
 - Module CLAUDE notes: `backend/app/modules/copilot/CLAUDE.md`
 - [Documentation portal contract](../../technical/documentation-portal.md)
+- [Redaction guarantees and limits](../copilot-agentic-architecture.md#15-redaction-guarantees-and-limits) — pseudonymization, free-text gap, DPIA guidance

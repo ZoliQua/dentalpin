@@ -102,7 +102,9 @@
       "bank_transfer": "Überweisung",
       "direct_debit": "Lastschrift",
       "insurance": "Versicherung",
-      "other": "Sonstige"
+      "other": "Sonstige",
+      "upi": "UPI",
+      "netbanking": "Online-Banking"
     },
     "refund": {
       "title": "Zahlung erstatten",
@@ -233,6 +235,7 @@
     "reports": {
       "title": "Zahlungsberichte",
       "subtitle": "Einnahmen, Erstattungen, Patientensalden und Trends für den Zeitraum.",
+      "loadError": "Zahlungsberichte konnten nicht geladen werden.",
       "cardDescription": "Einnahmen, Erstattungen, Patientensalden, Altersstruktur und Trends.",
       "period": "Zeitraum",
       "refresh": "Aktualisieren",
@@ -282,8 +285,7 @@
       "drilldown": {
         "viewPayments": "Zahlungen im Zeitraum anzeigen",
         "viewPatients": "Patienten mit Schulden anzeigen"
-      },
-      "loadError": "Die Berichte konnten nicht geladen werden."
+      }
     },
     "target": {
       "label": "Zuordnen zu",

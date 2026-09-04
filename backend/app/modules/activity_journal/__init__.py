@@ -56,6 +56,8 @@ _SUBSCRIBED = [
     EventType.TREATMENT_PLAN_TREATMENT_REMOVED,
     EventType.TREATMENT_PLAN_ITEM_SESSION_COMPLETED,
     EventType.TREATMENT_PLAN_BUDGET_SYNC_REQUESTED,
+    # Documents — generated PDFs (publisher passes db=db).
+    EventType.DOCUMENT_GENERATED,
 ]
 
 

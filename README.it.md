@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Software open source per la gestione dello studio dentistico.** Pazienti,
+**Software a codice sorgente disponibile (BSL 1.1) per la gestione dello studio dentistico, che passa ad Apache 2.0 quattro anni dopo la pubblicazione.** Pazienti,
 odontogramma, agenda, piani di cura, fatturazione e un copilot AI integrato —
 modulare, self-hosted, API-first.
 
@@ -33,11 +33,11 @@ DentalPin nasce da una premessa semplice: **un'unica piattaforma aperta per gli 
 
 ### Perché ora?
 
-L'AI ha cambiato radicalmente ciò che i piccoli team possono costruire. Funzionalità che un tempo richiedevano grandi reparti di sviluppo oggi possono essere implementate in pochi giorni. Questa è la nostra occasione per creare il software dentale open source che avrebbe dovuto esistere già anni fa — prima che gli studi restassero intrappolati in sistemi legacy da cui non possono uscire.
+L'AI ha cambiato radicalmente ciò che i piccoli team possono costruire. Funzionalità che un tempo richiedevano grandi reparti di sviluppo oggi possono essere implementate in pochi giorni. Questa è la nostra occasione per creare il software dentale a codice sorgente disponibile (BSL 1.1, che passa ad Apache 2.0 quattro anni dopo la pubblicazione) che avrebbe dovuto esistere già anni fa — prima che gli studi restassero intrappolati in sistemi legacy da cui non possono uscire.
 
 ### I nostri principi
 
-- **Open source** — I dati del tuo studio appartengono a te. Anche il tuo software dovrebbe.
+- **Codice sorgente disponibile (BSL 1.1)** — I dati del tuo studio appartengono a te. Anche il tuo software dovrebbe.
 - **Modulare** — Inizia in modo semplice, aggiungi ciò che ti serve. Non pagare per funzionalità che non userai mai.
 - **Globale per progettazione** — Pensato per la localizzazione fin dal primo giorno. Stesso nucleo, qualsiasi lingua, qualsiasi paese.
 - **API-first** — Ogni funzionalità è una API. Integra con qualsiasi cosa, automatizza tutto.
@@ -155,7 +155,7 @@ Per tutti i dettagli sui dati demo consulta [docs/user-manual/en/demo.md](docs/u
 | Livello | Tecnologia |
 |---------|------------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Database | PostgreSQL 15 |
 | Autenticazione | JWT con refresh token |
 

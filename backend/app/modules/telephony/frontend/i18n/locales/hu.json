@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Hívások"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telefónia (CTI)",
+      "description": "A bejövő hívásokat a képernyőn jeleníti meg és hívásnaplót vezet — bármely alközpont webhookon át."
+    },
+    "gateway": "Átjáró",
+    "receiving": "Események érkeznek",
+    "defaultCountry": "Alapértelmezett ország",
+    "defaultCountryHelp": "Kétbetűs országkód a helyi formátumú számok értelmezéséhez (pl. HU).",
+    "active": "Bekapcsolva",
+    "rotateSecret": "Titok cseréje",
+    "webhook": "Esemény-webhook",
+    "webhookHelp": "Állítsa be az alközpontot vagy a Zapiert, hogy a normalizált híváseseményeket aláírva erre az URL-re küldje.",
+    "secret": "Aláíró titok",
+    "secretShownOnce": "Másolja ki ezt a titkot most — csak egyszer jelenik meg. Az alközpont/automatizáció ezzel írja alá az eseményeket (X-DentalPin-Signature).",
+    "copy": "Másolás",
+    "copied": "Vágólapra másolva",
+    "saved": "Beállítások mentve",
+    "saveError": "A beállításokat nem sikerült menteni",
+    "calls": {
+      "title": "Hívásnapló",
+      "allStatuses": "Minden állapot",
+      "status": {
+        "ringing": "Csörög",
+        "answered": "Fogadott",
+        "ended": "Befejezett",
+        "missed": "Nem fogadott"
+      },
+      "unknownCaller": "Ismeretlen hívó",
+      "openRecord": "Karton megnyitása",
+      "searchPatient": "Páciens keresése",
+      "empty": "Még nincsenek hívások.",
+      "when": "Mikor",
+      "caller": "Hívó",
+      "number": "Szám",
+      "statusCol": "Állapot",
+      "duration": "Időtartam"
+    },
+    "pop": {
+      "incoming": "Bejövő hívás"
+    }
+  }
+}

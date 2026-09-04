@@ -5,6 +5,7 @@
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
 - feat(#144, #132): Polish (pl) and Italian (it) locales for the module's frontend layer.
+- feat(#334): Hungarian (hu) locale for the module's frontend layer.
 
 - feat(#262): GSTIN validation verifies the 15th-character mod-36 check digit (`gstin_checksum_char`) on top of the CBIC format regex — typos are rejected at the settings PUT with the expected digit named. The settings response gains `gstin_state_mismatch` (GSTIN's leading state code vs `clinic_state` — warn, never block) and the settings screen shows a live hint; the fixture/demo GSTINs were checksum-corrected (`…1Z5→…1Z7`, `…9Z9→…9ZW`, `…1Z6→…1ZC`, `…1Z3→…1Z4`).
 - feat(#131): German (de) locale for the module's frontend layer.

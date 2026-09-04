@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Software open source de gestión de clínicas dentales.** Pacientes, odontograma,
+**Software de gestión de clínicas dentales con código fuente disponible (BSL 1.1), que pasa a Apache 2.0 cuatro años después de su publicación.** Pacientes, odontograma,
 agenda, planes de tratamiento, facturación y un copiloto de IA integrado — modular,
 self-hosted y API-first.
 
@@ -33,11 +33,11 @@ DentalPin se construye sobre una premisa simple: **una plataforma abierta para c
 
 ### ¿Por qué ahora?
 
-La IA ha cambiado fundamentalmente lo que los equipos pequeños pueden construir. Funcionalidades que antes requerían grandes departamentos de desarrollo ahora pueden implementarse en días. Esta es nuestra ventana para crear el software dental de código abierto que debería haber existido hace años — antes de que las clínicas quedaran encerradas en sistemas legacy de los que no pueden escapar.
+La IA ha cambiado fundamentalmente lo que los equipos pequeños pueden construir. Funcionalidades que antes requerían grandes departamentos de desarrollo ahora pueden implementarse en días. Esta es nuestra ventana para crear el software dental de código fuente disponible (BSL 1.1, que pasa a Apache 2.0 cuatro años después de su publicación) que debería haber existido hace años — antes de que las clínicas quedaran encerradas en sistemas legacy de los que no pueden escapar.
 
 ### Nuestros principios
 
-- **Código Abierto** — Los datos de su clínica le pertenecen. Su software también.
+- **Código fuente disponible (BSL 1.1)** — Los datos de su clínica le pertenecen. Su software también.
 - **Modular** — Comience simple, añada lo que necesite. No pague por funcionalidades que nunca usará.
 - **Global por Diseño** — Construido para la localización desde el primer día. Mismo núcleo, cualquier idioma, cualquier país.
 - **API-Primero** — Cada funcionalidad es una API. Integre con todo, automatice todo.
@@ -158,7 +158,7 @@ Consulte [docs/user-manual/en/demo.md](docs/user-manual/en/demo.md) para detalle
 | Capa | Tecnología |
 |------|-----------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Base de datos | PostgreSQL 15 |
 | Autenticación | JWT con refresh tokens |
 

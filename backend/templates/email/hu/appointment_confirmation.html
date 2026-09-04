@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Időpont-visszaigazolás - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Kedves {{ patient_name }}!</h2>
+
+<p>Időpontját visszaigazoltuk. A részletek az alábbiakban találhatók:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Dátum</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Időpont</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelőorvos</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if cabinet_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelőhelyiség</div>
+            <div class="value">{{ cabinet_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if treatment_type %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelés</div>
+            <div class="value">{{ treatment_type }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if notes %}
+<div class="alert alert-info">
+    <strong>Megjegyzés:</strong> {{ notes }}
+</div>
+{% endif %}
+
+<p>Kérjük, érkezzen 10 perccel az időpontja előtt. Ha le kell mondania vagy módosítania szeretné időpontját, kérjük, jelezze legalább 24 órával korábban.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">A rendelő hívása</a>
+</div>
+{% endif %}
+
+<p>Szeretettel várjuk!</p>
+{% endblock %}

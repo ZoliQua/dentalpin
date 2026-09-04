@@ -8,7 +8,6 @@ from .models import (
     Appointment,
     AppointmentCabinetEvent,
     AppointmentStatusEvent,
-    AppointmentTreatment,
     Cabinet,
 )
 from .router import router
@@ -65,7 +64,6 @@ class AgendaModule(BaseModule):
         return [
             Cabinet,
             Appointment,
-            AppointmentTreatment,
             AppointmentStatusEvent,
             AppointmentCabinetEvent,
         ]

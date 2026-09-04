@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Terminerinnerung - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ patient_name }},</h2>
+
+<p>wir möchten Sie an Ihren bevorstehenden Termin erinnern:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Datum</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Uhrzeit</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Behandler/in</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if cabinet_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Behandlungszimmer</div>
+            <div class="value">{{ cabinet_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if treatment_type %}
+    <div class="info-row">
+        <div>
+            <div class="label">Behandlung</div>
+            <div class="value">{{ treatment_type }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="alert alert-info">
+    <strong>Bitte beachten:</strong> Kommen Sie bitte 10 Minuten vor Ihrem Termin.
+</div>
+
+{% if notes %}
+<p><strong>Hinweise:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Falls Sie den Termin nicht wahrnehmen können, geben Sie uns bitte rechtzeitig Bescheid, damit wir die Zeit anderweitig vergeben können.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Termin bestätigen</a>
+</div>
+{% endif %}
+
+<p>Wir freuen uns auf Sie!</p>
+{% endblock %}

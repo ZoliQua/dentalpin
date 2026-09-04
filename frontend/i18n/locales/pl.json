@@ -35,7 +35,8 @@
     "menu": "Menu",
     "openMenu": "Otwórz menu",
     "close": "Zamknij",
-    "toggleSidebar": "Przełącz pasek boczny"
+    "toggleSidebar": "Przełącz pasek boczny",
+    "documents": "Dokumenty"
   },
   "auth": {
     "login": "Zaloguj się",

@@ -6,6 +6,7 @@ by Alembic at import time and is awkward to import from tests.
 
 from __future__ import annotations
 
+import functools
 import importlib.util
 import logging
 from collections.abc import Callable
@@ -60,7 +61,13 @@ def alembic_cfg_path() -> Path:
     return Path(__file__).resolve().parents[3] / "alembic.ini"
 
 
+@functools.lru_cache(maxsize=1)
 def _load_script_directory():
+    # Memoized (#323): building the ScriptDirectory parses every revision
+    # file; reconcile_with_db used to rebuild it once per module (~0.4s of
+    # repeated graph loading per boot). Revision files ship with the code
+    # and never change inside a running process, so one instance is safe.
+    # Tests that synthesize revision trees call clear_alembic_caches().
     cfg_path = alembic_cfg_path()
     if not cfg_path.is_file():
         return None
@@ -72,6 +79,37 @@ def _load_script_directory():
     except Exception as exc:  # pragma: no cover — defensive
         logger.warning("Could not load Alembic ScriptDirectory: %s", exc)
         return None
+
+
+@functools.lru_cache(maxsize=1)
+def _branch_heads_by_versions_dir() -> dict[Path, str]:
+    """One full-graph walk → {module versions dir: branch head} (#323).
+
+    ``walk_revisions`` goes heads→base, so the first revision seen for a
+    directory is the latest descendant — the branch head. Replaces one
+    full walk per module (35× the same 105-file graph) with a single
+    shared pass.
+    """
+    script = _load_script_directory()
+    if script is None:
+        return {}
+    heads: dict[Path, str] = {}
+    for rev in script.walk_revisions():
+        rev_path_str = getattr(rev, "path", None)
+        if not rev_path_str:
+            continue
+        try:
+            rev_dir = Path(rev_path_str).resolve().parent
+        except (OSError, ValueError):
+            continue
+        heads.setdefault(rev_dir, rev.revision)
+    return heads
+
+
+def clear_alembic_caches() -> None:
+    """Drop the memoized ScriptDirectory + branch-head map (tests only)."""
+    _load_script_directory.cache_clear()
+    _branch_heads_by_versions_dir.cache_clear()
 
 
 def resolve_module_branch_head(module: BaseModule) -> str | None:
@@ -90,22 +128,7 @@ def resolve_module_branch_head(module: BaseModule) -> str | None:
     versions_dir = _module_versions_dir(module)
     if versions_dir is None:
         return None
-
-    script = _load_script_directory()
-    if script is None:
-        return None
-
-    for rev in script.walk_revisions():
-        rev_path_str = getattr(rev, "path", None)
-        if not rev_path_str:
-            continue
-        try:
-            rev_dir = Path(rev_path_str).resolve().parent
-        except (OSError, ValueError):
-            continue
-        if rev_dir == versions_dir:
-            return rev.revision
-    return None
+    return _branch_heads_by_versions_dir().get(versions_dir)
 
 
 def module_branch_is_isolated(module: BaseModule) -> bool:

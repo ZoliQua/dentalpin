@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Poranny briefing - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Briefing z dnia {{ today }}</h2>
+
+{% if appointments is not none %}
+<h3>Dzisiejsze wizyty ({{ appointments | length }})</h3>
+{% if appointments %}
+<div class="info-box">
+    {% for a in appointments %}
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">{{ a.start_time[11:16] if a.start_time else '' }}</div>
+            <div class="value">{{ a.patient_name or '—' }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Status</div>
+            <div class="value">{{ a.status }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Brak zaplanowanych wizyt na dziś.</p>
+{% endif %}
+{% endif %}
+
+{% if recalls is not none %}
+<h3>Zaległe wizyty kontrolne ({{ recalls | length }})</h3>
+{% if recalls %}
+<div class="info-box">
+    {% for r in recalls %}
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">{{ r.reason }}</div>
+            <div class="value">{{ r.patient_name or '—' }}{% if r.phone %} · {{ r.phone }}{% endif %}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Priorytet</div>
+            <div class="value">{{ r.priority }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Brak zaległych wizyt kontrolnych.</p>
+{% endif %}
+{% endif %}
+
+{% if budgets is not none %}
+<h3>Kosztorysy bez odpowiedzi ({{ budgets | length }})</h3>
+{% if budgets %}
+<div class="info-box">
+    {% for b in budgets %}
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">{{ b.number }}</div>
+            <div class="value">{{ b.patient_name or '—' }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Kwota</div>
+            <div class="value">{{ b.total }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>Brak kosztorysów oczekujących na odpowiedź.</p>
+{% endif %}
+{% endif %}
+
+<p style="color: #71717a; font-size: 14px;">
+    Automatyczne podsumowanie wygenerowane przez copilota DentalPin. Możesz je
+    wyłączyć lub zmienić godzinę wysyłki w Ustawienia → Copilot.
+</p>
+{% endblock %}

@@ -113,6 +113,12 @@ export interface GettingStartedRule {
    * ``useApi()`` client instead of creating one (setup-only composable).
    */
   load?: (api: ApiClient) => Promise<void>
+  /**
+   * Permission gating the rule — same contract as SettingsPageEntry.
+   * ``can()`` embeds module-activation, so a rule from a baked-but-
+   * uninstalled module neither renders nor fires its ``load`` (#326).
+   */
+  permission?: string | string[]
   /** Guided-mode sequence. Lower first; ties resolve in registration order. */
   order?: number
   /** Optional steps are listed apart and don't count towards progress. */
@@ -260,6 +266,13 @@ export function useSettingsRegistry() {
       : can(page.permission)
   }
 
+  function isRuleVisible(rule: GettingStartedRule): boolean {
+    if (!rule.permission) return true
+    return Array.isArray(rule.permission)
+      ? canAny(rule.permission)
+      : can(rule.permission)
+  }
+
   function pagesByCategory(id: SettingsCategoryId): SettingsPageEntry[] {
     // touch `version` so this is reactive to register/unregister calls
     void version.value
@@ -368,6 +381,7 @@ export function useSettingsRegistry() {
     void version.value
     const skipped = onboardingState.value.skipped ?? {}
     return [..._rules]
+      .filter(rule => isRuleVisible(rule))
       .map((rule, idx) => ({ rule, idx }))
       .sort((a, b) => (a.rule.order ?? 0) - (b.rule.order ?? 0) || a.idx - b.idx)
       .map(({ rule }) => ({
@@ -412,11 +426,15 @@ export function useSettingsRegistry() {
   const skipRule = (id: string) => patchOnboarding({ skip: [id] })
   const unskipRule = (id: string) => patchOnboarding({ unskip: [id] })
 
-  /** Run every rule's ``load`` (best effort, in parallel) so ``when`` sees fresh data. */
+  /** Run every visible rule's ``load`` (best effort, in parallel) so ``when`` sees fresh data. */
   async function loadGettingStarted(): Promise<void> {
+    // Same gate as isPageVisible (#326): rules of baked-but-uninstalled
+    // modules used to fire their API calls on every onboarding refresh
+    // (guaranteed 403/404 round-trips).
+    const visible = _rules.filter(r => isRuleVisible(r))
     // `version` is captured synchronously (Nuxt context) — after the await
     // `useState` would be unavailable and the bump silently lost.
-    await Promise.allSettled(_rules.map(r => nuxtApp.runWithContext(() => r.load?.(api))))
+    await Promise.allSettled(visible.map(r => nuxtApp.runWithContext(() => r.load?.(api))))
     version.value = version.value + 1
   }
 

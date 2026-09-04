@@ -35,7 +35,8 @@
     "menu": "Menu",
     "openMenu": "Abrir menu",
     "close": "Fechar",
-    "toggleSidebar": "Alternar barra lateral"
+    "toggleSidebar": "Alternar barra lateral",
+    "documents": "Documentos"
   },
   "auth": {
     "login": "Iniciar sessão",

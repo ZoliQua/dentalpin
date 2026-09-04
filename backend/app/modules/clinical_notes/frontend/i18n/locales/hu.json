@@ -1,0 +1,124 @@
+{
+  "clinicalNotes": {
+    "types": {
+      "administrative": "Adminisztratív",
+      "diagnosis": "Diagnózis",
+      "treatment": "Kezelés",
+      "treatment_plan": "Terv",
+      "appointment_clinical": "Klinikai",
+      "appointment_administrative": "Adminisztratív"
+    },
+    "appointment": {
+      "addByType": "{label} jegyzet hozzáadása",
+      "empty": "Ehhez az időponthoz még nincs jegyzet. A fenti gombokkal adhat hozzá."
+    },
+    "feed": {
+      "filterLabel": "Szűrők",
+      "filterAll": "Összes",
+      "filterClear": "Szűrők törlése",
+      "filterStatus": "{n} / {total} típus megjelenítve",
+      "addAdministrative": "Adminisztratív jegyzet",
+      "loadMore": "Továbbiak betöltése",
+      "empty": {
+        "title": "Még nincs jegyzet",
+        "help": "Az adminisztratív, diagnózis- és kezelési jegyzetek itt jelennek meg időrendben."
+      }
+    },
+    "diagnosisSidebar": {
+      "title": "Jegyzetek",
+      "addNote": "Jegyzet hozzáadása",
+      "empty": "Ebben a kategóriában nincs jegyzet."
+    },
+    "treatmentButton": {
+      "title": "Kezelési jegyzetek",
+      "add": "Jegyzet hozzáadása",
+      "empty": "Ehhez a kezeléshez még nincs jegyzet.",
+      "aria": "Kezelési jegyzetek ({n})"
+    },
+    "timeline": {
+      "addPlanNote": "Tervjegyzet",
+      "empty": "Még nincs jegyzet.",
+      "emptyForFilter": "Nincs a szűrőnek megfelelő jegyzet.",
+      "source": {
+        "plan": "Terv",
+        "treatment": "Kezelés",
+        "visit": "Vizit"
+      }
+    },
+    "byPlan": {
+      "empty": "A páciensnek még nincs tervhez kapcsolt klinikai jegyzete.",
+      "planNotesLabel": "Tervjegyzetek",
+      "unknownTreatment": "Kezelés",
+      "noNotesForTreatment": "Ehhez a kezeléshez még nincs jegyzet."
+    },
+    "composer": {
+      "placeholder": "Írja meg a jegyzetet…",
+      "templates": "Sablonok",
+      "attach": "Fénykép vagy dokumentum csatolása",
+      "bindToTooth": "Csatolás a(z) {n} foghoz"
+    },
+    "linked": {
+      "tooth": "{n}. fog",
+      "treatment": "Kezelés",
+      "treatmentOnTooth": "{label} ({n}. fog)",
+      "plan": "Terv",
+      "planNamed": "Terv: {label}"
+    },
+    "actions": {
+      "showMore": "Több megjelenítése",
+      "showLess": "Kevesebb megjelenítése",
+      "openLinked": "Kontextus megnyitása"
+    },
+    "author": {
+      "unknown": "Ismeretlen szerző"
+    },
+    "time": {
+      "justNow": "épp most",
+      "minutesAgo": "{n} perce",
+      "hoursAgo": "{n} órája",
+      "daysAgo": "{n} napja"
+    },
+    "toasts": {
+      "saved": "Jegyzet elmentve",
+      "deleted": "Jegyzet törölve",
+      "saveFailed": "A jegyzet mentése nem sikerült"
+    },
+    "confirms": {
+      "delete": "Törli ezt a jegyzetet? A visszaállításhoz az ügyfélszolgálattal kell kapcsolatba lépni."
+    },
+    "templates": {
+      "endo": {
+        "singleVisit": "Gyökérkezelés (egy ülésben)",
+        "multiVisit": "Gyökérkezelés (több ülésben)"
+      },
+      "perio": {
+        "scaling": "Depurálás / RAR"
+      },
+      "implant": {
+        "placement": "Implantátum behelyezése"
+      },
+      "diagnosis": {
+        "caries": "Fogszuvasodás",
+        "periapical": "Periapikális elváltozás"
+      },
+      "admin": {
+        "phoneCall": "Telefonhívás pácienssel",
+        "reschedule": "Időpont-módosítási kérés"
+      },
+      "general": {
+        "followUp": "Általános utánkövetés"
+      }
+    },
+    "templateBodies": {
+      "endo_single_visit": "Diagnózis: \nÉrzéstelenítés: \nFeltárt csatornák: \nMunkahossz: \nGyökértömés: \nPosztoperatív teendők: ",
+      "endo_multi_visit": "Ülés: \nMegmunkált csatornák: \nCsatornába helyezett gyógyszer: \nKövetkező időpont: ",
+      "perio_scaling": "Kezelt kvadránsok: \nSzondázási mélység: \nSzondázási vérzés: \nSzájhigiénés instrukciók: ",
+      "implant_placement": "Implantátum (márka / átmérő / hossz): \nVégső nyomaték (Ncm): \nPrimer stabilitás: \nCsontpótlás: \nPosztoperatív teendők: ",
+      "diagnosis_caries": "Lelet: fogszuvasodás \nMélység: \nTünetek: \nVitalitásvizsgálat: \nJavasolt kezelés: ",
+      "diagnosis_periapical": "Periapikális elváltozás \nFog: \nRöntgen: \nVizsgálatok (kopogtatás, tapintás): \nDiagnózis: ",
+      "admin_phone_call": "Páciens hívása: \nOk: \nMegtett intézkedés: \nUtánkövetés: ",
+      "admin_reschedule": "Időpont-módosítási kérés: \nJelenlegi időpont: \nÚj javaslat: ",
+      "general_follow_up": "Leletek: \nElvégzett beavatkozás: \nInstrukciók a páciensnek: "
+    }
+  }
+}

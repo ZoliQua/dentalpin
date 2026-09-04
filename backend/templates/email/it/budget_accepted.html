@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Preventivo accettato - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Gentile {{ patient_name }},</h2>
+
+<p>Abbiamo registrato l'accettazione del Suo preventivo. Grazie per la fiducia che ci ha accordato.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">N. preventivo</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Data di accettazione</div>
+            <div class="value">{{ accepted_date }}</div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div>
+            <div class="label">Totale del trattamento</div>
+            <div class="value" style="font-size: 20px; color: #3b82f6;">{{ total }} €</div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success">
+    <strong>Prossimo passo!</strong> La contatteremo per fissare gli appuntamenti necessari per il Suo trattamento.
+</div>
+
+{% if notes %}
+<p><strong>Note:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Se ha domande o desidera fissare il primo appuntamento, ci contatti pure.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Fissare un appuntamento</a>
+</div>
+{% endif %}
+
+<p>Grazie per averci scelto!</p>
+{% endblock %}

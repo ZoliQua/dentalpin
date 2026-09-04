@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#126): de/it/pl locale parity with en (confirms.cancel / confirms.done).
+
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
 - fix(#101): cancel and mark-done confirm before closing a recall (no undo endpoint exists); cancel gets destructive styling.
@@ -9,6 +11,7 @@
 
 - feat(#131): German (de) locale for the module's frontend layer.
 - feat(#144, #132): Polish (pl) and Italian (it) locales for the module's frontend layer.
+- feat(#334): Hungarian (hu) locale for the module's frontend layer.
 - fix(#184): type-check clean — the new-category reason ref is typed to the `reasons` union.
 - fix(#183): the four event handlers are transactional (ADR 0019). `on_appointment_scheduled` writes `linked_appointment_id`, an FK to the appointment the publisher has only flushed — from its own session that write was rejected and swallowed, so **auto-link never worked** through the API.
 - i18n: add Tamil locale (`ta.json`) with full UI coverage.

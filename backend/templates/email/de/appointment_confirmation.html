@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Terminbestätigung - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ patient_name }},</h2>
+
+<p>Ihr Termin wurde bestätigt. Hier die Details:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Datum</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Uhrzeit</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Behandler/in</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if cabinet_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Behandlungszimmer</div>
+            <div class="value">{{ cabinet_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if treatment_type %}
+    <div class="info-row">
+        <div>
+            <div class="label">Behandlung</div>
+            <div class="value">{{ treatment_type }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if notes %}
+<div class="alert alert-info">
+    <strong>Hinweise:</strong> {{ notes }}
+</div>
+{% endif %}
+
+<p>Bitte kommen Sie 10 Minuten vor Ihrem Termin. Falls Sie absagen oder verschieben müssen, geben Sie uns bitte mindestens 24 Stunden im Voraus Bescheid.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Praxis anrufen</a>
+</div>
+{% endif %}
+
+<p>Wir freuen uns auf Sie!</p>
+{% endblock %}

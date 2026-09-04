@@ -116,6 +116,11 @@ def _build_context(
     )
 
 
+def _dialect_for(provider_name: str) -> str:
+    """Tool-schema dialect for the conversation's provider."""
+    return "anthropic" if provider_name == "anthropic" else "openai"
+
+
 def _redactor_for(conv: CopilotConversation, settings_row: CopilotSettings) -> Redactor:
     r = Redactor(enabled=settings_row.redaction_enabled)
     r.seed(conv.context)
@@ -175,6 +180,7 @@ async def drive_turn(
         model=conv.model,
         max_tokens=4096,
         budget=budget,
+        dialect=_dialect_for(conv.provider),
     ):
         yield ev
     await _persist_tail(db, conv, history, start)
@@ -235,6 +241,7 @@ async def resume_turn(
         model=conv.model,
         max_tokens=4096,
         budget=budget,
+        dialect=_dialect_for(conv.provider),
     ):
         yield ev
     await _persist_tail(db, conv, history, start)

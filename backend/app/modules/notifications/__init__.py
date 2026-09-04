@@ -55,6 +55,17 @@ class NotificationsModule(BaseModule):
         },
     }
 
+    def on_activate(self) -> None:
+        # Register the built-in email channel adapter — re-attached per
+        # boot while installed (ADR 0020, issue #325; used to run at
+        # import time in channels/registry.py). Idempotent; the loader
+        # activates this module before any vendor channel that depends
+        # on it.
+        from .channels import channel_registry
+        from .channels.email_adapter import EmailAdapter
+
+        channel_registry.register(EmailAdapter())
+
     def get_models(self) -> list:
         return [
             NotificationTemplate,

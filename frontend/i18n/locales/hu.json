@@ -35,7 +35,8 @@
     "menu": "Menü",
     "openMenu": "Menü megnyitása",
     "close": "Bezárás",
-    "toggleSidebar": "Oldalsáv be/ki"
+    "toggleSidebar": "Oldalsáv be/ki",
+    "documents": "Dokumentumok"
   },
   "auth": {
     "login": "Bejelentkezés",

@@ -126,8 +126,8 @@
       "dismiss": "Verwerfen"
     },
     "confirms": {
-      "cancel": "Diesen Recall stornieren? Der Zyklus wird beendet und kann nicht rückgängig gemacht werden.",
-      "done": "Diesen Recall als erledigt markieren? Damit wird er für diesen Zyklus abgeschlossen."
+      "cancel": "Erinnerung für {name} abbrechen? Dies kann nicht rückgängig gemacht werden.",
+      "done": "Erinnerung für {name} als erledigt markieren? Dies schließt sie für diesen Zyklus."
     }
   }
 }

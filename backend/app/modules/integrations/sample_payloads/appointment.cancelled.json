@@ -1,0 +1,15 @@
+{
+  "appointment_id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+  "clinic_id": "b5d1f2a3-7c8e-4d9f-a0b1-c2d3e4f5a6b7",
+  "patient_id": "3f8b2c1d-4a5e-4b6f-8c7d-9e0f1a2b3c4d",
+  "professional_id": "7d2e3f4a-5b6c-4d7e-8f9a-0b1c2d3e4f5a",
+  "treatment_type": "cleaning",
+  "cabinet": "Cab 1",
+  "start_time": "2026-08-30T09:30:00+02:00",
+  "end_time": "2026-08-30T10:00:00+02:00",
+  "from_status": "scheduled",
+  "to_status": "cancelled",
+  "changed_at": "2026-08-29T18:00:00+02:00",
+  "changed_by": "7d2e3f4a-5b6c-4d7e-8f9a-0b1c2d3e4f5a",
+  "note": "Patient requested reschedule"
+}

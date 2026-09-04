@@ -35,7 +35,8 @@
     "menu": "Menü",
     "openMenu": "Menü öffnen",
     "close": "Schließen",
-    "toggleSidebar": "Seitenleiste umschalten"
+    "toggleSidebar": "Seitenleiste umschalten",
+    "documents": "Dokumente"
   },
   "auth": {
     "login": "Anmelden",

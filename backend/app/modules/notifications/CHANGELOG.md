@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- fix(#326): the SMTP onboarding rule carries `permission: 'notifications.settings.read'`.
+
+- refactor(#126): budget_sent treatment names resolve through the shared `app.core.i18n_names.catalog_name` helper (was es → en → first value).
+
+- feat(#343): patient communications in German, Hungarian, Polish and Italian — full email-template sets under `backend/templates/email/{de,hu,pl,it}/`, the clinic communication-language gate and pickers extended to all 9 UI languages, and parity gaps in existing locales filled (`en` verifactu `.txt` bodies, `invoice_sent` for es/fr/pt). A parity test now pins every locale to the same template set.
+
+- feat(#334): Hungarian (hu) locale for the module's frontend layer.
+
+- fix(#325): the built-in EmailAdapter registers from `on_activate()` instead of at import in `channels/registry.py` (ADR 0020); activation order still guarantees email precedes vendor channels.
+
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
 - feat(#287): clinic-wide channel configuration — `preferred_channel`, `fallback_enabled`, `manual_channels` on clinic_notification_settings (migration notif_0004) with `available_channels` computed from the adapter registry; the gateway resolves auto-sends as preferred→fallback instead of per-type channel lists; missing preference rows no longer block WhatsApp (opt-out, bug 11); manual `POST /send` accepts `channels` and no longer 400s phone-only WhatsApp sends; every contact guard is email-OR-phone; the broken 7/14-day budget reminder actually sends (new `budget_reminder` handler + templates); skip rows carry the real channel; Settings page grew a Channels card; the type table gained invoice_sent/budget_reminder/recall_reminder.

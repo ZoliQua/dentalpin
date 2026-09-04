@@ -2,11 +2,10 @@
 
 Webhook subscriptions (REST Hooks) for third-party automations — issue
 #65. Phase 1: subscription CRUD, outbox-backed delivery with
-retry/backoff/auto-disable, Stripe-style HMAC signing, two working
-triggers (`patient.created`, `appointment.completed`), and API
-tokens. The public data-read API that will authenticate with those
-tokens, the full trigger catalog, and the Zapier/Make/n8n
-integrations are follow-up PRs, not in this module yet.
+retry/backoff/auto-disable, Stripe-style HMAC signing, eight working
+triggers, stable per-event `event_id`, API tokens, and a
+token-authenticated public data-read API. Zapier/Make/n8n apps and the
+admin UI are follow-up PRs, not in this module yet.
 
 ## What it does
 
@@ -16,13 +15,20 @@ subscriptions` and `/api/v1/integrations/tokens` (JWT +
 `.write` and `integrations.tokens.read`/`.write`). A clinic subscribes
 to one or more event types with a target URL; the module signs and
 delivers a JSON payload to that URL whenever a subscribed event fires.
-A clinic can also issue bearer API tokens (name + scopes), shown once
-on creation, revocable — no endpoint consumes them yet.
 
-Every payload carries `occurred_at`, but there's no frozen sample
-payload per trigger yet and no event id stable across subscribers
-(`WebhookDelivery.id` is per-subscription) — both are follow-up work
-(issue #65 §3), not in Phase 1.
+Token-authenticated public data-read API under `/api/v1/integrations/
+public/` — no JWT, authenticated by `Authorization: Bearer dp_...`,
+rate-limited per token (60/min + 1000/day, `X-RateLimit-*` headers),
+clinic-scoped off the token's `clinic_id`. `GET /public/ping` is the
+token-introspection auth test (no scope); every authenticated request
+stamps the token's `last_used_at`; `GET /public/patients` accepts
+format-tolerant exact-match `phone`/`email`/`national_id` params (the
+search-or-create find primitive, issue #65 §5; ported from PR #348).
+
+Every payload carries `occurred_at`. Since Phase 2, each delivery also
+carries a stable `event_id` (same id across every subscription that
+matched one bus event publish — dedupe key, issue #65 §1) and there is
+a frozen sample payload per supported trigger in `sample_payloads/`.
 
 ## Outbox
 
@@ -105,10 +111,12 @@ shown once on creation, never stored/returned again. Revocation
 mirrors `WebhookSubscription`'s own `disabled_at`/`disabled_reason`
 shape (`revoked_at`/`revoked_reason`, soft, not delete). `scopes` is
 validated against a closed catalog (`SUPPORTED_TOKEN_SCOPES` in
-`triggers.py`, same pattern as `SUPPORTED_EVENT_TYPES`) rather than
-accepted as free text, even though no consumer endpoint checks scopes
-yet — avoids having to migrate stored free-text scopes once the
-public data-read API lands.
+`triggers.py`, same pattern as `SUPPORTED_EVENT_TYPES`) at create time.
+The public data-read API (`public.py`) is the first consumer of those
+tokens: it enforces scopes via `require_scope()`, rate-limits per token
+(in-process fixed window, 60/min + 1000/day), and surfaces
+`X-RateLimit-*` headers. Single-process rate limiting — documented
+limitation.
 
 ## Dependencies
 

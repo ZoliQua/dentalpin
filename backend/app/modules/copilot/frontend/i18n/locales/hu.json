@@ -1,0 +1,185 @@
+{
+  "nav": {
+    "copilot": "IA"
+  },
+  "copilot": {
+    "title": "IA",
+    "open": "IA megnyitása",
+    "empty": "Kérdezzen a páciensekről vagy a naptárról, vagy kérjen időpontfoglalást.",
+    "placeholder": "Írja be az üzenetét…",
+    "send": "Küldés",
+    "copy": "Másolás",
+    "new": "Új beszélgetés",
+    "thinking": "Gondolkodom…",
+    "you": "Ön",
+    "assistant": "IA",
+    "trust": "Az Ön adatai védve vannak",
+    "phase": {
+      "working": "Dolgozom…",
+      "writing": "Írok…"
+    },
+    "tabs": {
+      "pending": "Teendők",
+      "chat": "Csevegés"
+    },
+    "pending": {
+      "empty": "Nincs függőben lévő teendő. Minden naprakész.",
+      "unknownPatient": "Ismeretlen páciens",
+      "group": {
+        "recall": "Utánkövetendő visszahívások",
+        "budget": "Válaszra váró árajánlatok"
+      }
+    },
+    "nudge": {
+      "act": "Megnézem",
+      "dismiss": "Elrejtés",
+      "appointmentCancelled": {
+        "text": "A(z) {time} időpontot lemondták — épp felszabadult egy idősáv.",
+        "prompt": "A(z) {time} időpontot lemondták. Keressen visszahívásra váró pácienseket, akikkel betölthető az idősáv."
+      }
+    },
+    "suggest": {
+      "heading": "Miben segíthetek?",
+      "cat": {
+        "workflows": "Munkafolyamatok",
+        "patients": "Páciensek",
+        "agenda": "Naptár",
+        "recalls": "Visszahívások",
+        "money": "Bevételek és árajánlatok",
+        "reports": "Riportok"
+      },
+      "dailyBriefing": "Napi összefoglaló",
+      "prepareVisit": "Vizit előkészítése",
+      "fillGap": "Idősáv betöltése",
+      "searchPatient": "Páciens keresése",
+      "patientSummary": "Páciens összefoglalása",
+      "freeSlots": "Mai szabad idősávok",
+      "bookAppointment": "Időpont foglalása",
+      "dueRecalls": "Esedékes visszahívások",
+      "pendingBudgets": "Megválaszolatlan árajánlatok",
+      "recordPayment": "Fizetés rögzítése",
+      "monthCollections": "E havi bevételek",
+      "agendaSummary": "Naptár áttekintése",
+      "prompt": {
+        "dailyBriefing": "Kérem a napi összefoglalót: mai időpontok, lejárt visszahívások és megválaszolatlan árajánlatok",
+        "prepareVisit": "Készítse elő nekem egy páciens következő vizitjét",
+        "fillGap": "Felszabadult egy idősáv a naptárban, kit hívhatnánk fel?",
+        "searchPatient": "Keressen meg egy pácienst",
+        "patientSummary": "Adjon összefoglalót egy páciensről",
+        "freeSlots": "Milyen szabad idősávok vannak ma?",
+        "bookAppointment": "Időpontot szeretnék foglalni",
+        "dueRecalls": "Mely visszahívások esedékesek ebben a hónapban?",
+        "pendingBudgets": "Mely árajánlatok lettek elküldve válasz nélkül?",
+        "recordPayment": "Páciens fizetését szeretném rögzíteni",
+        "monthCollections": "Összefoglaló az e havi bevételekről",
+        "agendaSummary": "Adjon áttekintést a mai naptárról"
+      }
+    },
+    "settings": {
+      "title": "Copilot",
+      "description": "AI-asszisztens: napi összefoglaló és motor",
+      "saved": "Beállítások elmentve",
+      "digest": {
+        "title": "Reggeli összefoglaló e-mail",
+        "description": "Minden reggel: mai időpontok, lejárt visszahívások és megválaszolatlan árajánlatok.",
+        "enabled": "Napi összefoglaló küldése",
+        "hour": "Küldés órája",
+        "hourHelp": "A rendelő időzónája szerint értelmezve.",
+        "recipients": "Címzettek",
+        "recipientsHelp": "Minden címzett saját összefoglalót kap, arra korlátozva, amit a szerepköre láthat.",
+        "recipientsPlaceholder": "Válasszon munkatársakat…"
+      },
+      "engine": {
+        "title": "Motor",
+        "provider": "Szolgáltató",
+        "model": "Modell",
+        "redaction": "PHI-adatok kitakarása",
+        "redactionOn": "Engedélyezve",
+        "redactionOff": "Letiltva"
+      },
+      "metrics": {
+        "title": "Használat",
+        "description": "Az elmúlt {days} nap.",
+        "toolCalls": "Eszközhívások",
+        "errorRate": "Hibaarány",
+        "avgLatency": "Átl. válaszidő",
+        "conversations": "Beszélgetések",
+        "tokenBudget": "Havi tokenkeret",
+        "topTools": "Leggyakrabban használt eszközök",
+        "toolNames": {
+          "recalls_list_due_recalls": "Lejárt visszahívások",
+          "budget_list_budgets": "Függőben lévő árajánlatok",
+          "patients_list_patients": "Pácienskeresés",
+          "appointments_list_appointments": "Időpontok",
+          "invoices_list_invoices": "Számlák"
+        }
+      }
+    },
+    "tool": {
+      "running": "{name} futtatása…",
+      "done": "{name} kész",
+      "failed": "{name} sikertelen"
+    },
+    "card": {
+      "viewPatient": "Karton megtekintése",
+      "noResults": "Nincs találat",
+      "notFound": "Nem található",
+      "more": "+{n} további",
+      "freeSlots": "Szabad idősávok",
+      "appointments": "Időpontok",
+      "patients": "Páciensek"
+    },
+    "patientStatus": {
+      "active": "aktív",
+      "archived": "archivált"
+    },
+    "apptStatus": {
+      "scheduled": "Beütemezve",
+      "confirmed": "Megerősítve",
+      "checked_in": "A váróban",
+      "in_treatment": "A székben",
+      "completed": "Befejezve",
+      "cancelled": "Lemondva",
+      "no_show": "Nem jelent meg"
+    },
+    "confirm": {
+      "title": "Művelet megerősítése",
+      "body": "Az IA a(z) {name} műveletet szeretné futtatni.",
+      "approve": "Megerősítés",
+      "reject": "Mégse",
+      "approved": "Megerősítve",
+      "rejected": "Elutasítva",
+      "destructiveNote": "Ez a művelet nem vonható vissza.",
+      "action": {
+        "book_appointment": "Az IA időpontot szeretne foglalni.",
+        "cancel_appointment": "Az IA le szeretne mondani egy időpontot.",
+        "create_patient": "Az IA új pácienst szeretne létrehozni."
+      },
+      "field": {
+        "patient_id": "Páciens",
+        "professional_id": "Kezelőorvos",
+        "appointment_id": "Időpont",
+        "cabinet_id": "Kezelő",
+        "cabinet": "Kezelő",
+        "start_time": "Dátum",
+        "end_time": "Vége",
+        "datetime": "Dátum",
+        "service": "Szolgáltatás",
+        "reason": "Ok",
+        "duration_minutes": "Időtartam (perc)",
+        "first_name": "Keresztnév",
+        "last_name": "Vezetéknév",
+        "phone": "Telefon",
+        "email": "E-mail",
+        "date_of_birth": "Születési dátum",
+        "query": "Keresés"
+      }
+    },
+    "budgetExceeded": "Elérte a havi IA-használati keretet.",
+    "error": "Hiba történt.",
+    "page": {
+      "title": "IA",
+      "subtitle": "Az Ön rendelőasszisztense, az Ön jogosultságaihoz igazítva."
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Kosztorys zaakceptowany - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Dzień dobry, {{ patient_name }}!</h2>
+
+<p>Odnotowaliśmy akceptację Twojego kosztorysu. Dziękujemy za okazane zaufanie.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Nr kosztorysu</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Data akceptacji</div>
+            <div class="value">{{ accepted_date }}</div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div>
+            <div class="label">Łączny koszt leczenia</div>
+            <div class="value" style="font-size: 20px; color: #3b82f6;">{{ total }} €</div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success">
+    <strong>Kolejny krok!</strong> Skontaktujemy się z Tobą, aby zaplanować wizyty potrzebne do przeprowadzenia leczenia.
+</div>
+
+{% if notes %}
+<p><strong>Uwagi:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Jeśli masz pytania lub chcesz umówić pierwszą wizytę, skontaktuj się z nami.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Umów wizytę</a>
+</div>
+{% endif %}
+
+<p>Dziękujemy za wybór naszego gabinetu!</p>
+{% endblock %}

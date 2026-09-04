@@ -20,15 +20,18 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, backref, mapped_column, relationship
 
 from app.database import Base, TimestampMixin
 
 if TYPE_CHECKING:
     from app.core.auth.models import Clinic, User
+    from app.modules.agenda.models import Appointment
     from app.modules.budget.models import Budget
+    from app.modules.catalog.models import TreatmentCatalogItem
     from app.modules.odontogram.models import Treatment
     from app.modules.patients.models import Patient
 
@@ -216,3 +219,48 @@ class PlannedTreatmentItemSession(Base, TimestampMixin):
         Index("idx_pti_session_plan_item", "plan_item_id"),
         Index("ix_pti_session_plan_item_status", "plan_item_id", "status"),
     )
+
+
+class AppointmentTreatment(Base):
+    """Plan↔appointment link rows (``appointment_treatments``).
+
+    Owned by treatment_plan since #337: ``planned_treatment_item_id`` is
+    NOT NULL — a row cannot exist without a planned item, so this was
+    never agenda data with a plan reference but the plan-side visit
+    bridge. All three FKs are declarable from here (agenda and catalog
+    are in ``manifest.depends``); from agenda's side the edge was a
+    manifest cycle (#309). The table itself is unchanged — created by
+    ag_0001, future ALTERs live on the ``tp`` branch.
+
+    The ``backref`` installs ``Appointment.treatments`` (cascade
+    delete-orphan, ordered) so agenda keeps reading its appointments'
+    treatments duck-typed without ever importing this class; its
+    queries eager-load through the planned-work provider.
+    """
+
+    __tablename__ = "appointment_treatments"
+
+    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    appointment_id: Mapped[UUID] = mapped_column(
+        ForeignKey("appointments.id", ondelete="CASCADE"), index=True
+    )
+    planned_treatment_item_id: Mapped[UUID] = mapped_column(
+        ForeignKey("planned_treatment_items.id"), index=True
+    )
+    catalog_item_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("treatment_catalog_items.id", ondelete="SET NULL"), nullable=True
+    )
+    display_order: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    completed_in_appointment: Mapped[bool] = mapped_column(Boolean, default=False)
+    notes: Mapped[str | None] = mapped_column(Text, default=None)
+
+    appointment: Mapped["Appointment"] = relationship(
+        backref=backref(
+            "treatments",
+            cascade="all, delete-orphan",
+            order_by="AppointmentTreatment.display_order",
+        )
+    )
+    planned_item: Mapped["PlannedTreatmentItem"] = relationship()
+    catalog_item: Mapped["TreatmentCatalogItem | None"] = relationship()

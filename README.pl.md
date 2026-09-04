@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Oprogramowanie open source do zarządzania gabinetem stomatologicznym.** Pacjenci,
+**Oprogramowanie o dostępnym kodzie źródłowym (BSL 1.1) do zarządzania gabinetem stomatologicznym, przechodzące na Apache 2.0 cztery lata po publikacji.** Pacjenci,
 diagram zębowy, terminarz, plany leczenia, fakturowanie i wbudowany copilot AI —
 modułowe, self-hosted, API-first.
 
@@ -33,11 +33,11 @@ DentalPin opiera się na prostym założeniu: **jedna otwarta platforma dla gabi
 
 ### Dlaczego teraz?
 
-AI fundamentalnie zmieniła to, co mogą zbudować małe zespoły. Funkcje, które kiedyś wymagały dużych działów rozwoju, dziś można wdrożyć w kilka dni. To nasza szansa, aby stworzyć otwarte oprogramowanie stomatologiczne, które powinno istnieć już lata temu — zanim gabinety zostały uwięzione w systemach legacy, z których nie mogą się wydostać.
+AI fundamentalnie zmieniła to, co mogą zbudować małe zespoły. Funkcje, które kiedyś wymagały dużych działów rozwoju, dziś można wdrożyć w kilka dni. To nasza szansa, aby stworzyć oprogramowanie stomatologiczne o dostępnym kodzie źródłowym (BSL 1.1, przechodzące na Apache 2.0 cztery lata po publikacji), które powinno istnieć już lata temu — zanim gabinety zostały uwięzione w systemach legacy, z których nie mogą się wydostać.
 
 ### Nasze zasady
 
-- **Open source** — Dane Twojego gabinetu należą do Ciebie. Twoje oprogramowanie też powinno.
+- **Dostępny kod źródłowy (BSL 1.1)** — Dane Twojego gabinetu należą do Ciebie. Twoje oprogramowanie też powinno.
 - **Modułowość** — Zacznij prosto, dodawaj to, czego potrzebujesz. Nie płać za funkcje, których nigdy nie użyjesz.
 - **Globalność w założeniu** — Zaprojektowany z myślą o lokalizacji od pierwszego dnia. Ten sam rdzeń, dowolny język, dowolny kraj.
 - **API-first** — Każda funkcja to API. Integruj z czymkolwiek, automatyzuj wszystko.
@@ -155,7 +155,7 @@ Pełne informacje o danych demo znajdziesz w [docs/user-manual/en/demo.md](docs/
 | Warstwa | Technologia |
 |---------|-------------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Baza danych | PostgreSQL 15 |
 | Uwierzytelnianie | JWT z refresh tokenami |
 

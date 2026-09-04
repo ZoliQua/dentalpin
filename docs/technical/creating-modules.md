@@ -485,8 +485,16 @@ alembic revision --autogenerate \
 
 `backend/alembic.ini`'s `version_locations` lists every module's
 `migrations/versions` directory so `alembic history | heads | upgrade`
-find them before `env.py` runs. Because each branch adds a head, the
-round-trip tests use the plural form `alembic upgrade heads`. The
+find them before `env.py` runs. **This registration step is mandatory when
+you create a module's migration branch**: the Alembic CLI builds its graph
+from that *static* list, and `env.py`'s runtime discovery override is too
+late for graph resolution. Skip it and the module's `alembic_roundtrip`
+test fails ("X tables missing after upgrade heads") even though the
+SQLAlchemy `create_all` suite passes. A CI guard
+(`test_every_module_migrations_dir_is_registered_in_alembic_ini`) fails the
+manifest gate until the directory is appended to the list as
+`:app/modules/<name>/migrations/versions`. Because each branch adds a
+head, the round-trip tests use the plural form `alembic upgrade heads`. The
 container entrypoint runs `python -m app.cli db upgrade` instead, which
 names the core heads plus the branch head of every *installed* module —
 an uninstalled module's branch is never applied at boot (ADR 0020).

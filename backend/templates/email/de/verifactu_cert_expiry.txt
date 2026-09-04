@@ -1,0 +1,17 @@
+Hallo {{ admin_name }},
+
+{% if is_expired -%}
+das digitale Zertifikat der Praxis "{{ clinic_name }}", mit dem die Übermittlungen an die AEAT (Veri*Factu) signiert werden, IST BEREITS ABGELAUFEN. Solange Sie es nicht erneuern, bleiben die Datensätze in der Warteschlange und die AEAT lehnt jede Übermittlung ab.
+{%- else -%}
+das digitale Zertifikat der Praxis "{{ clinic_name }}", mit dem die Übermittlungen an die AEAT (Veri*Factu) signiert werden, läuft in {{ days_left }} Tag(en) ab. Wir empfehlen, es vor Ablauf der Frist zu erneuern, damit die Rechnungsstellung nicht unterbrochen wird.
+{%- endif %}
+
+Inhaber: {{ subject_cn or '—' }}
+Ablaufdatum: {{ valid_until.strftime('%d/%m/%Y') }}
+
+Schritte:
+1. Beantragen Sie ein neues Zertifikat bei der FNMT.
+2. Öffnen Sie DentalPin → Einstellungen → Verifactu → Zertifikat.
+3. Laden Sie die .pfx-Datei hoch und geben Sie das Passwort ein.
+
+Wenn Sie Hilfe benötigen, antworten Sie auf diese E-Mail.

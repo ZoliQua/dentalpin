@@ -98,6 +98,41 @@ async def test_settings_patch_provider_change_requires_openai_key(
 
 
 @pytest.mark.asyncio
+async def test_settings_patch_provider_change_requires_anthropic_key(
+    client: AsyncClient, auth_headers: dict, test_clinic, monkeypatch
+) -> None:
+    from app.config import settings as app_settings
+
+    monkeypatch.setattr(app_settings, "ANTHROPIC_API_KEY", "")
+    res = await client.patch(
+        "/api/v1/copilot/settings",
+        json={"provider": "anthropic"},
+        headers=auth_headers,
+    )
+    assert res.status_code == 400
+    assert "ANTHROPIC_API_KEY" in res.text
+
+
+@pytest.mark.asyncio
+async def test_settings_patch_provider_switch_defaults_model(
+    client: AsyncClient, auth_headers: dict, test_clinic, monkeypatch
+) -> None:
+    """Switching provider without naming a model must not keep the other vendor's model id."""
+    from app.config import settings as app_settings
+
+    monkeypatch.setattr(app_settings, "ANTHROPIC_API_KEY", "test-key")
+    res = await client.patch(
+        "/api/v1/copilot/settings",
+        json={"provider": "anthropic"},
+        headers=auth_headers,
+    )
+    assert res.status_code == 200, res.text
+    body = res.json()["data"]
+    assert body["provider"] == "anthropic"
+    assert body["model"] == app_settings.COPILOT_MODEL_CHAT_ANTHROPIC
+
+
+@pytest.mark.asyncio
 async def test_settings_patch_rejects_bad_hour(
     client: AsyncClient, auth_headers: dict, test_clinic
 ) -> None:

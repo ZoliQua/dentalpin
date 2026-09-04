@@ -1,0 +1,88 @@
+{
+  "documents": {
+    "title": "Dokumentumok",
+    "subtitle": "Receptek, igazolások, beutalók és röntgenkérések kezelése",
+    "newDocument": "Új dokumentum",
+    "editDocument": "Dokumentum szerkesztése",
+    "filterType": "Szűrés típus szerint",
+    "filterStatus": "Szűrés állapot szerint",
+    "empty": "Még nincsenek dokumentumok. Hozza létre az elsőt.",
+    "patient": "Beteg",
+    "selectPatient": "Beteg kiválasztása",
+    "patientSearchEmpty": "Nem találhatók betegek ehhez a kereséshez",
+    "type": "Dokumentum típusa",
+    "selectType": "Típus kiválasztása",
+    "titleLabel": "Cím",
+    "titlePlaceholder": "pl. Amoxicillin recept",
+    "types": {
+      "all": "Minden típus",
+      "prescription": "Recept",
+      "medical_certificate": "Orvosi igazolás",
+      "referral": "Beutaló levél",
+      "radiology_request": "Röntgenkérés"
+    },
+    "status": {
+      "all": "Minden állapot",
+      "draft": "Piszkozat",
+      "generated": "Generálva",
+      "archived": "Archiválva"
+    },
+    "actions": {
+      "generate": "PDF generálása",
+      "edit": "Szerkesztés",
+      "archive": "Archiválás",
+      "download": "PDF letöltése"
+    },
+    "messages": {
+      "created": "Dokumentum létrehozva",
+      "updated": "Dokumentum frissítve",
+      "generated": "Dokumentum sikeresen generálva",
+      "archived": "Dokumentum archiválva",
+      "downloaded": "PDF letöltve",
+      "downloadFailed": "A PDF letöltése nem sikerült"
+    },
+    "content": {
+      "diagnosis": "Diagnózis",
+      "diagnosisPlaceholder": "Adja meg a diagnózist...",
+      "medications": "Gyógyszerek",
+      "addMedication": "Gyógyszer hozzáadása",
+      "medName": "Gyógyszer neve",
+      "medDose": "Adagolás",
+      "medFrequency": "Gyakoriság",
+      "medDuration": "Időtartam",
+      "notes": "Megjegyzések",
+      "notesPlaceholder": "További megjegyzések...",
+      "description": "Leírás",
+      "recommendations": "Javaslatok",
+      "referredTo": "Beutalva",
+      "specialty": "Szakterület",
+      "reason": "Beutalás oka",
+      "clinicalSummary": "Klinikai összefoglaló",
+      "examType": "Vizsgálat típusa",
+      "region": "Régió",
+      "clinicalQuestion": "Klinikai kérdés"
+    },
+    "settings": {
+      "cards": {
+        "letterhead": {
+          "title": "Dokumentum fejléc",
+          "description": "A rendelő arculata recepteken, igazolásokon, beutalókon és röntgenkéréseken"
+        }
+      },
+      "letterhead": {
+        "help": "Ezek a mezők felülírják a rendelő profilját a generált PDF-eken. Az üresen hagyott mező a rendelő név, cím és adószám értékeit használja.",
+        "name": "Fejléc név",
+        "nameHint": "Alapértelmezés: rendelő neve",
+        "address": "Fejléc cím",
+        "phone": "Fejléc telefon",
+        "email": "Fejléc e-mail",
+        "registrationNumber": "Regisztrációs/engedélys szám",
+        "logo": "Logó",
+        "logoHint": "Minden PDF bal felső sarkában jelenik meg. Javaslat: négyzet alakú, átlátszó PNG, 512×512 px alatt.",
+        "chooseLogo": "Kép kiválasztása",
+        "save": "Fejléc mentése",
+        "saved": "Fejléc mentve"
+      }
+    }
+  }
+}

@@ -12,17 +12,20 @@ surface (appointments CRUD, transitions, cabinet assignments, kanban).
 
 `manifest.depends = ["patients", "catalog", "odontogram"]`.
 
-**Planned-work contract (#309).** Booking against treatment-plan items
-is a two-way product dependency, but ``treatment_plan`` already
+**Planned-work contract (#309/#337).** Booking against treatment-plan
+items is a two-way product dependency, but ``treatment_plan`` already
 declares ``agenda`` and the manifest graph must stay acyclic — so this
 module NEVER imports treatment_plan. It owns the
 ``PlannedWorkProvider`` protocol + registry in ``planned_work.py``;
-``treatment_plan`` registers its implementation at import time
-(``agenda_provider.py``). Loader options, booking validation and the
-catalog-item snapshot all go through the registry. The
-``appointment_treatments.planned_treatment_item_id`` FK remains
-documented debt in ``tests/test_module_fk_isolation.py`` — legalizing
-it needs a column-ownership move, not a manifest entry.
+``treatment_plan`` registers its implementation from ``on_activate``
+(``agenda_provider.py``). Since #337 the ``appointment_treatments``
+table and its ``AppointmentTreatment`` model are treatment_plan-owned
+too (the planned-item FK is NOT NULL — it was always the plan's visit
+bridge): the provider installs ``Appointment.treatments`` via backref,
+serves the full eager-load options, creates the link rows at booking,
+and hands agenda the clinic-scoped row for the visit-note editor.
+Agenda touches the rows only duck-typed. The FK allowlist in
+``tests/test_module_fk_isolation.py`` is empty.
 
 ## Permissions
 

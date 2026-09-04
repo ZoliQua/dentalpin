@@ -32,6 +32,7 @@ export default defineNuxtPlugin(() => {
     descriptionKey: 'patients.onboarding.description',
     icon: 'i-lucide-user-plus',
     to: '/patients?new=1',
+    permission: 'patients.read',
     order: 90,
     optional: true,
     severity: 'info',

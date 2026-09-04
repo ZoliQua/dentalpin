@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Időpont lemondva - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Kedves {{ patient_name }}!</h2>
+
+<p>Tájékoztatjuk, hogy időpontja lemondásra került.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Dátum</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Időpont</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelőorvos</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if cancellation_reason %}
+<div class="alert alert-warning">
+    <strong>Indok:</strong> {{ cancellation_reason }}
+</div>
+{% endif %}
+
+<p>Ha új időpontot szeretne foglalni, keressen minket bizalommal.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Új időpont foglalása</a>
+</div>
+{% endif %}
+
+<p>Elnézését kérjük az esetleges kellemetlenségért.</p>
+{% endblock %}

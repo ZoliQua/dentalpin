@@ -128,6 +128,16 @@ export const PERMISSIONS = {
     settingsRead: 'whatsapp_kapso.settings.read',
     settingsWrite: 'whatsapp_kapso.settings.write'
   },
+  whatsappWebhook: {
+    settingsRead: 'whatsapp_webhook.settings.read',
+    settingsWrite: 'whatsapp_webhook.settings.write'
+  },
+  telephony: {
+    settingsRead: 'telephony.settings.read',
+    settingsWrite: 'telephony.settings.write',
+    callsRead: 'telephony.calls.read',
+    callsWrite: 'telephony.calls.write'
+  },
   schedules: {
     clinicHoursRead: 'schedules.clinic_hours.read',
     clinicHoursWrite: 'schedules.clinic_hours.write',
@@ -185,5 +195,9 @@ export const PERMISSIONS = {
   medicationCatalog: {
     read: 'medication_catalog.read',
     write: 'medication_catalog.write'
+  },
+  generatedDocuments: {
+    read: 'documents.read',
+    write: 'documents.write'
   }
 } as const

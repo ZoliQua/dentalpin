@@ -1,14 +1,17 @@
 ---
 module: integrations
-last_verified_commit: d426572
+last_verified_commit: ab94969a
 ---
 
 # Integrations — permissions
 
 Returned by `IntegrationsModule.get_permissions()`
 (relative names; the registry namespaces them as `integrations.<name>`).
-Admin-only in Phase 1 — every other role gets `[]` in
-`manifest.role_permissions`.
+Admin-only — every other role gets `[]` in `manifest.role_permissions`.
+
+The public data-read API (`/api/v1/integrations/public/...`) is NOT gated
+by RBAC permissions — it uses API-token scopes (`patients:read`) instead
+of staff JWT claims.
 
 | Permission | Allows | Required by |
 |------------|--------|-------------|
@@ -17,6 +20,20 @@ Admin-only in Phase 1 — every other role gets `[]` in
 | `integrations.tokens.read` | List a clinic's API tokens | `GET /api/v1/integrations/tokens` |
 | `integrations.tokens.write` | Create or revoke an API token | `POST /api/v1/integrations/tokens`, `POST /api/v1/integrations/tokens/{id}/revoke` |
 
+## API-token scopes (public data-read API)
+
+Validated against `SUPPORTED_TOKEN_SCOPES` in `triggers.py` at token
+creation time. Enforced per-endpoint by the `require_scope()` dependency in
+`public.py`.
+
+| Scope | Allows | Required by |
+|-------|--------|-------------|
+| `patients:read` | Read patients for the token's clinic (incl. the structured `phone`/`email`/`national_id` find params) | `GET /api/v1/integrations/public/patients`, `GET /api/v1/integrations/public/patients/{id}` |
+
+`GET /api/v1/integrations/public/ping` (token introspection — the auth
+test a Zapier/Make app runs) requires a valid token but no scope.
+Every authenticated public request stamps the token's `last_used_at`.
+
 ## Role assignment
 
 See `backend/app/core/auth/permissions.py` for the canonical role table.
@@ -24,9 +41,14 @@ See `backend/app/core/auth/permissions.py` for the canonical role table.
 ## Adding a new permission
 
 1. Add the relative name to `get_permissions()` in
-   `backend/app/modules/integrations/__init__.py` (or `module.py`).
-2. Add the namespaced form to the relevant role(s) in
-   `backend/app/core/auth/permissions.py`.
+   `backend/app/modules/integrations/__init__.py`.
+2. Grant it to roles in `manifest.role_permissions`.
 3. Add a row to the table above.
 4. Annotate the endpoint(s) with `Depends(require_permission(...))`.
 5. Update `frontend/app/config/permissions.ts` if it gates UI.
+
+## Adding a new token scope
+
+1. Add the scope string to `SUPPORTED_TOKEN_SCOPES` in `triggers.py`.
+2. Add a consumer endpoint to `public.py` with `Depends(require_scope(...))`.
+3. Add a row to the token scopes table above.

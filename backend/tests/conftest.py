@@ -23,7 +23,6 @@ from app.modules.agenda.models import (  # noqa: F401
     Appointment,
     AppointmentCabinetEvent,
     AppointmentStatusEvent,
-    AppointmentTreatment,
     Cabinet,
 )
 from app.modules.billing.models import (  # noqa: F401
@@ -85,6 +84,7 @@ from app.modules.schedules.models import (  # noqa: F401
     ScheduleShift,
 )
 from app.modules.treatment_plan.models import (  # noqa: F401
+    AppointmentTreatment,
     PlannedTreatmentItem,
     TreatmentPlan,
 )

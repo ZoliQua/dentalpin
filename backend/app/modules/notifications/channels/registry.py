@@ -15,7 +15,6 @@ from __future__ import annotations
 import logging
 
 from .base import Channel, ChannelAdapter
-from .email_adapter import EmailAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +50,18 @@ class ChannelRegistry:
                 return adapter
         return None
 
+    def adapters_for_channel(self, channel: Channel | str) -> list[ChannelAdapter]:
+        """All adapters registered for ``channel``, most recent first.
+
+        Callers that can ``await adapter.supports(...)`` should iterate
+        this instead of :meth:`get_for_channel` — with two vendors
+        installed for one channel (e.g. ``whatsapp_kapso`` +
+        ``whatsapp_webhook``) the clinic's *configured* one wins, not the
+        last-imported one.
+        """
+        channel = Channel(channel)
+        return [a for a in reversed(list(self._adapters.values())) if a.channel == channel]
+
     def get_by_name(self, adapter_name: str) -> ChannelAdapter | None:
         return self._adapters.get(adapter_name)
 
@@ -58,6 +69,8 @@ class ChannelRegistry:
         return sorted({a.channel for a in self._adapters.values()})
 
 
-# Global singleton. Email is always present.
+# Global singleton. The built-in EmailAdapter is registered by
+# ``NotificationsModule.on_activate`` (ADR 0020, issue #325) — the
+# loader activates ``notifications`` before any vendor that depends on
+# it, so email is still always present first.
 channel_registry = ChannelRegistry()
-channel_registry.register(EmailAdapter())

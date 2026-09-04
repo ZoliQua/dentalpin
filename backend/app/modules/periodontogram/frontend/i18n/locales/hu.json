@@ -1,0 +1,85 @@
+{
+  "periodontogram": {
+    "tab": {
+      "label": "Parodontogram"
+    },
+    "empty": {
+      "title": "Még nincs parodontális vizsgálat",
+      "description": "Nyisson új vizsgálatot a szondázási mélységek, a vérzés, a plakk és a többi SEPA-mutató rögzítéséhez.",
+      "cta": "Vizsgálat indítása"
+    },
+    "session": {
+      "draftBadge": "Folyamatban lévő piszkozat",
+      "closedBadge": "Lezárt vizsgálat",
+      "recordedAt": "Rögzítve: {date}",
+      "openDraft": "Új vizsgálat indítása",
+      "continueDraft": "Piszkozat folytatása",
+      "closeTitle": "Parodontális vizsgálat lezárása",
+      "closeDescription": "Lezárás után a vizsgálat már nem módosítható, és megjelenik az előzményekben. Javításhoz új vizsgálatot kell nyitnia.",
+      "closeButton": "Vizsgálat lezárása",
+      "discardTitle": "Piszkozat elvetése",
+      "discardDescription": "A vizsgálat során rögzített összes adat törlődik. Ez a művelet nem vonható vissza.",
+      "discardButton": "Elvetés",
+      "cancel": "Mégse",
+      "closeSession": "Vizsgálat lezárása",
+      "discardDraft": "Piszkozat elvetése"
+    },
+    "indices": {
+      "bop": "Vérzés",
+      "pi": "Plakk",
+      "calMean": "Átlagos CAL",
+      "deepPockets": "Tasakok ≥5 mm"
+    },
+    "saveState": {
+      "saving": "Mentés…",
+      "dirty": "Nem mentett módosítások",
+      "saved": "Módosítások mentve"
+    },
+    "history": {
+      "viewingSession": "Vizsgálat megtekintése: {date} (csak olvasható).",
+      "returnToCurrent": "Vissza az aktuálishoz"
+    },
+    "arch": {
+      "upper": "Felső",
+      "lower": "Alsó",
+      "palatal": "Palatinális",
+      "lingual": "Linguális",
+      "vestibular": "Vesztibuláris",
+      "probing": "Szondázás",
+      "margin": "Ínyszél",
+      "bleeding": "Vérzés",
+      "plaque": "Plakk",
+      "probingTitle": "{code} szondázási mélység (0–15 mm)",
+      "marginTitle": "{code} ínyszél (-5-től 10 mm-ig)",
+      "plaqueTitle": "{code} plakk (kattintson a váltáshoz)",
+      "bleedingTitle": "{code} vérzés (kattintson a váltáshoz)",
+      "implant": "Implantátum",
+      "implantToggleOn": "Implantátum (kattintson az eltávolításhoz)",
+      "implantToggleOff": "Kattintson az implantátumként való megjelöléshez",
+      "mobility": "Mozgathatóság",
+      "mobilityTitle": "Kattintson a mozgathatóság módosításához (0–3)",
+      "prognosis": "Prognózis",
+      "prognosisTitle": "Jó / Megfelelő / Kétséges / Reménytelen",
+      "furcaV": "Furkáció V",
+      "furcaVTitle": "Vesztibuláris furkáció (0/I/II/III)",
+      "furcaLP": "Furkáció L/P",
+      "furcaLPTitle": "Linguális/palatinális furkáció (0/I/II/III)",
+      "gingivalWidth": "Ínyszélesség",
+      "siteMarkerAria": "{code} mérési pont, szondázás {depth}"
+    },
+    "chart": {
+      "ariaLabel": "Parodontogram — felső és alsó fogív"
+    },
+    "indicesBanner": {
+      "observationsPlaceholder": "Vizsgálati megjegyzések…",
+      "noteLabel": "Megjegyzés (nem kötelező)"
+    },
+    "loading": "Parodontogram betöltése…",
+    "errors": {
+      "loadFailed": "Nem sikerült betölteni a parodontogramot.",
+      "saveFailed": "Nem sikerült menteni a módosítást.",
+      "checkConnection": "Ellenőrizze a kapcsolatot, és próbálja újra.",
+      "closeAborted": "Néhány mérés még nincs mentve — a vizsgálat nem lett lezárva. Ellenőrizze a kapcsolatot, és próbálja újra."
+    }
+  }
+}

@@ -233,8 +233,22 @@ class NotificationGateway:
         return attempted
 
     @staticmethod
+    async def _supporting_adapter(db: AsyncSession, clinic_id, channel):
+        """First adapter for ``channel`` that is configured for this clinic.
+
+        With two vendors installed for one channel (kapso + webhook) the
+        registry alone can't pick — ``supports`` reads the clinic's config
+        and decides. Most-recently-registered wins only as a tie-break
+        between two *configured* adapters.
+        """
+        for adapter in channel_registry.adapters_for_channel(channel):
+            if await adapter.supports(db, clinic_id):
+                return adapter
+        return None
+
+    @staticmethod
     async def _dispatch_one(db: AsyncSession, msg: CommunicationMessage) -> None:
-        adapter = channel_registry.get_for_channel(msg.channel)
+        adapter = await NotificationGateway._supporting_adapter(db, msg.clinic_id, msg.channel)
         if adapter is None:
             await NotificationGateway._mark_failed(db, msg, f"no adapter for channel {msg.channel}")
             return
@@ -458,8 +472,7 @@ class NotificationGateway:
         order = [preferred]
         if settings.fallback_enabled:
             other = "whatsapp" if preferred == "email" else "email"
-            adapter = channel_registry.get_for_channel(other)
-            if adapter is not None and await adapter.supports(db, clinic_id):
+            if await NotificationGateway._supporting_adapter(db, clinic_id, other) is not None:
                 order.append(other)
         return order
 
@@ -480,8 +493,8 @@ class NotificationGateway:
                 channel = Channel(name)
             except ValueError:
                 continue
-            adapter = channel_registry.get_for_channel(channel)
-            if adapter is None or not await adapter.supports(db, clinic_id):
+            adapter = await NotificationGateway._supporting_adapter(db, clinic_id, channel)
+            if adapter is None:
                 continue
 
             if channel == Channel.EMAIL:

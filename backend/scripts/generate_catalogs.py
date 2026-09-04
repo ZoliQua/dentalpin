@@ -35,11 +35,26 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-_default_repo_root = Path(__file__).resolve().parents[2]
+_scripts_dir = Path(__file__).resolve().parent
+_default_repo_root = _scripts_dir.parents[1]
+
+
+def _find_repo_root(start: Path) -> Path:
+    """Ascend to the repo root — a dir holding both ``docs/`` and ``backend/``
+    (same marker as ``check_docs_coverage._locate_repo_root``). Falls back to
+    two levels above this scripts dir, which is the layout under a bare
+    backend mount (compose bind-mounts ``./backend`` to ``/app``, one level
+    shallower than the checked-out repo)."""
+    for candidate in (start, *start.parents):
+        if (candidate / "docs").is_dir() and (candidate / "backend").is_dir():
+            return candidate
+    return _default_repo_root
+
+
 _env_repo_root = os.environ.get("DENTALPIN_REPO_ROOT")
-REPO_ROOT = Path(_env_repo_root).resolve() if _env_repo_root else _default_repo_root
+REPO_ROOT = Path(_env_repo_root).resolve() if _env_repo_root else _find_repo_root(_scripts_dir)
 _env_backend_root = os.environ.get("DENTALPIN_BACKEND_ROOT")
-BACKEND_ROOT = Path(_env_backend_root).resolve() if _env_backend_root else REPO_ROOT / "backend"
+BACKEND_ROOT = Path(_env_backend_root).resolve() if _env_backend_root else _scripts_dir.parent
 MODULES_ROOT = BACKEND_ROOT / "app" / "modules"
 DOCS_ROOT = REPO_ROOT / "docs"
 
@@ -142,7 +157,13 @@ def _scan_publishers() -> dict[str, list[tuple[str, str, int]]]:
             text = path.read_text(encoding="utf-8", errors="replace")
             if "event_bus.publish" not in text:
                 continue
-            relpath = path.relative_to(REPO_ROOT).as_posix()
+            try:
+                relpath = path.relative_to(REPO_ROOT).as_posix()
+            except ValueError:
+                # Repo and backend mounted separately (gate: /repo + /app).
+                # Prefix "backend/" so the rendered path matches the host
+                # layout and a regenerated catalog stays freshness-stable.
+                relpath = "backend/" + path.relative_to(BACKEND_ROOT).as_posix()
             module_name = _module_name_for(path)
 
             # Same-file constant table (module-local event enums).
@@ -333,7 +354,10 @@ def _render_events_catalog(modules, publishers) -> str:
         "Every event declared in `app.core.events.types.EventType`, with "
         "its publishers (grepped from `event_bus.publish` callsites) and "
         "subscribers (modules that return the event from "
-        "`get_event_handlers()`).\n",
+        "`get_event_handlers()`). Publisher rows anchor at **file level** — "
+        "no absolute line numbers, because any unrelated edit above a "
+        "callsite would shift the line and churn this committed snapshot. "
+        "Find the call by grepping the file for the publish statement.\n",
         "Maintained by `backend/scripts/generate_catalogs.py`.\n",
         "## Summary\n",
         "| Event | Constant | Publishers | Subscribers |",
@@ -371,8 +395,8 @@ def _render_events_catalog(modules, publishers) -> str:
         for event in feral:
             sites = publishers[event]
             lines.append(f"- `{event}` — {len(sites)} site(s):")
-            for _, relpath, lineno in sites:
-                lines.append(f"  - `{relpath}:{lineno}`")
+            for _, relpath, _lineno in sites:
+                lines.append(f"  - `{relpath}`")
 
     lines.append("")
     lines.append("## Detail\n")
@@ -383,9 +407,13 @@ def _render_events_catalog(modules, publishers) -> str:
         lines.append(f"### `{value}`\n")
         lines.append(f"- **Constant:** `EventType.{const}`")
         if pubs:
+            # File-level anchor only: embedding an absolute line number in the
+            # committed snapshot makes it churn (and trip catalog-freshness) on
+            # every unrelated edit above a publish callsite. Grep the file for
+            # the publish statement to locate the call.
             lines.append("- **Publishers:**")
-            for module_name, relpath, lineno in pubs:
-                lines.append(f"  - `{module_name}` — `{relpath}:{lineno}`")
+            for module_name, relpath, _lineno in pubs:
+                lines.append(f"  - `{module_name}` — `{relpath}`")
         else:
             lines.append("- **Publishers:** _none in tree — declared but unused_")
         if subs:

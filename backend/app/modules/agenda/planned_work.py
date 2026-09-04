@@ -34,9 +34,10 @@ class PlannedWorkProvider(Protocol):
     """What agenda needs from the planned-work owner."""
 
     def appointment_loader_options(self) -> list[Any]:
-        """ORM loader options that eager-load the graph behind
-        ``AppointmentTreatment.planned_item`` (treatment → teeth /
-        catalog item, and the owning plan) for appointment reads."""
+        """Complete ORM loader options for ``Appointment.treatments``
+        (the relationship itself is installed by the provider's module —
+        #337 — so the whole chain, planned-item graph and catalog item
+        included, is built on the owning side)."""
         ...
 
     async def validate_bookable_items(
@@ -51,10 +52,26 @@ class PlannedWorkProvider(Protocol):
         item state). Empty list means all bookable."""
         ...
 
-    async def catalog_item_id_for(self, db: AsyncSession, planned_item_id: UUID) -> UUID | None:
-        """The catalog item behind a planned item's treatment, if any —
-        used to snapshot ``AppointmentTreatment.catalog_item_id`` at
-        booking time."""
+    async def attach_planned_items(
+        self,
+        db: AsyncSession,
+        appointment_id: UUID,
+        planned_item_ids: list[UUID],
+    ) -> None:
+        """Create the plan↔appointment link rows for a booking, in the
+        given display order, snapshotting each item's catalog item.
+        Flushes; caller refreshes what it needs."""
+        ...
+
+    async def visit_note_row(
+        self,
+        db: AsyncSession,
+        clinic_id: UUID,
+        appointment_treatment_id: UUID,
+    ) -> tuple[Any, Any] | None:
+        """The clinic-scoped ``(appointment_treatment, appointment)``
+        pair for the visit-note editor, or None. Rows are mutated
+        duck-typed by agenda."""
         ...
 
 

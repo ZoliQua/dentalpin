@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Llamadas"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telefonía (CTI)",
+      "description": "Muestra las llamadas entrantes en pantalla y guarda un registro — cualquier centralita vía webhook."
+    },
+    "gateway": "Pasarela",
+    "receiving": "Recibiendo eventos",
+    "defaultCountry": "País por defecto",
+    "defaultCountryHelp": "Código de país de dos letras para interpretar números locales (p. ej. ES).",
+    "active": "Activado",
+    "rotateSecret": "Rotar secreto",
+    "webhook": "Webhook de eventos",
+    "webhookHelp": "Configura tu centralita o Zapier para enviar eventos de llamada normalizados a esta URL, firmados con el secreto.",
+    "secret": "Secreto de firma",
+    "secretShownOnce": "Copia este secreto ahora: solo se muestra una vez. Tu centralita/automatización firma cada evento con él (X-DentalPin-Signature).",
+    "copy": "Copiar",
+    "copied": "Copiado al portapapeles",
+    "saved": "Configuración guardada",
+    "saveError": "No se pudo guardar la configuración",
+    "calls": {
+      "title": "Registro de llamadas",
+      "allStatuses": "Todos los estados",
+      "status": {
+        "ringing": "Sonando",
+        "answered": "Contestada",
+        "ended": "Finalizada",
+        "missed": "Perdida"
+      },
+      "unknownCaller": "Llamante desconocido",
+      "openRecord": "Abrir ficha",
+      "searchPatient": "Buscar paciente",
+      "empty": "Aún no hay llamadas.",
+      "when": "Cuándo",
+      "caller": "Llamante",
+      "number": "Número",
+      "statusCol": "Estado",
+      "duration": "Duración"
+    },
+    "pop": {
+      "incoming": "Llamada entrante"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Chiamate"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telefonia (CTI)",
+      "description": "Mostra le chiamate in arrivo sullo schermo e tiene un registro — qualsiasi centralino via webhook."
+    },
+    "gateway": "Gateway",
+    "receiving": "Ricezione eventi",
+    "defaultCountry": "Paese predefinito",
+    "defaultCountryHelp": "Codice paese di due lettere per interpretare i numeri locali (es. IT).",
+    "active": "Attivo",
+    "rotateSecret": "Rigenera segreto",
+    "webhook": "Webhook degli eventi",
+    "webhookHelp": "Configura il centralino o Zapier per inviare a questo URL gli eventi di chiamata normalizzati, firmati con il segreto.",
+    "secret": "Segreto di firma",
+    "secretShownOnce": "Copia questo segreto adesso: viene mostrato una sola volta. Il centralino/automazione firma ogni evento con esso (X-DentalPin-Signature).",
+    "copy": "Copia",
+    "copied": "Copiato negli appunti",
+    "saved": "Impostazioni salvate",
+    "saveError": "Impossibile salvare le impostazioni",
+    "calls": {
+      "title": "Registro chiamate",
+      "allStatuses": "Tutti gli stati",
+      "status": {
+        "ringing": "Squilla",
+        "answered": "Risposta",
+        "ended": "Terminata",
+        "missed": "Persa"
+      },
+      "unknownCaller": "Chiamante sconosciuto",
+      "openRecord": "Apri scheda",
+      "searchPatient": "Cerca paziente",
+      "empty": "Ancora nessuna chiamata.",
+      "when": "Quando",
+      "caller": "Chiamante",
+      "number": "Numero",
+      "statusCol": "Stato",
+      "duration": "Durata"
+    },
+    "pop": {
+      "incoming": "Chiamata in arrivo"
+    }
+  }
+}

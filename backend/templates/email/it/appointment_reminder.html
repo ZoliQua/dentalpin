@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Promemoria appuntamento - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Gentile {{ patient_name }},</h2>
+
+<p>Le ricordiamo che ha un appuntamento in programma:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Data</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Ora</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Professionista</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if cabinet_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Ambulatorio</div>
+            <div class="value">{{ cabinet_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if treatment_type %}
+    <div class="info-row">
+        <div>
+            <div class="label">Trattamento</div>
+            <div class="value">{{ treatment_type }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="alert alert-info">
+    <strong>Promemoria:</strong> La preghiamo di arrivare 10 minuti prima dell'appuntamento.
+</div>
+
+{% if notes %}
+<p><strong>Note:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Se non può presentarsi, La preghiamo di avvisarci per tempo, così da poter riassegnare l'orario.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Confermare la presenza</a>
+</div>
+{% endif %}
+
+<p>La aspettiamo!</p>
+{% endblock %}

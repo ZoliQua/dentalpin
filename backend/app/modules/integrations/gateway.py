@@ -13,17 +13,17 @@ import json
 import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.email.encryption import decrypt_password
+from app.core.webhooks.signing import SIGNATURE_HEADER, sign
 
 from . import client as webhook_client
 from .client import WebhookDeliveryError
 from .models import WebhookDelivery, WebhookSubscription
-from .signing import SIGNATURE_HEADER, sign
 
 logger = logging.getLogger(__name__)
 
@@ -50,13 +50,22 @@ class WebhookGateway:
         clinic_id: UUID,
         event_type: str,
         payload: dict[str, Any],
+        *,
+        event_id: UUID | None = None,
     ) -> list[WebhookDelivery]:
         """Queue one delivery per active subscription matching ``event_type``.
 
         DB-only — no network I/O — so a rolled-back publisher transaction
         queues nothing, same guarantee as
         ``NotificationGateway.enqueue``.
+
+        ``event_id`` is the stable id shared by every delivery queued for
+        this one source event publish (issue #65 §1). When omitted (Phase 1
+        callers / tests), a fresh id is generated once here so all matching
+        deliveries still share it.
         """
+        if event_id is None:
+            event_id = uuid4()
         result = await db.execute(
             select(WebhookSubscription).where(
                 WebhookSubscription.clinic_id == clinic_id,
@@ -74,6 +83,7 @@ class WebhookGateway:
                 clinic_id=clinic_id,
                 event_type=event_type,
                 payload=payload,
+                event_id=event_id,
                 status="queued",
                 next_attempt_at=datetime.now(UTC),
             )
@@ -146,6 +156,7 @@ class WebhookGateway:
         body = json.dumps(
             {
                 "event": delivery.event_type,
+                "event_id": str(delivery.event_id or delivery.id),
                 "delivery_id": str(delivery.id),
                 "data": delivery.payload,
             },

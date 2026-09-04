@@ -145,6 +145,11 @@ class EventType:
     DOCUMENT_UPLOADED = "document.uploaded"
     DOCUMENT_DELETED = "document.deleted"
     DOCUMENT_ARCHIVED = "document.archived"
+    # Published by the documents module after a prescription, certificate,
+    # referral or radiology request is rendered as PDF. Payload carries
+    # (document_id, clinic_id, patient_id, document_type, title, created_by?).
+    # Consumed by activity_journal for timeline entries.
+    DOCUMENT_GENERATED = "document.generated"
     # Photo-aware subset of DOCUMENT_UPLOADED. Fired alongside the
     # generic event whenever ``media_kind ∈ {photo, xray}`` so timeline
     # / gallery subscribers can render thumbnails inline without
@@ -281,3 +286,17 @@ class EventType:
     # without importing staff_tasks.
     STAFF_TASK_CREATED = "staff_task.created"
     STAFF_TASK_STATUS_CHANGED = "staff_task.status_changed"
+
+    # Telephony events (telephony module — CTI screen-pop + call log,
+    # issue #64). Fired by the inbound CTI webhook after normalization
+    # and caller→patient matching. Payload: (clinic_id, call_log_id,
+    # call_id, event, direction, from_number, to_number, patient_id —
+    # null when unmatched). CALL_UNKNOWN_CALLER fires alongside
+    # CALL_RINGING when no patient matched. No bundled subscriber;
+    # optional modules (patient_timeline / integrations) may subscribe
+    # without importing telephony.
+    CALL_RINGING = "call.ringing"
+    CALL_ANSWERED = "call.answered"
+    CALL_ENDED = "call.ended"
+    CALL_MISSED = "call.missed"
+    CALL_UNKNOWN_CALLER = "call.unknown_caller"

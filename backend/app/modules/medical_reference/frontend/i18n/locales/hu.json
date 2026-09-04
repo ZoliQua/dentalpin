@@ -1,0 +1,36 @@
+{
+  "medicalReference": {
+    "settingsLabel": "Orvosi referencialisták",
+    "settingsDescription": "A páciensadatlapokon használt allergia-, gyógyszer- és betegséglisták kezelése.",
+    "title": "Orvosi referencialisták",
+    "description": "Ezek a listák adják a kereshető legördülő menüket a páciensek anamnézisében. Egy elem inaktiválása eltávolítja azt a jövőbeli keresésekből, a meglévő páciensadatok azonban változatlanok maradnak.",
+    "tabs": {
+      "allergies": "Allergiák",
+      "medications": "Gyógyszerek",
+      "diseases": "Betegségek",
+      "surgeries": "Műtétek",
+      "interactions": "Kölcsönhatások",
+      "contraindications": "Ellenjavallatok"
+    },
+    "name": "Név",
+    "status": "Állapot",
+    "active": "Aktív",
+    "inactive": "Inaktív",
+    "showInactive": "Inaktívak megjelenítése",
+    "newItemPlaceholder": "Új elem neve…",
+    "addSuccess": "Hozzáadva",
+    "addError": "Nem sikerült hozzáadni az elemet",
+    "updateError": "Nem sikerült frissíteni az elemet",
+    "deactivate": "Inaktiválás",
+    "deactivateError": "Nem sikerült inaktiválni az elemet",
+    "itemCount": "{count} elem",
+    "medicationA": "A gyógyszer",
+    "medicationB": "B gyógyszer",
+    "riskNote": "Kockázat",
+    "riskNotePlaceholder": "Írja le a kockázatot…",
+    "flags": {
+      "interaction": "{a} + {b} kölcsönhatás",
+      "contraindication": "{a}: ellenjavallt a következővel: {b}"
+    }
+  }
+}

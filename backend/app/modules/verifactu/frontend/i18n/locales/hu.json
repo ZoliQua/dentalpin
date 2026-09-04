@@ -1,0 +1,351 @@
+{
+  "verifactu": {
+    "nav": { "settings": "Verifactu (AEAT)" },
+    "settingsCards": {
+      "title": "Verifactu (AEAT)",
+      "description": "Spanyol e-számlázási megfelelőség. Tanúsítvány, SIF-gyártó, beküldési sor és adóügyi nyilvántartás kezelése.",
+      "open": "Megnyitás"
+    },
+    "title": "Verifactu (AEAT)",
+    "subtitle": "Spanyol e-számlázási megfelelőség (RRSIF / Veri*Factu).",
+    "hero": {
+      "loading": { "title": "Betöltés…", "description": "" },
+      "setup": {
+        "title": "Beállítás szükséges",
+        "description": "Végezze el az alábbi lépéseket a Verifactu aktiválása előtt."
+      },
+      "inactive": {
+        "title": "Készen áll az aktiválásra",
+        "description": "Minden beállítás elkészült. Aktiválja a Verifactut, hogy megkezdődjön a számlák beküldése az AEAT felé."
+      },
+      "active-test": {
+        "title": "A Verifactu teszt módban aktív",
+        "description": "A számlák az AEAT tesztkörnyezetébe kerülnek beküldésre. Hasznos az integráció ellenőrzéséhez az éles üzem előtt."
+      },
+      "active-prod": {
+        "title": "A Verifactu éles üzemben aktív",
+        "description": "A számlák valós adóügyi adatként kerülnek beküldésre az AEAT felé. Minden hiba hivatalosan rögzítésre kerül."
+      },
+      "activate": "Verifactu aktiválása",
+      "deactivate": "Verifactu kikapcsolása"
+    },
+    "setup": {
+      "clinicNif": "Állítsa be a rendelő adószámát (CIF/NIF)",
+      "clinicNifCta": "Rendelő adatai",
+      "producer": "Töltse ki a SIF-gyártó adatait",
+      "producerCta": "Gyártó",
+      "declaration": "Írja alá a gyártó declaración responsable nyilatkozatát",
+      "declarationCta": "Aláírás",
+      "certificate": "Töltse fel a digitális tanúsítványt (FNMT)",
+      "certificateCta": "Feltöltés"
+    },
+    "cards": {
+      "manage": "Kezelés",
+      "emisor": {
+        "title": "Kiállító adatai",
+        "editHint": "Ezek az adatok a rendelő adataiból származnak. Módosításukhoz ott szerkessze őket.",
+        "editLink": "Rendelő adatai"
+      },
+      "producer": {
+        "empty": "A SIF-gyártó még nincs beállítva."
+      },
+      "vatMapping": {
+        "title": "AEAT áfabesorolás",
+        "description": "Rendelje hozzá a katalógus minden áfakulcsához a megfelelő AEAT-besorolást (S1, E1, N1…)."
+      },
+      "activity": {
+        "title": "Tevékenység"
+      }
+    },
+    "modal": {
+      "confirmProdTitle": "Váltás éles üzemre?",
+      "confirmProdAction": "Igen, váltás éles üzemre"
+    },
+    "vatMapping": {
+      "title": "AEAT áfabesorolás",
+      "subtitle": "Határozza meg, hogy a katalógus egyes áfakulcsai milyen AEAT-besorolást kapjanak az egyes Verifactu-rekordokban.",
+      "legalIntroTitle": "Hogyan működik",
+      "legalIntro": "Ha egy sort 'Automatikus' értéken hagy, heurisztika érvényesül (kulcs>0 → S1, kulcs=0 → N1). Fogászati egészségügyi szolgáltatásoknál általában az 'E1 — Mentes, LIVA 20. cikk' rögzítése indokolt. A spanyol rendelőknek jellemzően csak a 'Mentes' áfakulcsnál van szükségük felülbírálásra.",
+      "empty": "Nincsenek áfakulcsok a rendelő katalógusában.",
+      "rate": "Kulcs",
+      "defaultBadge": "Alapértelmezett",
+      "autoOption": "Automatikus ({code}) — heurisztika alapján",
+      "sourceAuto": "automatikus",
+      "sourceOverride": "rögzített felülbírálás",
+      "save": "Mentés",
+      "saved": "Besorolás mentve.",
+      "saveFailed": "A besorolást nem sikerült menteni.",
+      "notesPlaceholder": "Megjegyzés (pl. 'art. 20.uno.3.º LIVA')"
+    },
+    "environment": {
+      "test": "Teszt",
+      "prod": "Éles",
+      "switchToProd": "Váltás éles üzemre",
+      "switchToTest": "Váltás teszt módra",
+      "warningProd": "Éles üzemre készül váltani. Mostantól minden kiállított számla valós adóügyi rekordként kerül beküldésre az AEAT felé.",
+      "label": "Környezet"
+    },
+    "errors": {
+      "cannotPromoteToProd": "Az Ön szerepköre nem állíthatja a Verifactut éles üzembe. Kérjen meg egy adminisztrátort a módosítás elvégzésére."
+    },
+    "status": {
+      "enabled": "Engedélyezve",
+      "disabled": "Letiltva",
+      "noCertificate": "Nincs tanúsítvány",
+      "certificateExpiringSoon": "A tanúsítvány {days} nap múlva lejár",
+      "certificateExpired": "A tanúsítvány lejárt"
+    },
+    "settings": {
+      "title": "Verifactu-beállítások",
+      "enable": "Verifactu engedélyezése",
+      "enableHint": "Ha engedélyezve van, minden kiállított számla automatikusan beküldésre kerül az AEAT felé.",
+      "nifEmisor": "A kiállító NIF-je",
+      "nifEmisorHint": "A rendelő NIF-je. Egyeznie kell a tanúsítvánnyal.",
+      "nombreRazon": "A kiállító hivatalos neve",
+      "save": "Mentés",
+      "saved": "Beállítások mentve"
+    },
+    "certificate": {
+      "title": "Digitális tanúsítvány",
+      "description": "Töltse fel a rendelő FNMT-tanúsítványát (.pfx / .p12). Titkosítva tároljuk.",
+      "active": "Aktív tanúsítvány",
+      "healthy": "Érvényes",
+      "subject": "Tulajdonos",
+      "issuer": "Kibocsátó",
+      "nif": "A tulajdonos NIF-je",
+      "validFrom": "Érvényesség kezdete",
+      "validUntil": "Érvényesség vége",
+      "uploadFile": "Tanúsítványfájl",
+      "uploadHint": "Elfogadott formátumok: .pfx és .p12.",
+      "password": "A tanúsítvány jelszava",
+      "passwordHint": "A fájlt védő jelszó. Soha nem tároljuk titkosítatlanul.",
+      "passwordPlaceholder": "••••••••",
+      "togglePassword": "Jelszó megjelenítése/elrejtése",
+      "uploadButton": "Tanúsítvány feltöltése",
+      "uploadTitle": "Tanúsítvány feltöltése",
+      "replaceTitle": "Tanúsítvány cseréje",
+      "uploadSubmit": "Tanúsítvány feltöltése",
+      "replaceSubmit": "Tanúsítvány cseréje",
+      "uploaded": "A tanúsítvány feltöltve és aktív",
+      "uploadFailed": "A tanúsítványt nem sikerült feltölteni",
+      "invalidFormat": "Érvénytelen formátum. Töltsön fel .pfx vagy .p12 fájlt.",
+      "history": "Tanúsítványelőzmények",
+      "historyEmpty": "Még nincs feltöltött tanúsítvány.",
+      "noActive": "Nincs aktív tanúsítvány",
+      "noActiveHint": "Töltse fel FNMT-tanúsítványát (.pfx / .p12) a Verifactu aktiválásához és az AEAT felé történő beküldések aláírásához.",
+      "dropzoneTitle": "Húzza ide a tanúsítványt",
+      "dropzoneSubtitle": "vagy kattintson a fájl kiválasztásához",
+      "dropzoneFormats": ".pfx vagy .p12 formátum",
+      "removeFile": "Fájl eltávolítása",
+      "encryptionNote": "A fájlt és a jelszót a szerverkulccsal titkosítjuk. Soha nem tároljuk titkosítatlanul.",
+      "helpTitle": "Honnan szerezhető be a tanúsítvány?",
+      "helpBody": "Az AEAT felé történő beküldések aláírásához a rendelő FNMT által kibocsátott digitális tanúsítványára van szükség. Három érvényes típus:",
+      "helpItem1": "Törvényes képviselői tanúsítvány — cégek (S.L., S.A.) számára.",
+      "helpItem2": "Személyes tanúsítvány — olyan autónomók (egyéni vállalkozók) számára, akiknek NIF-je megegyezik a kiállítóéval.",
+      "helpItem3": "Szervezeti pecsét — alternatíva szervezetek számára.",
+      "fnmtLink": "Tanúsítvány igénylése az FNMT portálján"
+    },
+    "queue": {
+      "title": "Beküldési sor",
+      "tabs": { "pending": "Függőben", "rejected": "Elutasítva", "transient": "Átmeneti hibák" },
+      "empty": "Nincs rekord ebben az állapotban.",
+      "retry": "Újrapróbálás",
+      "regenerateAndRetry": "Újragenerálás és újraküldés",
+      "regenerateTooltip": "Újraszámítja a rekordot az aktuális adatokból (NIF, tételek, …), és Subsanaciónként újraküldi.",
+      "retryAll": "Összes újragenerálása",
+      "retryAllConfirm": "A rendelő összes elutasított rekordja újragenerálásra kerül. Folytatja?",
+      "retryAllResult": "{n} rekord újragenerálva ({failed} sikertelen).",
+      "viewInvoice": "Számla megtekintése",
+      "viewHistory": "AEAT-előzmények",
+      "errorCode": "Kód",
+      "transportError": "Átviteli hiba",
+      "aeatFault": "AEAT-hibaválasz",
+      "rawError": "Eredeti AEAT-üzenet",
+      "submissionAttempt": "{n}. próbálkozás",
+      "processNow": "Feldolgozás most",
+      "processed": "{n} rekord feldolgozva",
+      "regeneratedToast": "A rekord újragenerálva és újraküldve.",
+      "blockingBanner": {
+        "title": "{n} Verifactu-rekord elutasítva",
+        "description": "Amíg nincsenek rendezve, nem állíthat ki új számlát (megszakadna a hash-lánc).",
+        "cta": "Sor megnyitása",
+        "adminContact": "Ha nincs hozzáférése, forduljon a(z) {email} adminisztrátorhoz."
+      },
+      "ctas": {
+        "edit_clinic": "Adóügyi adataim javítása",
+        "edit_billing_party": "Vevő adatainak szerkesztése",
+        "edit_lines": "Számlatételek ellenőrzése",
+        "edit_producer": "SIF-gyártó szerkesztése",
+        "retry": "Újrapróbálás",
+        "contact_support": "Kapcsolatfelvétel az ügyfélszolgálattal"
+      },
+      "history": {
+        "title": "AEAT beküldési előzmények",
+        "empty": "Nincsenek archivált korábbi próbálkozások (ez az első beküldés).",
+        "attempt": "{n}. próbálkozás",
+        "huella": "Hash",
+        "code": "AEAT-kód"
+      }
+    },
+    "billingParty": {
+      "modalTitle": "Vevő adatainak szerkesztése",
+      "intro": "Ezek az adatok a következő beküldéskor címzettként kerülnek elküldésre az AEAT felé.",
+      "fields": {
+        "name": "Név / hivatalos név",
+        "taxId": "Adószám",
+        "address": "Cím"
+      },
+      "save": "Mentés és újraküldés",
+      "saved": "Mentve. A Verifactu automatikusan újraküldi a rekordot.",
+      "concurrentEdit": "Időközben valaki más szerkesztette ezt a számlát. Töltse be újra, és próbálja meg ismét.",
+      "saveFailed": "A mentés nem sikerült."
+    },
+    "invoiceBanner": {
+      "rejectedTitle": "Az AEAT elutasította ezt a Verifactu-rekordot",
+      "rejectedBody": "Javítsa az alábbi adatokat, és automatikusan újraküldjük Subsanaciónként.",
+      "pdfStaleTitle": "A letöltött PDF elavult lehet",
+      "pdfStaleBody": "A QR-kód a javítás és az újraküldés után megváltozik. Töltse le újra a PDF-et, ha már elküldte a páciensnek.",
+      "downloadAgain": "Friss PDF letöltése"
+    },
+    "nif": {
+      "warningInvalid": "Az adószám formátuma nem tűnik helyesnek. Az AEAT elutasíthatja."
+    },
+    "globalBanner": {
+      "title": "Verifactu: az AEAT {n} számlát elutasított",
+      "description": "Rendezze őket, mielőtt új számlát állítana ki (megszakadna a hash-lánc).",
+      "cta": "Rendezés"
+    },
+    "badge": {
+      "short": "AEAT",
+      "tooltip": {
+        "ok": "Az AEAT elfogadta",
+        "warning": "Az AEAT megjegyzésekkel fogadta el",
+        "pending": "Beküldésre vár az AEAT felé",
+        "error": "Az AEAT elutasította"
+      }
+    },
+    "filter": {
+      "label": "Verifactu",
+      "options": {
+        "ok": "Elfogadva",
+        "warning": "Megjegyzésekkel",
+        "pending": "Függőben",
+        "error": "Elutasítva"
+      },
+      "shortcut": "Csak a problémák",
+      "empty": "Minden Verifactu-számla naprakész."
+    },
+    "records": {
+      "title": "Adóügyi nyilvántartás",
+      "subtitle": "Az AEAT felé beküldött rekordok megváltoztathatatlan előzményei.",
+      "filterState": "Állapot",
+      "filterTipo": "Típus",
+      "columns": {
+        "createdAt": "Dátum",
+        "tipoFactura": "Típus",
+        "serieNumero": "Sorszám",
+        "importe": "Összeg",
+        "state": "Állapot",
+        "csv": "AEAT CSV"
+      },
+      "viewXml": "XML megtekintése",
+      "verifyChain": "Lánc ellenőrzése"
+    },
+    "tipoFactura": {
+      "F1": "F1 — Teljes adattartalmú számla",
+      "F2": "F2 — Egyszerűsített számla",
+      "F3": "F3 — Helyettesítő számla",
+      "R1": "R1 — Helyesbítő számla",
+      "R2": "R2 — Behajthatatlan követelés",
+      "R5": "R5 — Egyszerűsített helyesbítő számla"
+    },
+    "recordState": {
+      "pending": "Függőben",
+      "sending": "Küldés folyamatban",
+      "accepted": "Elfogadva",
+      "accepted_with_errors": "Hibákkal elfogadva",
+      "rejected": "Elutasítva",
+      "failed_transient": "Újrapróbálás alatt",
+      "failed_validation": "Érvényesítési hiba"
+    },
+    "panel": {
+      "verifactuTitle": "Verifactu",
+      "huella": "Hash",
+      "csv": "AEAT CSV",
+      "qr": "QR-kód",
+      "viewRecord": "Teljes rekord megtekintése",
+      "submittedAt": "Beküldve",
+      "stillPending": "Beküldésre vár az AEAT felé"
+    },
+    "producer": {
+      "title": "SIF-gyártó",
+      "subtitle": "Annak jogi azonosítása, aki a szoftvert éles üzembe állítja, és aláírja a declaración responsable nyilatkozatot.",
+      "legalIntroTitle": "Jogi felelősség",
+      "legalIntro": "Az RD 1007/2023 13. cikke előírja, hogy a Sistema Informático de Facturación gyártója declaración responsable nyilatkozatot írjon alá. Ha a DentalPin felügyelt SaaS-ként működik, a gyártó a SaaS üzemeltetője. Ha egy rendelő saját maga üzemelteti (autodesarrollo), a gyártó maga a rendelő. Ha egy integrátor telepíti, a gyártó az integrátor.",
+      "process": {
+        "title": "Az Ön teendői",
+        "s1": "Határozza meg, ki a SIF-gyártó (1. lépés) — ezek a jogi adatok szerepelnek a nyilatkozatban és minden, az AEAT felé küldött rekordban.",
+        "s2": "Olvassa el a declaración responsable nyilatkozatot, és írja alá elektronikusan (2. lépés). A rendszer bizonyítékként rögzíti a dátumot és az aláíró felhasználót.",
+        "s3": "Töltse le az aláírt PDF-et (3. lépés) archiválás céljából, illetve — ha SaaS-t üzemeltet — a rendelőinek való továbbadáshoz.",
+        "legalNote": "A rendszerben tárolt elektronikus aláírás elegendő bizonyíték egy AEAT-ellenőrzéshez. A PDF ebből az aláírásból származtatott, tájékoztató jellegű dokumentum."
+      },
+      "step1": {
+        "title": "A gyártó adatai",
+        "description": "Ezek a mezők jogilag azonosítják a SIF-gyártót, és bekerülnek mind a declaración responsable nyilatkozatba, mind az AEAT felé küldött összes rekord SistemaInformatico blokkjába.",
+        "lockedTitle": "Lezárt adatok",
+        "lockedDescription": "A nyilatkozatot már ezekkel az adatokkal írták alá, ezért zárolva vannak. Ha módosítania kell őket, forduljon az ügyfélszolgálathoz az aláírás visszavonása érdekében."
+      },
+      "step2": {
+        "title": "A nyilatkozat aláírása",
+        "description": "Olvassa el figyelmesen a szöveget. Ha mindent rendben talál, jelölje be a jelölőnégyzetet, és kattintson az Elektronikus aláírás gombra. Az aláírást a rendszer a dátummal és a felhasználóval együtt rögzíti."
+      },
+      "step3": {
+        "title": "Aláírt nyilatkozat letöltése",
+        "description": "Nyomtatható dokumentum a gyártó adataival és az elektronikus aláírás bélyegzőjével. Hasznos belső archiváláshoz, AEAT-ellenőrzéshez, vagy a rendszert használó rendelőknek való továbbadáshoz.",
+        "lockedHint": "A nyilatkozat aláírása után érhető el (2. lépés)."
+      },
+      "fields": {
+        "name": "A gyártó hivatalos neve",
+        "nameHint": "A SIF-gyártóként eljáró cég vagy autónomo (egyéni vállalkozó) hivatalos neve.",
+        "nif": "A gyártó NIF-je",
+        "nifHint": "A SIF-gyártó NIF-je. Minden, az AEAT felé beküldött rekordban szerepel.",
+        "idSistema": "Rendszerazonosító",
+        "idSistemaHint": "Rövid azonosító (1-2 karakter), amelyet a gyártó a rendszerhez rendel. Alapértelmezés: DP.",
+        "version": "Rendszerverzió",
+        "versionHint": "Az éles üzemben futó szoftververzió (pl. 0.1.0)."
+      },
+      "declaration": {
+        "heading": "Declaración responsable",
+        "legalRef": "Sistema Informático de Facturación — Veri*Factu (RD 1007/2023, 13. cikk)",
+        "preamble": "Az 1007/2023. sz. királyi rendelet (RRSIF) 13. cikke és a HAC/1177/2024 rendelet alapján:",
+        "identity": "{name} ({nif} NIF-fel), a DentalPin nevű Sistema Informático de Facturación gyártójaként ({idSistema} rendszerazonosító, {version} verzió) felelőssége tudatában kijelenti, hogy:",
+        "item1": "A rendszer megfelel az 58/2003. sz. törvény (Ley General Tributaria) 29.2.j) cikkében és az RRSIF-ben foglalt követelményeknek.",
+        "item2": "A rendszer garantálja a számlázási rekordok sértetlenségét, megőrzését, hozzáférhetőségét, olvashatóságát, nyomon követhetőségét és megváltoztathatatlanságát.",
+        "item3": "A rendszer Veri*Factu módban megvalósítja a rekordok folyamatos beküldését az AEAT felé.",
+        "item4": "A gyártó vállalja, hogy a rendszert a jogszabályi változásoknak megfelelően naprakészen tartja."
+      },
+      "statusSigned": "Aláírva",
+      "statusUnsigned": "Aláírásra vár",
+      "readAndAccept": "Elolvastam, és SIF-gyártóként elfogadom a declaración responsable nyilatkozatot.",
+      "signButton": "Elektronikus aláírás",
+      "signNote": "A gombra kattintva az aláírás a dátummal és az Ön felhasználójával együtt rögzítésre kerül. A művelet a felületről nem vonható vissza.",
+      "signedToast": "Nyilatkozat aláírva és rögzítve.",
+      "sealedNote": "A gyártó adatai bizonyítékként lezárásra kerülnek egy esetleges AEAT-ellenőrzéshez.",
+      "saveDraft": "Mentés aláírás nélkül",
+      "draftSaved": "Piszkozat mentve (aláírás függőben).",
+      "downloadPdf": "Aláírt PDF letöltése",
+      "revokeAction": "Aláírás visszavonása a szerkesztéshez",
+      "revokeTitle": "Visszavonja az aláírást?",
+      "revokeBody": "Az elektronikus aláírás visszavonásával újra szerkesztheti a gyártó adatait. Mielőtt folytatná:",
+      "revokeBullet1": "A jelenlegi aláírás elveszti jogi bizonyító erejét az AEAT felé.",
+      "revokeBullet2": "A Verifactu automatikusan kikapcsol, amíg alá nem írja az új nyilatkozatot.",
+      "revokeBullet3": "Az AEAT felé már beküldött rekordokat ez nem érinti — csak a jövőbeli beküldésekhez bejelentett gyártó változik.",
+      "revokeConfirm": "Visszavonás és szerkesztés",
+      "revokedToast": "Aláírás visszavonva. Mostantól szerkesztheti a gyártó adatait.",
+      "signLabel": "A declaración responsable aláírása",
+      "alreadySigned": "Nyilatkozat aláírva",
+      "signedAt": "Elektronikusan aláírva: {at}",
+      "saveFailed": "A gyártó adatait nem sikerült menteni."
+    }
+  }
+}

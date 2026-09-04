@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Faktura - {{ clinic_name | default('DentalPin') }}{% endblock %}
+
+{% block content %}
+<h2>Faktura</h2>
+
+<p>Dzień dobry, {{ patient_name }}!</p>
+
+<p>Poniżej przesyłamy szczegóły faktury <strong>#{{ invoice_number }}</strong> wystawionej przez <strong>{{ clinic_name | default('DentalPin') }}</strong>:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Numer faktury</div>
+            <div class="value">#{{ invoice_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Data</div>
+            <div class="value">{{ invoice_date or '—' }}</div>
+        </div>
+    </div>
+    {% if due_date %}
+    <div class="info-row">
+        <div class="label">Termin płatności</div>
+        <div class="value">{{ due_date }}</div>
+    </div>
+    {% endif %}
+</div>
+
+{% if items %}
+<div class="info-box">
+    {% for item in items %}
+    <div class="info-row">
+        <div style="flex: 3;">
+            <div class="label">{{ item.description }}{% if item.quantity > 1 %} × {{ item.quantity }}{% endif %}</div>
+        </div>
+        <div style="flex: 1; text-align: right;">
+            <div class="value">{{ item.line_total }}</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="info-box">
+    {% if total_discount %}
+    <div class="info-row">
+        <div class="label">Suma częściowa</div>
+        <div class="value">{{ subtotal }}</div>
+    </div>
+    <div class="info-row">
+        <div class="label">Rabat</div>
+        <div class="value">-{{ total_discount }}</div>
+    </div>
+    {% endif %}
+    {% if total_tax %}
+    <div class="info-row">
+        <div class="label">Podatek</div>
+        <div class="value">{{ total_tax }}</div>
+    </div>
+    {% endif %}
+    <div class="info-row">
+        <div class="label">Razem</div>
+        <div class="value" style="font-size: 18px; font-weight: 700;">{{ total }}</div>
+    </div>
+    {% if balance_due and balance_due != total %}
+    <div class="info-row">
+        <div class="label">Do zapłaty</div>
+        <div class="value" style="color: #ef4444; font-weight: 700;">{{ balance_due }}</div>
+    </div>
+    {% endif %}
+</div>
+
+{% if custom_message %}
+<div class="alert alert-info">
+    {{ custom_message }}
+</div>
+{% endif %}
+
+<p>W razie pytań dotyczących tej faktury prosimy o kontakt.</p>
+{% endblock %}

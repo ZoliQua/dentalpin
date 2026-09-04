@@ -35,7 +35,8 @@
     "menu": "Menu",
     "openMenu": "Ouvrir le menu",
     "close": "Fermer",
-    "toggleSidebar": "Basculer la barre latérale"
+    "toggleSidebar": "Basculer la barre latérale",
+    "documents": "Documents"
   },
   "auth": {
     "login": "Connexion",

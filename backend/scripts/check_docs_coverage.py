@@ -44,29 +44,26 @@ def _locate_repo_root() -> Path:
 
     Order:
 
-    1. ``DENTALPIN_REPO_ROOT`` env var if set (useful in Docker where
-       ``/app`` is the backend mount and ``/docs`` is mounted separately —
-       set ``DENTALPIN_REPO_ROOT=/`` and ensure both ``/docs`` and
-       ``/backend`` exist as symlinks or mounts).
+    1. ``DENTALPIN_REPO_ROOT`` env var if set and it holds both ``docs/``
+       and ``backend/`` (useful in Docker where ``/app`` is the backend
+       mount and ``/docs`` is mounted separately — historically set
+       ``DENTALPIN_REPO_ROOT=/`` with ``/docs`` + ``/backend`` available).
+       A stale/mis-pointed override is tolerated and skipped rather than
+       hard-failing the script (some deploy layouts bind only the backend).
     2. Walk up from this file until we find both ``docs/`` and ``backend/``.
-
-    Works on the GitHub Actions runner (host layout), and in Docker when
-    the env var is set.
     """
     override = os.environ.get("DENTALPIN_REPO_ROOT")
     if override:
         root = Path(override).resolve()
         if (root / "docs").is_dir() and (root / "backend").is_dir():
             return root
-        raise RuntimeError(
-            f"DENTALPIN_REPO_ROOT={override!r} but it doesn't contain both `docs/` and `backend/`."
-        )
     here = Path(__file__).resolve()
     for candidate in (here.parent, *here.parents):
         if (candidate / "docs").is_dir() and (candidate / "backend").is_dir():
             return candidate
     raise RuntimeError(
-        f"Could not locate repo root from {here}. "
+        f"Could not locate repo root from {here} "
+        f"(DENTALPIN_REPO_ROOT={override!r} is not a valid checkout). "
         "Set DENTALPIN_REPO_ROOT or run the script from a checkout that "
         "contains both `docs/` and `backend/`."
     )

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- feat(#365): payment-gateway prerequisites — `upi` + `netbanking` methods (IN-gated chip in the create modal, labels in all 9 locales); four `payments.*` extension slots (`collect.actions`, `list.row.meta`, `ledger.row.meta`, `detail.sections`) rendering nothing by default; `idempotency_key` on `record_payment` / `POST /payments` / the agent tool with a per-clinic partial unique index (`pay_0005`). The IN gate also covers the list's method filter (`useClinicCountry`), and the refund modal always offers the source payment's method.
+
+- fix(#126): ledger treatment names had a bare es → en fallback — items named only in other locales degraded to nothing; now resolved through the shared `app.core.i18n_names.catalog_name` chain with an any-non-empty catch-all.
+
+- feat(#334): Hungarian (hu) locale for the module's frontend layer.
+
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
 - fix(#101): /reports/payments gets the same failed-fetch error banner; an error state is no longer mistakable for an empty period.

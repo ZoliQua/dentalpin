@@ -36,9 +36,7 @@ APPOINTMENT_STATUSES: tuple[str, ...] = (
 
 if TYPE_CHECKING:
     from app.core.auth.models import Clinic, User
-    from app.modules.catalog.models import TreatmentCatalogItem
     from app.modules.patients.models import Patient
-    from app.modules.treatment_plan.models import PlannedTreatmentItem
 
 
 class Cabinet(Base, TimestampMixin):
@@ -118,11 +116,11 @@ class Appointment(Base, TimestampMixin):
     cabinet_assigner: Mapped[User | None] = relationship(foreign_keys=[cabinet_assigned_by])
     cabinet_ref: Mapped[Cabinet | None] = relationship()
 
-    treatments: Mapped[list[AppointmentTreatment]] = relationship(
-        back_populates="appointment",
-        cascade="all, delete-orphan",
-        order_by="AppointmentTreatment.display_order",
-    )
+    # ``treatments`` is installed by treatment_plan's AppointmentTreatment
+    # backref (#337): the link table is plan-owned (its planned-item FK is
+    # NOT NULL), and this direction of the dependency is the undeclarable
+    # one (#309). Agenda reads it duck-typed; eager loading goes through
+    # the planned-work provider.
 
     status_events: Mapped[list[AppointmentStatusEvent]] = relationship(
         back_populates="appointment",
@@ -151,31 +149,6 @@ class Appointment(Base, TimestampMixin):
             name="ck_appointment_status_valid",
         ),
     )
-
-
-class AppointmentTreatment(Base):
-    """Junction table linking appointments to planned treatment items."""
-
-    __tablename__ = "appointment_treatments"
-
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    appointment_id: Mapped[UUID] = mapped_column(
-        ForeignKey("appointments.id", ondelete="CASCADE"), index=True
-    )
-    planned_treatment_item_id: Mapped[UUID] = mapped_column(
-        ForeignKey("planned_treatment_items.id"), index=True
-    )
-    catalog_item_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey("treatment_catalog_items.id", ondelete="SET NULL"), nullable=True
-    )
-    display_order: Mapped[int] = mapped_column(Integer, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    completed_in_appointment: Mapped[bool] = mapped_column(Boolean, default=False)
-    notes: Mapped[str | None] = mapped_column(Text, default=None)
-
-    appointment: Mapped[Appointment] = relationship(back_populates="treatments")
-    planned_item: Mapped[PlannedTreatmentItem] = relationship()
-    catalog_item: Mapped[TreatmentCatalogItem | None] = relationship()
 
 
 class AppointmentStatusEvent(Base):

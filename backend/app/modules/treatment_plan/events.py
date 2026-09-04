@@ -67,8 +67,7 @@ async def on_appointment_completed(data: dict[str, Any], *, db: AsyncSession) ->
         return
 
     # Import here to avoid circular imports
-    from app.modules.agenda.models import AppointmentTreatment
-
+    from .models import AppointmentTreatment
     from .service import TreatmentPlanService
 
     result = await db.execute(

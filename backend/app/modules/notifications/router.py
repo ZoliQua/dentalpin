@@ -602,9 +602,10 @@ async def list_available_channels(
 
     available: list[str] = []
     for channel in channel_registry.available_channels():
-        adapter = channel_registry.get_for_channel(channel)
-        if adapter is not None and await adapter.supports(db, ctx.clinic_id):
-            available.append(channel.value)
+        for adapter in channel_registry.adapters_for_channel(channel):
+            if await adapter.supports(db, ctx.clinic_id):
+                available.append(channel.value)
+                break
     return ApiResponse(data=ChannelAvailabilityResponse(available=available))
 
 

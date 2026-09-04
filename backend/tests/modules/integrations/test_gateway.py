@@ -7,10 +7,10 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.email.encryption import encrypt_password
+from app.core.webhooks.signing import SIGNATURE_HEADER, verify
 from app.modules.integrations import client as webhook_client
 from app.modules.integrations.gateway import MAX_CONSECUTIVE_FAILURES, WebhookGateway
 from app.modules.integrations.models import WebhookDelivery, WebhookSubscription
-from app.modules.integrations.signing import SIGNATURE_HEADER, verify
 
 EVENT = "patient.created"
 
@@ -274,3 +274,47 @@ async def test_dispatch_inactive_subscription_marks_failed_without_network(
     await db_session.refresh(delivery)
     assert delivery.status == "failed"
     assert "inactive" in delivery.error_message
+
+
+@pytest.mark.asyncio
+async def test_enqueue_shares_event_id_across_deliveries(db_session: AsyncSession, test_clinic):
+    """Multiple active subscriptions for the same event all get the same event_id."""
+    await _subscription(db_session, test_clinic.id)
+    await _subscription(db_session, test_clinic.id)
+
+    from uuid import UUID
+
+    shared = UUID("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee")
+    deliveries = await WebhookGateway.enqueue_for_event(
+        db_session, test_clinic.id, EVENT, {"patient_id": "p1"}, event_id=shared
+    )
+    await db_session.commit()
+
+    assert len(deliveries) == 2
+    assert all(d.event_id == shared for d in deliveries)
+
+
+@pytest.mark.asyncio
+async def test_dispatch_envelope_carries_event_id(
+    db_session: AsyncSession, test_clinic, monkeypatch
+):
+    """Dispatched payload must include event_id (issue #65 §1)."""
+    import json
+
+    await _subscription(db_session, test_clinic.id, secret="s3cret")
+    deliveries = await WebhookGateway.enqueue_for_event(
+        db_session, test_clinic.id, EVENT, {"patient_id": "p1"}
+    )
+    await db_session.commit()
+
+    captured: dict = {}
+
+    async def fake_post(url, body, headers):
+        captured["body"] = json.loads(body)
+        return httpx.Response(200, request=httpx.Request("POST", url))
+
+    monkeypatch.setattr(webhook_client, "post_webhook", fake_post)
+    await WebhookGateway.dispatch_outbox(db_session)
+
+    assert "event_id" in captured["body"]
+    assert captured["body"]["event_id"] == str(deliveries[0].event_id)

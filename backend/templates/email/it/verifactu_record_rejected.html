@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Fattura respinta dall'AEAT — azione richiesta{% endblock %}
+
+{% block content %}
+<h2>Gentile {{ admin_name }},</h2>
+
+<div class="alert alert-error">
+    L'AEAT ha <strong>respinto</strong> il registro Verifactu della fattura <strong>{{ invoice_number }}</strong> dello studio <strong>{{ clinic_name }}</strong>.
+    Finché questa incidenza non verrà risolta, <strong>non sarà possibile emettere nuove fatture</strong> (la catena delle impronte risulterebbe compromessa).
+</div>
+
+<div class="info-box">
+    <div class="label">Fattura</div>
+    <div class="value">{{ invoice_number }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Codice AEAT</div>
+    <div class="value">{{ codigo_error or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Motivo</div>
+    <div class="value">{{ friendly_message }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Cosa fare ora?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    {% if suggested_cta == 'edit_clinic' %}
+    <li style="margin-bottom: 8px;">Entri in <em>Impostazioni → Studio</em> e verifichi il CIF/NIF dello studio.</li>
+    <li style="margin-bottom: 8px;">Torni in <em>Impostazioni → Verifactu → Coda</em> e prema <strong>«Rigenera e reinvia»</strong>.</li>
+    {% elif suggested_cta == 'edit_billing_party' %}
+    <li style="margin-bottom: 8px;">Apra la fattura {{ invoice_number }} e prema <strong>«Modifica dati del cliente»</strong> nel banner rosso.</li>
+    <li style="margin-bottom: 8px;">Dopo il salvataggio, il registro viene reinviato automaticamente.</li>
+    {% elif suggested_cta == 'edit_lines' %}
+    <li style="margin-bottom: 8px;">Verifichi la mappatura dell'IVA e gli importi della fattura {{ invoice_number }}.</li>
+    <li style="margin-bottom: 8px;">Emetta una nota di rettifica se la fattura era già stata pagata, oppure la riemetta se era una bozza.</li>
+    {% else %}
+    <li style="margin-bottom: 8px;">Entri in <em>Impostazioni → Verifactu → Coda</em> per consultare il dettaglio del rifiuto.</li>
+    <li style="margin-bottom: 8px;">Se la causa non è chiara, contatti il supporto allegando il codice di errore.</li>
+    {% endif %}
+</ol>
+
+{% if queue_url %}
+<p style="margin-top: 20px;">
+    <a href="{{ queue_url }}" style="display: inline-block; padding: 10px 16px; background: #18181b; color: #fff; text-decoration: none; border-radius: 6px;">Apri la coda Verifactu</a>
+</p>
+{% endif %}
+{% endblock %}

@@ -83,6 +83,13 @@ class WebhookDelivery(Base, TimestampMixin):
     event_type: Mapped[str] = mapped_column(String(100), index=True)
     payload: Mapped[dict] = mapped_column(JSONB)
 
+    # Stable id shared by every delivery queued for the same source event
+    # publish (all subscriptions matching one bus event get the same
+    # ``event_id``), so a receiver can dedupe — issue #65 §1. Phase 1 rows
+    # are nullable; when absent, dispatch falls back to this delivery's own
+    # id.
+    event_id: Mapped[UUID | None] = mapped_column(UUID(as_uuid=True), index=True, default=None)
+
     status: Mapped[str] = mapped_column(
         String(20), default="queued", index=True
     )  # queued, sending, sent, failed

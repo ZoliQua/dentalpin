@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Faktura odrzucona przez AEAT — wymagane działanie{% endblock %}
+
+{% block content %}
+<h2>Dzień dobry, {{ admin_name }}!</h2>
+
+<div class="alert alert-error">
+    AEAT <strong>odrzuciła</strong> rejestr Verifactu faktury <strong>{{ invoice_number }}</strong> gabinetu <strong>{{ clinic_name }}</strong>.
+    Do czasu rozwiązania tego problemu <strong>nie będzie można wystawiać nowych faktur</strong> (łańcuch odcisków zostałby naruszony).
+</div>
+
+<div class="info-box">
+    <div class="label">Faktura</div>
+    <div class="value">{{ invoice_number }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Kod AEAT</div>
+    <div class="value">{{ codigo_error or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Powód</div>
+    <div class="value">{{ friendly_message }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Co teraz zrobić?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    {% if suggested_cta == 'edit_clinic' %}
+    <li style="margin-bottom: 8px;">Przejdź do <em>Konfiguracja → Klinika</em> i sprawdź numer CIF/NIF gabinetu.</li>
+    <li style="margin-bottom: 8px;">Wróć do <em>Konfiguracja → Verifactu → Kolejka</em> i kliknij <strong>„Wygeneruj ponownie i wyślij”</strong>.</li>
+    {% elif suggested_cta == 'edit_billing_party' %}
+    <li style="margin-bottom: 8px;">Otwórz fakturę {{ invoice_number }} i kliknij <strong>„Edytuj dane klienta”</strong> na czerwonym banerze.</li>
+    <li style="margin-bottom: 8px;">Po zapisaniu rejestr zostanie ponownie wysłany automatycznie.</li>
+    {% elif suggested_cta == 'edit_lines' %}
+    <li style="margin-bottom: 8px;">Sprawdź mapowanie stawek VAT (IVA) oraz kwoty na fakturze {{ invoice_number }}.</li>
+    <li style="margin-bottom: 8px;">Wystaw fakturę korygującą, jeśli faktura była już opłacona, lub wystaw ją ponownie, jeśli była wersją roboczą.</li>
+    {% else %}
+    <li style="margin-bottom: 8px;">Przejdź do <em>Konfiguracja → Verifactu → Kolejka</em>, aby zobaczyć szczegóły odrzucenia.</li>
+    <li style="margin-bottom: 8px;">Jeśli przyczyna nie jest jasna, skontaktuj się z pomocą techniczną, podając kod błędu.</li>
+    {% endif %}
+</ol>
+
+{% if queue_url %}
+<p style="margin-top: 20px;">
+    <a href="{{ queue_url }}" style="display: inline-block; padding: 10px 16px; background: #18181b; color: #fff; text-decoration: none; border-radius: 6px;">Otwórz kolejkę Verifactu</a>
+</p>
+{% endif %}
+{% endblock %}

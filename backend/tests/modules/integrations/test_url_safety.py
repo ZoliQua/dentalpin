@@ -11,7 +11,7 @@ import socket
 
 import pytest
 
-from app.modules.integrations.url_safety import (
+from app.core.webhooks.url_safety import (
     UnsafeWebhookURLError,
     validate_before_dispatch,
     validate_new_url,

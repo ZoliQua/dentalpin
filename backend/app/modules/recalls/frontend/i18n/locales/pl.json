@@ -126,8 +126,8 @@
       "dismiss": "Odrzuć"
     },
     "confirms": {
-      "cancel": "Anulować tę wizytę kontrolną? Cykl zostanie zakończony i nie można tego cofnąć.",
-      "done": "Oznaczyć tę wizytę kontrolną jako wykonaną? Zamknie to bieżący cykl."
+      "cancel": "Anulować przypomnienie dla {name}? Tej operacji nie można cofnąć.",
+      "done": "Oznaczyć przypomnienie dla {name} jako wykonane? Zamyka je na ten cykl."
     }
   }
 }

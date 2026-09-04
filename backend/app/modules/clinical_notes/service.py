@@ -30,6 +30,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.events import event_bus
 from app.core.events.types import EventType
+from app.core.i18n_names import catalog_name
 from app.modules.agenda.models import Appointment
 from app.modules.media.models import Document, MediaAttachment
 from app.modules.media.service import AttachmentService
@@ -574,11 +575,8 @@ def _author_brief(author) -> dict:
 def _resolve_label(
     names: dict[str, str] | None,
 ) -> str | None:
-    """Resolve a display label from catalog names: es → en → fr → pt → ta → any."""
-    names = names or {}
-    return next((names[k] for k in ("es", "en", "fr", "pt", "ta") if names.get(k)), None) or next(
-        (v for v in names.values() if v), None
-    )
+    """Resolve a display label from catalog names (shared priority chain)."""
+    return catalog_name(names)
 
 
 def _build_linked(
@@ -633,7 +631,8 @@ def _build_linked(
 
 async def list_merged_for_plan(db: AsyncSession, clinic_id: UUID, plan_id: UUID) -> list[dict]:
     """Plan + treatment + visit notes for a single plan, newest-first."""
-    from app.modules.agenda.models import Appointment, AppointmentTreatment
+    from app.modules.agenda.models import Appointment
+    from app.modules.treatment_plan.models import AppointmentTreatment
 
     plan_result = await db.execute(
         select(TreatmentPlan).where(

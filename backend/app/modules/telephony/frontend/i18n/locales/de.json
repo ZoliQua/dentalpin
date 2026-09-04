@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Anrufe"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telefonie (CTI)",
+      "description": "Zeigt eingehende Anrufe auf dem Bildschirm und führt ein Anrufprotokoll — jede Telefonanlage per Webhook."
+    },
+    "gateway": "Gateway",
+    "receiving": "Ereignisse werden empfangen",
+    "defaultCountry": "Standardland",
+    "defaultCountryHelp": "Zweibuchstabiger Ländercode zur Interpretation lokaler Rufnummern (z. B. DE).",
+    "active": "Aktiviert",
+    "rotateSecret": "Geheimnis erneuern",
+    "webhook": "Ereignis-Webhook",
+    "webhookHelp": "Konfigurieren Sie Ihre Telefonanlage oder Zapier so, dass normalisierte Anrufereignisse signiert an diese URL gesendet werden.",
+    "secret": "Signaturgeheimnis",
+    "secretShownOnce": "Kopieren Sie dieses Geheimnis jetzt — es wird nur einmal angezeigt. Ihre Anlage/Automatisierung signiert jedes Ereignis damit (X-DentalPin-Signature).",
+    "copy": "Kopieren",
+    "copied": "In die Zwischenablage kopiert",
+    "saved": "Einstellungen gespeichert",
+    "saveError": "Einstellungen konnten nicht gespeichert werden",
+    "calls": {
+      "title": "Anrufprotokoll",
+      "allStatuses": "Alle Status",
+      "status": {
+        "ringing": "Klingelt",
+        "answered": "Angenommen",
+        "ended": "Beendet",
+        "missed": "Verpasst"
+      },
+      "unknownCaller": "Unbekannter Anrufer",
+      "openRecord": "Akte öffnen",
+      "searchPatient": "Patient suchen",
+      "empty": "Noch keine Anrufe.",
+      "when": "Wann",
+      "caller": "Anrufer",
+      "number": "Nummer",
+      "statusCol": "Status",
+      "duration": "Dauer"
+    },
+    "pop": {
+      "incoming": "Eingehender Anruf"
+    }
+  }
+}

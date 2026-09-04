@@ -16,9 +16,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.email.encryption import encrypt_password
+from app.core.webhooks.url_safety import validate_new_url
 
 from .models import ApiToken, WebhookSubscription
-from .url_safety import validate_new_url
 
 # Server-side generated, shown once, never Fernet-decrypted back out for
 # display (only internally, to sign a delivery).

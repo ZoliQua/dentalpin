@@ -1,0 +1,17 @@
+Hello {{ admin_name }},
+
+{% if is_expired -%}
+The digital certificate for the clinic "{{ clinic_name }}" used to sign submissions to the AEAT (Veri*Factu) HAS ALREADY EXPIRED. Until you renew it, records will remain queued and the AEAT will reject any submission.
+{%- else -%}
+The digital certificate for the clinic "{{ clinic_name }}" used to sign submissions to the AEAT (Veri*Factu) expires in {{ days_left }} day(s). We recommend renewing it before the deadline so that invoicing is not interrupted.
+{%- endif %}
+
+Holder: {{ subject_cn or '—' }}
+Expiry date: {{ valid_until.strftime('%d/%m/%Y') }}
+
+Steps:
+1. Request a new certificate from the FNMT.
+2. Go to DentalPin → Settings → Verifactu → Certificate.
+3. Upload the .pfx file and enter its password.
+
+If you need help, reply to this email.

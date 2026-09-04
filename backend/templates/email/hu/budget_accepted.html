@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Árajánlat elfogadva - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Kedves {{ patient_name }}!</h2>
+
+<p>Rögzítettük árajánlatának elfogadását. Köszönjük bizalmát!</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Árajánlat száma</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Elfogadás dátuma</div>
+            <div class="value">{{ accepted_date }}</div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div>
+            <div class="label">A kezelés teljes összege</div>
+            <div class="value" style="font-size: 20px; color: #3b82f6;">{{ total }} €</div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success">
+    <strong>Következő lépés:</strong> hamarosan felvesszük Önnel a kapcsolatot, hogy egyeztessük a kezeléséhez szükséges időpontokat.
+</div>
+
+{% if notes %}
+<p><strong>Megjegyzés:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Ha kérdése van, vagy szeretné lefoglalni első időpontját, keressen minket bizalommal.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Időpontfoglalás</a>
+</div>
+{% endif %}
+
+<p>Köszönjük, hogy minket választott!</p>
+{% endblock %}

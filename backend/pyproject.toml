@@ -44,10 +44,13 @@ dependencies = [
     # .dpm.zst.enc). cryptography (already above) handles AES-256-GCM
     # + scrypt for the DPME envelope.
     "zstandard>=0.22.0",
-    # copilot agentic layer: OpenAI is the only live LLM provider in v1
-    # (app/core/llm/). The Provider protocol is vendor-agnostic, so
-    # Anthropic/Ollama slot in later without touching callers.
+    # copilot agentic layer (app/core/llm/): the Provider protocol is
+    # vendor-agnostic; OpenAI and Anthropic are the live providers, and
+    # further vendors (Gemini, Ollama) slot in without touching callers.
     "openai>=1.40",
+    "anthropic>=0.40",
+    # telephony module: E.164 normalization of caller numbers (issue #64).
+    "phonenumbers>=8.13",
 ]
 
 [project.optional-dependencies]
@@ -89,6 +92,15 @@ treatment_consumables = "app.modules.treatment_consumables:TreatmentConsumablesM
 lab_orders = "app.modules.lab_orders:LabOrdersModule"
 activity_journal = "app.modules.activity_journal:ActivityJournalModule"
 medication_catalog = "app.modules.medication_catalog:MedicationCatalogModule"
+accounting_export = "app.modules.accounting_export:AccountingExportModule"
+clinical_notes = "app.modules.clinical_notes:ClinicalNotesModule"
+payments = "app.modules.payments:PaymentsModule"
+periodontogram = "app.modules.periodontogram:PeriodontogramModule"
+whatsapp_kapso = "app.modules.whatsapp_kapso:WhatsappKapsoModule"
+documents = "app.modules.documents:DocumentsModule"
+whatsapp_webhook = "app.modules.whatsapp_webhook:WhatsappWebhookModule"
+telephony = "app.modules.telephony:TelephonyModule"
+suppliers = "app.modules.suppliers:SuppliersModule"
 
 [tool.setuptools.packages.find]
 where = ["."]

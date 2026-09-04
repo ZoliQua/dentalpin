@@ -1,0 +1,310 @@
+{
+  "payments": {
+    "nav": {
+      "payments": "Befizetések",
+      "reports": "Befizetési riportok"
+    },
+    "balance": {
+      "debt": "Tartozik",
+      "credit": "Előleg",
+      "paid": "Összes befizetés"
+    },
+    "list": {
+      "title": "Befizetések",
+      "subtitle": "Páciensbefizetések, árajánlat-előlegek és számlára befizetett összegek.",
+      "empty": "Nincs rögzített befizetés.",
+      "new": "Új befizetés",
+      "searchPlaceholder": "Páciens vagy hivatkozás",
+      "filterDateFrom": "Ettől",
+      "filterDateTo": "Eddig",
+      "filterMethod": "Fizetési mód",
+      "filterPatient": "Páciens",
+      "filter": {
+        "method": "Fizetési mód",
+        "hasRefunds": "Visszatérítéssel",
+        "hasUnallocated": "Hozzárendelés nélkül",
+        "patient": "Páciens",
+        "withDebt": "Tartozással",
+        "paymentStatus": "Állapot"
+      },
+      "sort": {
+        "paymentDate": "Dátum",
+        "amount": "Összeg"
+      },
+      "budgetStatus": {
+        "paid": "Kifizetve",
+        "partial": "Részben fizetve",
+        "unpaid": "Nincs kifizetve"
+      },
+      "row": {
+        "debtTooltip": "A páciens fennálló tartozása",
+        "creditTooltip": "A páciens előlegegyenlege",
+        "allocationsLabel": "Hozzárendelés",
+        "refundedLabel": "Visszatérítve",
+        "noPatient": "Nincs páciens"
+      },
+      "columnDate": "Dátum",
+      "columnPatient": "Páciens",
+      "columnAmount": "Összeg",
+      "columnMethod": "Fizetési mód",
+      "columnAllocations": "Hozzárendelés",
+      "columnNet": "Nettó",
+      "columnActions": "Műveletek"
+    },
+    "detail": {
+      "title": "Befizetés {reference}",
+      "amount": "Összeg",
+      "method": "Fizetési mód",
+      "date": "Dátum",
+      "recordedBy": "Rögzítette",
+      "allocations": "Hozzárendelések",
+      "refunds": "Visszatérítések",
+      "refund": "Visszatérítés",
+      "refundedTotal": "Visszatérítve",
+      "netAmount": "Nettó",
+      "reference": "Hivatkozás",
+      "notes": "Megjegyzések"
+    },
+    "new": {
+      "title": "Befizetés rögzítése",
+      "patient": "Páciens",
+      "patientPlaceholder": "Páciens keresése...",
+      "unknownPatient": "Ismeretlen páciens",
+      "amount": "Összeg",
+      "suggestedHint": "Beszedésre vár: {amount}",
+      "useSuggested": "használja ezt az összeget",
+      "method": "Fizetési mód",
+      "moreMethods": "További lehetőségek",
+      "date": "Dátum",
+      "today": "Ma",
+      "advanced": "Speciális beállítások",
+      "reference": "Hivatkozás",
+      "referencePlaceholder": "Kártyás engedélyszám, átutalási közlemény...",
+      "notes": "Megjegyzések",
+      "allocations": "Hozzárendelés",
+      "allocationsHint": "Ossza fel a befizetést árajánlatok között, vagy hagyja a páciens előlegeként.",
+      "addAllocation": "Hozzárendelés hozzáadása",
+      "allocationToBudget": "Árajánlatra",
+      "allocationOnAccount": "Előlegként",
+      "sumLabel": "Összesen:",
+      "sumMismatch": "nem egyezik az összeggel",
+      "submit": "Rögzítés",
+      "submitWithAmount": "{amount} beszedése",
+      "cancel": "Mégse",
+      "errPatient": "Válasszon pácienst",
+      "errAmount": "Adjon meg 0-nál nagyobb összeget",
+      "errSum": "A hozzárendelések összegének meg kell egyeznie a befizetés összegével",
+      "errUnknown": "A befizetést nem sikerült rögzíteni. Próbálja újra."
+    },
+    "methods": {
+      "cash": "Készpénz",
+      "card": "Bankkártya",
+      "bank_transfer": "Átutalás",
+      "direct_debit": "Csoportos beszedés",
+      "insurance": "Biztosító",
+      "other": "Egyéb",
+      "upi": "UPI",
+      "netbanking": "Netbank"
+    },
+    "refund": {
+      "title": "Befizetés visszatérítése",
+      "amount": "Összeg",
+      "method": "Fizetési mód",
+      "reason": "Indok",
+      "note": "Részletek",
+      "submit": "Visszatérítés",
+      "reasonCodes": {
+        "duplicate": "Duplikált befizetés",
+        "overpaid": "Túlfizetés",
+        "treatment_cancelled": "Kezelés lemondva",
+        "dispute": "Reklamáció",
+        "other": "Egyéb"
+      }
+    },
+    "ledger": {
+      "title": "Páciens-egyenleg",
+      "totalPaid": "Összes befizetés",
+      "totalEarned": "Elvégzett kezelés",
+      "patientCredit": "A páciens előlegegyenlege",
+      "clinicReceivable": "Rendelői követelés",
+      "onAccount": "Előleg",
+      "empty": "Nincsenek mozgások."
+    },
+    "budgetCard": {
+      "title": "Árajánlat befizetései",
+      "budgetTotal": "Árajánlat összege",
+      "collected": "Beszedve",
+      "pending": "Hátralévő",
+      "collect": "Beszedés",
+      "empty": "Ehhez az árajánlathoz még nincs hozzárendelt befizetés.",
+      "collectedLabel": "Beszedve",
+      "pendingLabel": "Hátralévő",
+      "outOfTotal": "a teljes {total} összegből",
+      "settled": "Az árajánlat teljes egészében beszedve",
+      "history": "Befizetési előzmények",
+      "payment": "Befizetés",
+      "emptyDetailed": "Még nincs beszedett befizetés. Az első rögzítéséhez használja a „Beszedés” gombot."
+    },
+    "budgetCollect": {
+      "title": "Árajánlat beszedése",
+      "amountLabel": "Összeg",
+      "methodLabel": "Fizetési mód",
+      "dateLabel": "Befizetés dátuma",
+      "today": "Ma",
+      "quickFull": "Teljes összeg",
+      "optionalDetails": "Hivatkozás vagy megjegyzés hozzáadása (nem kötelező)",
+      "referenceLabel": "Hivatkozás",
+      "referencePlaceholder": "pl. POS-tranzakció azonosítója",
+      "notesLabel": "Belső megjegyzések",
+      "submit": "Beszedés",
+      "cancel": "Mégse",
+      "success": "Befizetés rögzítve",
+      "errorGeneric": "A befizetést nem sikerült rögzíteni",
+      "noteAppliedToBudget": "az árajánlatra kerül elszámolásra.",
+      "notePendingAfter": "Hátralévő",
+      "noteFullySettled": "Az árajánlat teljes egészében rendezve lesz.",
+      "noteToBudget": "az árajánlatra kerül elszámolásra, és",
+      "noteExcessToOnAccount": "a páciens előlegére kerül.",
+      "noteBudgetSettled": "Az árajánlat már teljes egészében ki van fizetve.",
+      "noteToOnAccount": "a páciens előlegére kerül."
+    },
+    "pendingCharges": {
+      "title": "Beszedésre vár",
+      "count": "{n} ülés",
+      "more": "+ {n} további",
+      "collect": "{amount} beszedése",
+      "unnamedSession": "Névtelen ülés"
+    },
+    "patientPanel": {
+      "title": "Páciens-egyenleg",
+      "kpis": {
+        "totalPaid": "Összes befizetés",
+        "debt": "Rendelői követelés",
+        "onAccount": "Előleg"
+      },
+      "sidebar": {
+        "title": "Összegzés",
+        "credit": "Páciens-előleg",
+        "lastPayment": "Utolsó befizetés",
+        "noLastPayment": "Még nincs befizetés",
+        "totalEarned": "Elvégzett kezelés"
+      },
+      "banner": {
+        "debtTitle": "{amount} tartozása van a rendelő felé",
+        "debtDescription": "Az összes befizetés kevesebb, mint az elvégzett kezelések értéke.",
+        "creditTitle": "{amount} előlege van",
+        "creditDescription": "Többet fizetett be, mint az elvégzett kezelések értéke."
+      },
+      "cobrar": "Befizetés rögzítése",
+      "timeline": {
+        "title": "Mozgások",
+        "empty": "Nincs rögzített mozgás",
+        "emptyCta": "Első befizetés rögzítése",
+        "loadError": "Nem sikerült betölteni a páciens egyenlegét.",
+        "retry": "Újrapróbálás",
+        "drPrefix": "Dr. {name}",
+        "types": {
+          "payment": "Befizetés",
+          "refund": "Visszatérítés",
+          "earned": "Elvégzett kezelés"
+        },
+        "treatmentStatus": {
+          "planned": "Tervezett",
+          "performed": "Elvégezve",
+          "completed": "Befejezve",
+          "cancelled": "Lemondva",
+          "in_progress": "Folyamatban"
+        },
+        "rowMenu": {
+          "detail": "Részletek megtekintése",
+          "refund": "Visszatérítés",
+          "reallocate": "Árajánlathoz rendelés…"
+        }
+      },
+      "refundModal": {
+        "title": "Befizetés visszatérítése",
+        "amount": "Visszatérítendő összeg",
+        "method": "Visszatérítés módja",
+        "reason": "Indok",
+        "note": "Részletek (nem kötelező)",
+        "submit": "Visszatérítés megerősítése",
+        "cancel": "Mégse",
+        "errorGeneric": "A visszatérítést nem sikerült rögzíteni"
+      }
+    },
+    "reports": {
+      "title": "Befizetési riportok",
+      "subtitle": "Beszedések, visszatérítések, páciensegyenlegek és trendek az időszakban.",
+      "loadError": "Nem sikerült betölteni a befizetési riportokat",
+      "cardDescription": "Beszedett összegek, visszatérítések, páciensegyenlegek, korosítás és trendek.",
+      "period": "Időszak",
+      "refresh": "Frissítés",
+      "collected": "Beszedve",
+      "refunded": "Visszatérítve",
+      "net": "Nettó",
+      "patientCredit": "Páciens-előlegek összesen",
+      "patientCreditHint": "Előleg- vagy számlára befizetett egyenlegek.",
+      "clinicReceivable": "Rendelői követelés",
+      "refundRatio": "Visszatérítési arány",
+      "byMethod": "Fizetési mód szerint",
+      "byProfessional": "Kezelő szerint",
+      "byProfessionalHint": "Elvégzett kezelés, nem beszedett összeg.",
+      "aging": "Követelések korosítása",
+      "agingHint": "Fennálló tartozású páciensek a tartozás kora szerint csoportosítva.",
+      "refunds": "Visszatérítések indok szerint",
+      "refundsHint": "A visszatérítések megoszlása a rögzített indok szerint.",
+      "bucket": "{range} nap",
+      "unknownProfessional": "Nincs hozzárendelve",
+      "countShort": "{n} tranzakció",
+      "countPatients": "{n} páciens",
+      "granularity": {
+        "day": "Nap",
+        "week": "Hét",
+        "month": "Hónap"
+      },
+      "hero": {
+        "netCollected": "Nettó beszedés",
+        "netCollectedHint": "Beszedések mínusz visszatérítések az időszakban.",
+        "receivable": "Fennálló követelés",
+        "receivableHint": "Elvégzett, de még nem beszedett kezelések, kor szerint.",
+        "vsPrevious": "az előző időszakhoz képest",
+        "transactionsCount": "{n} tranzakció az időszakban"
+      },
+      "trend": {
+        "title": "Beszedési trend",
+        "subtitle": "Nettó összeg intervallumonként. A szaggatott vonal a visszatérítéseket mutatja."
+      },
+      "empty": {
+        "noDataTitle": "Nincs adat ebben az időszakban",
+        "noDataDescription": "Módosítsa az időszakot, vagy rögzítsen egy befizetést a riport megjelenítéséhez.",
+        "noTrend": "Nincs elég adatpont a trend kirajzolásához.",
+        "noMethods": "Nincs fizetési mód szerinti beszedés az időszakban.",
+        "noProfessionals": "Nincs elvégzett kezelés az időszakban.",
+        "noReceivable": "Nincs fennálló tartozású páciens."
+      },
+      "drilldown": {
+        "viewPayments": "Befizetések megtekintése az időszakban",
+        "viewPatients": "Tartozó páciensek megtekintése"
+      }
+    },
+    "target": {
+      "label": "Elszámolás célja",
+      "placeholder": "Válasszon célt",
+      "onAccount": "Páciens-előleg (számlára befizetés)",
+      "onAccountHint": "A páciens előlegeként marad. Nem kerül elszámolásra egyetlen számlára vagy árajánlatra sem, amíg hozzá nem rendeli.",
+      "budgetHint": "Erre az árajánlatra és a hozzá kiállított számlákra kerül elszámolásra.",
+      "lockedBudget": "A(z) {budget} árajánlatra és annak számláira kerül elszámolásra."
+    },
+    "reallocate": {
+      "title": "Árajánlathoz rendelés",
+      "hint": "A teljes {amount} összegű befizetés a kiválasztott árajánlatra és annak kiállított számláira kerül át.",
+      "submit": "Hozzárendelés",
+      "success": "Befizetés az árajánlathoz rendelve",
+      "error": "A befizetést nem sikerült újra hozzárendelni. Próbálja újra."
+    },
+    "followup": {
+      "collect": "Befizetés beszedése",
+      "collected": "Befizetés rögzítve."
+    }
+  }
+}

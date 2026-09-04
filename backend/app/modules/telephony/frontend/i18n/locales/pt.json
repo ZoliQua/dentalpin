@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Chamadas"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telefonia (CTI)",
+      "description": "Mostra as chamadas recebidas no ecrã e mantém um registo — qualquer PBX via webhook."
+    },
+    "gateway": "Gateway",
+    "receiving": "A receber eventos",
+    "defaultCountry": "País predefinido",
+    "defaultCountryHelp": "Código de país de duas letras para interpretar números locais (p. ex. PT).",
+    "active": "Ativado",
+    "rotateSecret": "Rodar segredo",
+    "webhook": "Webhook de eventos",
+    "webhookHelp": "Configure o seu PBX ou Zapier para enviar eventos de chamada normalizados para este URL, assinados com o segredo.",
+    "secret": "Segredo de assinatura",
+    "secretShownOnce": "Copie este segredo agora: só é mostrado uma vez. O seu PBX/automação assina cada evento com ele (X-DentalPin-Signature).",
+    "copy": "Copiar",
+    "copied": "Copiado para a área de transferência",
+    "saved": "Definições guardadas",
+    "saveError": "Não foi possível guardar as definições",
+    "calls": {
+      "title": "Registo de chamadas",
+      "allStatuses": "Todos os estados",
+      "status": {
+        "ringing": "A tocar",
+        "answered": "Atendida",
+        "ended": "Terminada",
+        "missed": "Perdida"
+      },
+      "unknownCaller": "Chamador desconhecido",
+      "openRecord": "Abrir ficha",
+      "searchPatient": "Procurar paciente",
+      "empty": "Ainda não há chamadas.",
+      "when": "Quando",
+      "caller": "Chamador",
+      "number": "Número",
+      "statusCol": "Estado",
+      "duration": "Duração"
+    },
+    "pop": {
+      "incoming": "Chamada recebida"
+    }
+  }
+}

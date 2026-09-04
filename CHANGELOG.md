@@ -11,27 +11,117 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-09-02
+
 ### Added
 
-- **Polish (`pl`) and Italian (`it`) interfaces** — full core app, 2426
-  keys each, dental-domain terminology reviewed against #144/#132 (pl:
-  *diagram zębowy, kosztorys, terminarz, gabinet, wywiad medyczny*; it:
-  *odontogramma, preventivo, agenda, anamnesi, riunito, studio* — not
-  *clinica*). Polish needs three plural forms, so `i18n.config.ts` gains
-  a `pl` `pluralRules` entry verified CLDR-exact over 0–1000 (incl. the
-  12–14 teen exception: `1 alergia / 2 alergie / 13 alergii / 22
-  alergie`). Module-layer keys fall back to English until their
-  translations land (#285, thanks @ZoliQua).
+- **Nine new optional modules** (all manual-install from the admin UI):
+  - **`inventory`** — stock list with low-stock alerts (#277), then
+    the core upgrade: unit cost tracking, stock movements with an
+    audit trail and automatic deduction on completed treatments (#289,
+    thanks @lamanji).
+  - **`treatment_consumables`** — links catalog treatments to the
+    inventory items they consume; feeds the auto-deduction above
+    (#280, thanks @lamanji).
+  - **`suppliers`** — supplier and procurement base module on top of
+    `contacts`; backend-only foundation for the purchasing suite
+    (#359, thanks @lamanji).
+  - **`medication_catalog`** — clinic-wide medication list (#279,
+    thanks @lamanji).
+  - **`staff_tasks`** — staff handoff board (#267, thanks @lamanji).
+  - **`activity_journal`** — append-only staff activity log with
+    resolved actor names (#278, thanks @lamanji).
+  - **`documents`** — branded PDF generation module
+    (#319, thanks @lamanji).
+  - **`whatsapp_webhook`** — WhatsApp via a signed webhook, the
+    zero-onboarding adapter for any PBX/automation tool; HMAC signing
+    and URL safety moved into `app/core/webhooks` so other adapters
+    can share them (#347, #63, thanks @ZoliQua).
+  - **`telephony`** — CTI gateway phase 1: HMAC-verified inbound call
+    events, E.164 normalization, caller→patient matching, persistent
+    call log and a screen-pop toast for ringing calls; the pop poll
+    backs off to a 10-minute status probe on unconfigured clinics
+    (#349, #366, #64, thanks @ZoliQua).
+- **Integrations Phase 2** (#65): eight webhook triggers with a stable
+  `event_id`, a token-authenticated public read API with `/public/ping`,
+  `last_used_at` stamping on tokens and a structured patient find
+  (#345, thanks @lamanji; #358).
+- **Notifications: WhatsApp-first channel configuration** with a
+  preferred channel per patient, manual send buttons on the patient
+  summary and a `GET /notifications/channels` probe so the conversation
+  card only renders where WhatsApp is actually available (#310, #287,
+  #306, thanks @ZoliQua).
+- **Copilot: Anthropic LLM provider adapter**, plus the design brief for
+  pluggable free/local providers (#342, #340, #332, thanks @ZoliQua).
+- **Polish (`pl`) and Italian (`it`) interfaces** — core app and all 20
+  module layers; Polish ships CLDR-exact three-form plural rules (#285,
+  #304, #144, #132, thanks @ZoliQua). **German and Hungarian** now cover
+  every module layer too (#297, #335), and patient communications
+  (email templates, reminders) render in de/hu/pl/it (#344). All nine
+  core locales sit at 2489 keys, enforced by a new parity test (#302,
+  #312, thanks @lamanji).
+- **Flow-continuity batch** (#207): *Confirmar plan* links to its draft
+  quote, *Programar cita* preselects the plan's pending treatments, the
+  post-appointment dialog can close unmarked treatments and open the
+  payment modal in place, and the signature modal prefills the signer
+  (#306, thanks @ZoliQua).
+- **Onboarding follow-ups** (#205): clinic address in `/setup`, "I see
+  patients myself" as a first-class switch, guided mode opens the form
+  directly, the guide bar counts the walk and the wizard language
+  follows the country preset (#296, thanks @ZoliQua).
+- **Agenda: export an appointment as `.ics`** (#282, #129).
+- **India GST: GSTIN mod-36 checksum and state-code cross-check**
+  (#295, #262).
+- **E2E suite runs against a production build in CI** (#294, #259) and
+  a country-readiness matrix is tracked in-repo (#339, #146).
+
+### Changed
+
+- **Module system hygiene**: the dependency-debt allowlists are drained
+  to empty via provider inversion and seed relocation (#315, #309);
+  `appointment_treatments` moved to `treatment_plan` (#338, #337); the
+  four import-time registrations moved to `on_activate` with an
+  AST-based ADR 0020 guard (#329); five missing module entry points
+  declared with a regression guard (#328); Alembic branch-head
+  resolution memoized to one walk per process (#336, #323); CI fails
+  when a module migrations dir is not registered in `alembic.ini`
+  (#346, thanks @lamanji).
+- **Baked-but-uninstalled modules stop costing at runtime**: routes
+  in `modules.json` plus a module-gate middleware (#333, #326).
+- **useApi error contract**: unhandled 4xx responses surface the
+  backend's message; silent-failure sweep across error states, input
+  preservation and destructive confirms (#317, #311, #101).
+- **Accessibility**: aria-labels on all 98 icon-only buttons across
+  host and module layers, closing the sweep (#305, #307, #127).
+- **Docs**: nine-language READMEs with contributor credits (#313),
+  EN/ES user-manual parity (#128), ADR numbering enforced by CI (#303),
+  the copilot redaction guarantee stated precisely as pseudonymization
+  with a documented free-text gap (#361, #357), Node 22 in CI and BSL
+  wording on every README (#363, #352).
 
 ### Fixed
 
+- Production deploy hardening (#351): `docker-compose.prod.yml` pulls
+  from `ghcr.io/dentalpin/dentalpin-*`, the namespace `release.yml`
+  actually publishes to, instead of the stale personal one; the frontend
+  image installs with `npm ci` and runs as `node` instead of root; Caddy
+  sets HSTS, `X-Content-Type-Options`, `Referrer-Policy` and
+  `frame-ancestors 'self'`; `.env.prod.example` pins a release instead of
+  `latest` (#362, thanks @lamanji).
 - Batch uninstall of a dependency pair no longer strands the dependent
   in `to_remove` (#286): the pending processor now runs removals in
   reverse topological order (dependents first), after installs and
   upgrades, so the dependent's backup runs while its tables still
-  exist. `pg_dump`'s "no matching tables were found" is additionally
-  treated as a skipped (empty) backup rather than a failure, so a
-  crash between downgrade and backup can't wedge the record either.
+  exist. Already-dropped tables are detected from the catalog rather
+  than `pg_dump`'s stderr (#292, #308).
+- Dev compose no longer runs the prod Nitro build, so 4 GB machines boot
+  again (#321); the `module_layers` symlink resolves inside the frontend
+  container (#293, #261); `frontend/modules.json` is guarded against
+  clobbering (#283, #264); Nuxt devtools disabled in e2e (#284).
+- Confirmed treatment plans stay schedulable in the appointment
+  selector (#301, #108); patient warning flags refresh after saving the
+  clinical history (#291, #274); the last local-only full-suite failure
+  root-caused and fixed (#316, #188).
 
 ## [2.4.0] - 2026-08-24
 

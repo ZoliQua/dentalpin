@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Appels"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Téléphonie (CTI)",
+      "description": "Affiche les appels entrants à l'écran et tient un journal — n'importe quel PBX via webhook."
+    },
+    "gateway": "Passerelle",
+    "receiving": "Réception d'événements",
+    "defaultCountry": "Pays par défaut",
+    "defaultCountryHelp": "Code pays à deux lettres pour interpréter les numéros locaux (ex. FR).",
+    "active": "Activé",
+    "rotateSecret": "Renouveler le secret",
+    "webhook": "Webhook d'événements",
+    "webhookHelp": "Configurez votre PBX ou Zapier pour envoyer les événements d'appel normalisés à cette URL, signés avec le secret.",
+    "secret": "Secret de signature",
+    "secretShownOnce": "Copiez ce secret maintenant : il n'est affiché qu'une seule fois. Votre PBX/automatisation signe chaque événement avec (X-DentalPin-Signature).",
+    "copy": "Copier",
+    "copied": "Copié dans le presse-papiers",
+    "saved": "Paramètres enregistrés",
+    "saveError": "Impossible d'enregistrer les paramètres",
+    "calls": {
+      "title": "Journal des appels",
+      "allStatuses": "Tous les statuts",
+      "status": {
+        "ringing": "Sonnerie",
+        "answered": "Répondu",
+        "ended": "Terminé",
+        "missed": "Manqué"
+      },
+      "unknownCaller": "Appelant inconnu",
+      "openRecord": "Ouvrir le dossier",
+      "searchPatient": "Rechercher le patient",
+      "empty": "Aucun appel pour l'instant.",
+      "when": "Quand",
+      "caller": "Appelant",
+      "number": "Numéro",
+      "statusCol": "Statut",
+      "duration": "Durée"
+    },
+    "pop": {
+      "incoming": "Appel entrant"
+    }
+  }
+}

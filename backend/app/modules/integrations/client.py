@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import httpx
 
-from .url_safety import UnsafeWebhookURLError, validate_before_dispatch
+from app.core.webhooks.url_safety import UnsafeWebhookURLError, validate_before_dispatch
 
 _REQUEST_TIMEOUT = 10.0
 

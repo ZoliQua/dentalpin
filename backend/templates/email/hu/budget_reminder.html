@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Árajánlata még válaszra vár - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Kedves {{ patient_name }}!</h2>
+
+<p>A(z) <strong>#{{ budget_number }}</strong> számú árajánlata, amelyet a(z) <strong>{{ clinic_name | default('DentalPin') }}</strong> rendelőtől kapott, még válaszra vár.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Árajánlat száma</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        {% if total %}
+        <div style="flex: 1; text-align: right;">
+            <div class="label">Összesen</div>
+            <div class="value">{{ total }} €</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if valid_until %}
+<div class="alert alert-warning">
+    <strong>Érvényesség:</strong> az árajánlat a következő dátumig érvényes: {{ valid_until }}.
+</div>
+{% endif %}
+
+{% if public_url %}
+<div class="button-container">
+    <a href="{{ public_url }}" class="button">Árajánlatom megtekintése</a>
+</div>
+{% endif %}
+
+<p>Ha már döntött, vagy bármilyen kérdése van, keressen minket — örömmel segítünk.</p>
+
+<p>Állunk rendelkezésére.</p>
+{% endblock %}

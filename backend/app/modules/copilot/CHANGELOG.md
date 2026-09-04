@@ -2,10 +2,15 @@
 
 ## Unreleased
 
+- feat(#343): morning-digest subject line localized for all 9 communication languages (was es/en with es fallback).
+
+- feat(#332): Anthropic joins OpenAI as a live LLM provider — per-clinic `copilot_settings.provider = "anthropic"` streams chat turns through `AnthropicProvider` (`app/core/llm/anthropic_provider.py`). The bridge now passes the provider-matching tool-schema dialect to the orchestrator, settings-save rejects `anthropic` when `ANTHROPIC_API_KEY` is missing, and switching provider without naming a model falls back to that provider's default (`COPILOT_MODEL_CHAT_ANTHROPIC`).
+
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
 - feat(#131): German (de) locale for the module's frontend layer.
 - feat(#144, #132): Polish (pl) and Italian (it) locales for the module's frontend layer.
+- feat(#334): Hungarian (hu) locale for the module's frontend layer.
 - fix(#184): `PERMISSIONS` imported from `~~/app/config/permissions` (the `~/` form only worked through the layer-aliasing fallback).
 - i18n: add Tamil locale (`ta.json`) with full UI coverage.
 

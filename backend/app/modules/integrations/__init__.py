@@ -2,8 +2,10 @@
 
 Phase 1 (issue #65): outbox infra + two working triggers
 (patient.created, appointment.completed) + Stripe-style HMAC signing +
-subscription CRUD + API tokens. Public data-read API, the full trigger
-catalog, Zapier/Make apps, and admin UI are follow-up PRs.
+subscription CRUD + API tokens. Phase 2: six more triggers, a stable
+per-event ``event_id``, a token-authenticated public data-read API, and
+frozen sample payloads. Zapier/Make apps and the admin UI are follow-up
+PRs.
 """
 
 from fastapi import APIRouter
@@ -25,8 +27,16 @@ class IntegrationsModule(BaseModule):
       failure
     - Stripe-style HMAC-SHA256 delivery signing
     - Two working triggers: patient.created, appointment.completed
-    - API tokens (issued, hashed, revocable) — no consumer endpoint yet;
-      the public data-read API is a follow-up PR
+    - API tokens (issued, hashed, revocable); the public data-read API
+      (Phase 2) is the first consumer of those tokens
+
+    Phase 2 adds:
+    - Six more triggers: appointment.scheduled/cancelled/no_show and
+      budget.sent/accepted/rejected
+    - A stable per-event ``event_id`` on every delivery (dedupe, issue #65 §1)
+    - A token-authenticated public data-read API (``/api/v1/integrations/
+      public/...``) enforced against the token's scopes
+    - Frozen sample payloads for every supported trigger
     """
 
     manifest = {
@@ -85,4 +95,10 @@ class IntegrationsModule(BaseModule):
         return {
             EventType.PATIENT_CREATED: IntegrationsHandlers.on_patient_created,
             EventType.APPOINTMENT_COMPLETED: IntegrationsHandlers.on_appointment_completed,
+            EventType.APPOINTMENT_SCHEDULED: IntegrationsHandlers.on_appointment_scheduled,
+            EventType.APPOINTMENT_CANCELLED: IntegrationsHandlers.on_appointment_cancelled,
+            EventType.APPOINTMENT_NO_SHOW: IntegrationsHandlers.on_appointment_no_show,
+            EventType.BUDGET_SENT: IntegrationsHandlers.on_budget_sent,
+            EventType.BUDGET_ACCEPTED: IntegrationsHandlers.on_budget_accepted,
+            EventType.BUDGET_REJECTED: IntegrationsHandlers.on_budget_rejected,
         }

@@ -1,0 +1,27 @@
+Hallo {{ admin_name }},
+
+die AEAT hat den Verifactu-Datensatz der Rechnung {{ invoice_number }} der Praxis "{{ clinic_name }}" ABGELEHNT.
+Solange Sie das Problem nicht beheben, können Sie keine neuen Rechnungen ausstellen (die Hash-Kette würde sonst beschädigt).
+
+Rechnung: {{ invoice_number }}
+AEAT-Fehlercode: {{ codigo_error or '—' }}
+Grund: {{ friendly_message }}
+
+Schritte:
+{% if suggested_cta == 'edit_clinic' -%}
+1. Öffnen Sie Einstellungen → Praxis und überprüfen Sie die CIF/NIF.
+2. Gehen Sie zurück zu Einstellungen → Verifactu → Warteschlange und klicken Sie auf "Neu erzeugen und erneut senden".
+{% elif suggested_cta == 'edit_billing_party' -%}
+1. Öffnen Sie die Rechnung {{ invoice_number }} und klicken Sie im Banner auf "Kundendaten bearbeiten".
+2. Nach dem Speichern wird der Datensatz automatisch erneut übermittelt.
+{% elif suggested_cta == 'edit_lines' -%}
+1. Überprüfen Sie die Steuerzuordnung (IVA) und die Beträge der Rechnung.
+2. Erstellen Sie eine Korrekturrechnung, falls die Rechnung bereits bezahlt war.
+{% else -%}
+1. Öffnen Sie Einstellungen → Verifactu → Warteschlange, um die Details einzusehen.
+2. Wenn die Ursache unklar ist, wenden Sie sich unter Angabe des Fehlercodes an den Support.
+{% endif %}
+
+{% if queue_url -%}
+Verifactu-Warteschlange: {{ queue_url }}
+{%- endif %}

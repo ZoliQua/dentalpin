@@ -2,9 +2,9 @@
 
 Admin CRUD for webhook subscriptions and API tokens, staff-
 authenticated (``integrations.subscriptions.*``, ``integrations.
-tokens.*``). Tokens are issued/revoked here but have no consumer
-endpoint yet — the public data-read API (issue #65 §2, §11) that
-would authenticate with them is follow-up scope.
+tokens.*``), plus the token-authenticated public data-read API
+(issue #65 §2, §11) under ``/public/...`` — third-party automations
+authenticate with a ``dp_`` bearer token against its scopes.
 """
 
 from __future__ import annotations
@@ -17,8 +17,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.dependencies import ClinicContext, get_clinic_context, require_permission
 from app.core.schemas import ApiResponse
+from app.core.webhooks.url_safety import UnsafeWebhookURLError
 from app.database import get_db
 
+from .public import public_router
 from .schemas import (
     ApiTokenCreate,
     ApiTokenCreated,
@@ -29,9 +31,9 @@ from .schemas import (
     WebhookSubscriptionUpdate,
 )
 from .service import IntegrationsService
-from .url_safety import UnsafeWebhookURLError
 
 router = APIRouter()
+router.include_router(public_router, prefix="/public")
 
 
 async def _get_owned_subscription(db: AsyncSession, clinic_id: UUID, subscription_id: UUID):

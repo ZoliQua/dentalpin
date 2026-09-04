@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Open source dental clinic management software.** Patients, odontogram, scheduling,
+**Source-available (BSL 1.1) dental clinic management software, converting to Apache 2.0 four years after publication.** Patients, odontogram, scheduling,
 treatment plans, billing and a built-in AI copilot — modular, self-hosted, API-first.
 
 ### ▶ [**Try the live demo**](https://demo.dentalpin.com)
@@ -32,11 +32,11 @@ DentalPin is built on a simple premise: **one open platform for dental clinics e
 
 ### Why now?
 
-AI has fundamentally changed what small teams can build. Features that once required large development departments can now be implemented in days. This is our window to create the open source dental software that should have existed years ago—before clinics got locked into legacy systems they can't escape.
+AI has fundamentally changed what small teams can build. Features that once required large development departments can now be implemented in days. This is our window to create the source-available dental software (BSL 1.1, converting to Apache 2.0 four years after publication) that should have existed years ago—before clinics got locked into legacy systems they can't escape.
 
 ### Our principles
 
-- **Open Source** — Your clinic data belongs to you. Your software should too.
+- **Source-Available (BSL 1.1)** — Your clinic data belongs to you. Your software should too.
 - **Modular** — Start simple, add what you need. Don't pay for features you'll never use.
 - **Global by Design** — Built for localization from day one. Same core, any language, any country.
 - **API-First** — Every feature is an API. Integrate with anything, automate everything.
@@ -154,7 +154,7 @@ See [docs/user-manual/en/demo.md](docs/user-manual/en/demo.md) for full details 
 | Layer | Technology |
 |-------|-----------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Database | PostgreSQL 15 |
 | Auth | JWT with refresh tokens |
 

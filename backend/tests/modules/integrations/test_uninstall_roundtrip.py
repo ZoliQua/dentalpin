@@ -3,8 +3,9 @@
 Mirrors patient_relationships/recalls/schedules/whatsapp_kapso: install
 -> uninstall -> reinstall must drop ONLY the integrations tables and
 leave every other module untouched. The module now owns two revisions
-(int_0001, int_0002 — added api_tokens), so the branch-scoped downgrade
-target is ``integrations@-2`` — the same form ``_downgrade_target_for``
+(int_0001, int_0002 — added api_tokens — and int_0003 — added
+    ``event_id`` to webhook_deliveries), so the branch-scoped downgrade
+    target is ``integrations@-3`` — the same form ``_downgrade_target_for``
 resolves for the real uninstall path (``_count_owned_revisions``
 tracks this dynamically; this test's target is hardcoded and must be
 bumped whenever a revision is added to this branch). Marked
@@ -62,7 +63,7 @@ def test_integrations_uninstall_roundtrip_is_branch_scoped() -> None:
     )
     baseline_other = before - INTEGRATIONS_TABLES
 
-    _alembic("downgrade", "integrations@-2")
+    _alembic("downgrade", "integrations@-3")
     after_down = _list_tables()
     assert INTEGRATIONS_TABLES.isdisjoint(after_down), (
         f"integrations tables survived downgrade: {INTEGRATIONS_TABLES & after_down}"

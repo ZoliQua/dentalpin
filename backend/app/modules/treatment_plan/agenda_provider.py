@@ -21,21 +21,24 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.modules.agenda.models import AppointmentTreatment
+from app.modules.agenda.models import Appointment
 from app.modules.odontogram.models import Treatment
 
-from .models import PlannedTreatmentItem
+from .models import AppointmentTreatment, PlannedTreatmentItem
 
 
 class TreatmentPlanPlannedWorkProvider:
     def appointment_loader_options(self) -> list[Any]:
         return [
-            selectinload(AppointmentTreatment.planned_item).options(
-                selectinload(PlannedTreatmentItem.treatment).options(
-                    selectinload(Treatment.teeth),
-                    selectinload(Treatment.catalog_item),
+            selectinload(Appointment.treatments).options(
+                selectinload(AppointmentTreatment.planned_item).options(
+                    selectinload(PlannedTreatmentItem.treatment).options(
+                        selectinload(Treatment.teeth),
+                        selectinload(Treatment.catalog_item),
+                    ),
+                    selectinload(PlannedTreatmentItem.treatment_plan),
                 ),
-                selectinload(PlannedTreatmentItem.treatment_plan),
+                selectinload(AppointmentTreatment.catalog_item),
             )
         ]
 
@@ -78,11 +81,42 @@ class TreatmentPlanPlannedWorkProvider:
 
         return errors
 
-    async def catalog_item_id_for(self, db: AsyncSession, planned_item_id: UUID) -> UUID | None:
-        planned_item = await db.get(PlannedTreatmentItem, planned_item_id)
-        if not planned_item:
-            return None
-        await db.refresh(planned_item, ["treatment"])
-        if planned_item.treatment:
-            return planned_item.treatment.catalog_item_id
-        return None
+    async def attach_planned_items(
+        self,
+        db: AsyncSession,
+        appointment_id: UUID,
+        planned_item_ids: list[UUID],
+    ) -> None:
+        for order, planned_item_id in enumerate(planned_item_ids):
+            catalog_item_id = None
+            planned_item = await db.get(PlannedTreatmentItem, planned_item_id)
+            if planned_item:
+                await db.refresh(planned_item, ["treatment"])
+                if planned_item.treatment:
+                    catalog_item_id = planned_item.treatment.catalog_item_id
+            db.add(
+                AppointmentTreatment(
+                    appointment_id=appointment_id,
+                    planned_treatment_item_id=planned_item_id,
+                    catalog_item_id=catalog_item_id,
+                    display_order=order,
+                )
+            )
+        await db.flush()
+
+    async def visit_note_row(
+        self,
+        db: AsyncSession,
+        clinic_id: UUID,
+        appointment_treatment_id: UUID,
+    ) -> tuple[Any, Any] | None:
+        result = await db.execute(
+            select(AppointmentTreatment, Appointment)
+            .join(Appointment, AppointmentTreatment.appointment_id == Appointment.id)
+            .where(
+                AppointmentTreatment.id == appointment_treatment_id,
+                Appointment.clinic_id == clinic_id,
+            )
+        )
+        row = result.first()
+        return (row[0], row[1]) if row else None

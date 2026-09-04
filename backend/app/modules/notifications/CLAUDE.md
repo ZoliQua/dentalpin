@@ -12,7 +12,7 @@ Heavy subscriber + now a publisher. See ADR 0016.
   `ChannelAdapter` protocol, `OutboundMessage`/`AdapterResult`, `Channel`
   enum, and the idempotent `channel_registry` (pre-loads `EmailAdapter`).
   A vendor module `depends=["notifications"]` and calls
-  `channel_registry.register(...)` at import time.
+  `channel_registry.register(...)` from its `on_activate()` (ADR 0020 — never at import time, #325). The built-in EmailAdapter registers the same way from `NotificationsModule.on_activate`; the loader activates `notifications` before its vendors, so email is still always present first.
 - `gateway.py` — `NotificationGateway.enqueue` (consent gate → channel
   resolution → persist `queued` row → publish) and `dispatch_outbox`
   (the scheduled sender, retry + backoff). **No network in a request.**

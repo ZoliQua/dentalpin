@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Üdvözöljük a(z) {{ clinic_name }} rendelőben{% endblock %}
+
+{% block content %}
+<h2>Üdvözöljük, {{ patient_name }}!</h2>
+
+<p>Köszönjük, hogy regisztrált a(z) {{ clinic_name }} rendelőben. Örömmel segítünk Önnek fogai egészségének megőrzésében.</p>
+
+<div class="alert alert-success">
+    Betegkartonját sikeresen létrehoztuk rendszerünkben.
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Mit tehet most?</h3>
+
+<ul style="padding-left: 20px; color: #3f3f46;">
+    <li style="margin-bottom: 8px;">Lefoglalhatja első állapotfelmérő időpontját</li>
+    <li style="margin-bottom: 8px;">Tájékozódhat szolgáltatásainkról és kezeléseinkről</li>
+    <li style="margin-bottom: 8px;">Bármilyen kérdéssel kapcsolatba léphet velünk</li>
+</ul>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Első időpontom lefoglalása</a>
+</div>
+{% endif %}
+
+<div class="info-box">
+    <div class="label">Rendelési időnk</div>
+    <div class="value">{{ clinic_hours | default('Hétfőtől péntekig: 9:00 – 20:00') }}</div>
+</div>
+
+<p>Ha bármilyen kérdése van, forduljon hozzánk bizalommal. Örömmel segítünk.</p>
+
+<p>Szeretettel várjuk!</p>
+{% endblock %}

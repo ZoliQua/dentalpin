@@ -1,0 +1,12 @@
+{
+  "notifications": {
+    "conversation": {
+      "title": "WhatsApp-beszélgetés",
+      "empty": "Még nincsenek üzenetek.",
+      "placeholder": "Írjon választ…",
+      "replyError": "Nem sikerült elküldeni a választ",
+      "windowClosed": "A 24 órás időablak lezárult. A beszélgetés újranyitásához használjon sablont.",
+      "send": "Küldés"
+    }
+  }
+}

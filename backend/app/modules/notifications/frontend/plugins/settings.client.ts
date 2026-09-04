@@ -45,6 +45,7 @@ export default defineNuxtPlugin(() => {
     descriptionKey: 'notifications.onboarding.description',
     icon: 'i-lucide-mail',
     to: '/settings/notifications',
+    permission: 'notifications.settings.read',
     order: 80,
     optional: true,
     severity: 'info',

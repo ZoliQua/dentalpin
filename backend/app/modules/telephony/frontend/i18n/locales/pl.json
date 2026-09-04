@@ -1,0 +1,47 @@
+{
+  "nav": {
+    "telephonyCalls": "Połączenia"
+  },
+  "telephony": {
+    "settings": {
+      "title": "Telefonia (CTI)",
+      "description": "Wyświetla połączenia przychodzące na ekranie i prowadzi rejestr — dowolna centrala przez webhook."
+    },
+    "gateway": "Brama",
+    "receiving": "Odbieranie zdarzeń",
+    "defaultCountry": "Kraj domyślny",
+    "defaultCountryHelp": "Dwuliterowy kod kraju do interpretacji numerów lokalnych (np. PL).",
+    "active": "Włączone",
+    "rotateSecret": "Wymień sekret",
+    "webhook": "Webhook zdarzeń",
+    "webhookHelp": "Skonfiguruj centralę lub Zapier, aby wysyłały znormalizowane zdarzenia połączeń na ten adres, podpisane sekretem.",
+    "secret": "Sekret podpisu",
+    "secretShownOnce": "Skopiuj ten sekret teraz — jest wyświetlany tylko raz. Centrala/automatyzacja podpisuje nim każde zdarzenie (X-DentalPin-Signature).",
+    "copy": "Kopiuj",
+    "copied": "Skopiowano do schowka",
+    "saved": "Ustawienia zapisane",
+    "saveError": "Nie udało się zapisać ustawień",
+    "calls": {
+      "title": "Rejestr połączeń",
+      "allStatuses": "Wszystkie statusy",
+      "status": {
+        "ringing": "Dzwoni",
+        "answered": "Odebrane",
+        "ended": "Zakończone",
+        "missed": "Nieodebrane"
+      },
+      "unknownCaller": "Nieznany dzwoniący",
+      "openRecord": "Otwórz kartę",
+      "searchPatient": "Szukaj pacjenta",
+      "empty": "Brak połączeń.",
+      "when": "Kiedy",
+      "caller": "Dzwoniący",
+      "number": "Numer",
+      "statusCol": "Status",
+      "duration": "Czas trwania"
+    },
+    "pop": {
+      "incoming": "Połączenie przychodzące"
+    }
+  }
+}

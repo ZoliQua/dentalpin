@@ -1,0 +1,17 @@
+Tisztelt {{ admin_name }}!
+
+{% if is_expired -%}
+A(z) "{{ clinic_name }}" rendelőnek az AEAT felé történő beküldések (Veri*Factu) aláírásához használt digitális tanúsítványa MÁR LEJÁRT. Amíg nem újítja meg, a rekordok a várakozási sorban maradnak, és az AEAT minden beküldést elutasít.
+{%- else -%}
+A(z) "{{ clinic_name }}" rendelőnek az AEAT felé történő beküldések (Veri*Factu) aláírásához használt digitális tanúsítványa {{ days_left }} nap múlva lejár. Javasoljuk, hogy a határidő előtt újítsa meg, hogy a számlázás ne szakadjon meg.
+{%- endif %}
+
+Tulajdonos: {{ subject_cn or '—' }}
+Lejárat: {{ valid_until.strftime('%d/%m/%Y') }}
+
+Lépések:
+1. Igényeljen új tanúsítványt az FNMT-nél.
+2. Nyissa meg: DentalPin → Beállítások → Verifactu → Tanúsítvány.
+3. Töltse fel a .pfx fájlt, és adja meg a hozzá tartozó jelszót.
+
+Ha segítségre van szüksége, válaszoljon erre az e-mailre.

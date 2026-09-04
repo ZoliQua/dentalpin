@@ -6,7 +6,7 @@ import time
 
 import pytest
 
-from app.modules.integrations.signing import sign, verify
+from app.core.webhooks.signing import sign, verify
 
 SECRET = "whsec_test"
 PAYLOAD = b'{"event":"patient.created","id":"abc"}'

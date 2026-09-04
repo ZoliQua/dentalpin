@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Ihr nächster Kontrolltermin bei {{ clinic_name | default('DentalPin') }}{% endblock %}
+
+{% block content %}
+<h2>Es ist Zeit für Ihren nächsten Kontrolltermin</h2>
+
+<p>Hallo {{ patient_name }},</p>
+
+<p>wir haben Ihren nächsten Kontrolltermin{% if due_month %} für <strong>{{ due_month }}</strong>{% endif %}{% if reason %} ({{ reason }}){% endif %} bei <strong>{{ clinic_name | default('DentalPin') }}</strong> vorgemerkt.</p>
+
+<p>Kontaktieren Sie uns, um den Termin zu vereinbaren, der Ihnen am besten passt.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Meinen Termin buchen</a>
+</div>
+{% endif %}
+
+<p>Bei Fragen können Sie uns jederzeit gerne kontaktieren.</p>
+{% endblock %}

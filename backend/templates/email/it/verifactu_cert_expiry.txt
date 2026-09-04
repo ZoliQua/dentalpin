@@ -1,0 +1,17 @@
+Gentile {{ admin_name }},
+
+{% if is_expired -%}
+Il certificato digitale dello studio "{{ clinic_name }}" utilizzato per firmare gli invii all'AEAT (Veri*Factu) È GIÀ SCADUTO. Finché non verrà rinnovato, i registri resteranno in coda e l'AEAT respingerà qualsiasi invio.
+{%- else -%}
+Il certificato digitale dello studio "{{ clinic_name }}" utilizzato per firmare gli invii all'AEAT (Veri*Factu) scade tra {{ days_left }} giorno/i. Le consigliamo di rinnovarlo prima della scadenza, per evitare interruzioni della fatturazione.
+{%- endif %}
+
+Intestatario: {{ subject_cn or '—' }}
+Scadenza: {{ valid_until.strftime('%d/%m/%Y') }}
+
+Passaggi:
+1. Richieda un nuovo certificato alla FNMT.
+2. Entri in DentalPin → Impostazioni → Verifactu → Certificato.
+3. Carichi il file .pfx e ne inserisca la password.
+
+Se ha bisogno di assistenza, risponda a questa email.

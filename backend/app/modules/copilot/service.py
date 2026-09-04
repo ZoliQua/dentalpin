@@ -19,6 +19,11 @@ from .serde import content_to_json
 # agent_audit_logs.status values that count as a failed tool call.
 _FAILED_STATUSES = ("FAILED", "BLOCKED")
 
+_DEFAULT_MODEL_BY_PROVIDER = {
+    "openai": app_settings.COPILOT_MODEL_CHAT_OPENAI,
+    "anthropic": app_settings.COPILOT_MODEL_CHAT_ANTHROPIC,
+}
+
 
 class CopilotSettingsService:
     """Per-clinic provider/model/budget, lazy-created on first read."""
@@ -63,6 +68,17 @@ class CopilotSettingsService:
         # "openai" but whose deployment has no key (the digest is no-LLM).
         if data.get("provider") == "openai" and not app_settings.OPENAI_API_KEY:
             raise ValueError("OpenAI provider selected but OPENAI_API_KEY is not configured")
+        if data.get("provider") == "anthropic" and not app_settings.ANTHROPIC_API_KEY:
+            raise ValueError("Anthropic provider selected but ANTHROPIC_API_KEY is not configured")
+        # Switching provider without naming a model would leave the other
+        # vendor's model id behind — fall back to the new provider's default.
+        if (
+            data.get("provider")
+            and data["provider"] != row.provider
+            and not data.get("model")
+            and data["provider"] in _DEFAULT_MODEL_BY_PROVIDER
+        ):
+            data = {**data, "model": _DEFAULT_MODEL_BY_PROVIDER[data["provider"]]}
         for field in (
             "provider",
             "model",

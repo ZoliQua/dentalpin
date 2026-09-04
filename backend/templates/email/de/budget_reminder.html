@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Ihr Kostenvoranschlag ist noch offen - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ patient_name }},</h2>
+
+<p>Ihr Kostenvoranschlag <strong>#{{ budget_number }}</strong> von <strong>{{ clinic_name | default('DentalPin') }}</strong> wartet noch auf Ihre Rückmeldung.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Kostenvoranschlag Nr.</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        {% if total %}
+        <div style="flex: 1; text-align: right;">
+            <div class="label">Gesamtbetrag</div>
+            <div class="value">{{ total }} €</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if valid_until %}
+<div class="alert alert-warning">
+    <strong>Gültigkeit:</strong> Dieser Kostenvoranschlag ist gültig bis zum {{ valid_until }}.
+</div>
+{% endif %}
+
+{% if public_url %}
+<div class="button-container">
+    <a href="{{ public_url }}" class="button">Meinen Kostenvoranschlag ansehen</a>
+</div>
+{% endif %}
+
+<p>Wenn Sie bereits eine Entscheidung getroffen haben oder Fragen haben, kontaktieren Sie uns gerne — wir helfen Ihnen jederzeit weiter.</p>
+
+<p>Wir stehen Ihnen gerne zur Verfügung.</p>
+{% endblock %}

@@ -34,20 +34,20 @@
     "saveError": "Speichern nicht möglich",
     "synced": "{n} Vorlagen synchronisiert",
     "syncError": "Synchronisierung nicht möglich",
+    "onboarding": {
+      "label": "WhatsApp-Versand",
+      "description": "WhatsApp ist der bevorzugte Kanal der Klinik, aber Kapso ist noch nicht verbunden. Verbinden Sie es, damit automatische Nachrichten gesendet werden können."
+    },
     "types": {
       "appointment_confirmation": "Terminbestätigung",
       "appointment_reminder": "Terminerinnerung",
       "appointment_cancelled": "Terminabsage",
       "budget_sent": "Kostenvoranschlag gesendet",
-      "budget_accepted": "Kostenvoranschlag angenommen",
+      "budget_accepted": "Kostenvoranschlag akzeptiert",
       "budget_reminder": "Kostenvoranschlag-Erinnerung",
       "invoice_sent": "Rechnung gesendet",
-      "recall_reminder": "Recall-Erinnerung",
+      "recall_reminder": "Erinnerung",
       "welcome": "Willkommen"
-    },
-    "onboarding": {
-      "label": "WhatsApp verbinden",
-      "description": "Die Praxis bevorzugt WhatsApp, aber Kapso ist noch nicht verbunden."
     }
   }
 }

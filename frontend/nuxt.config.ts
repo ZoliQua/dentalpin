@@ -9,25 +9,40 @@ import { isAbsolute, join, resolve } from 'node:path'
  * `manifest.frontend.layer_path` is installed. When absent (fresh
  * checkout, no community modules yet), returns an empty array.
  */
-function loadModuleLayers(): { layers: string[], names: string[] } {
+function loadModuleLayers(): {
+  layers: string[]
+  names: string[]
+  routes: Record<string, string>
+} {
   const path = resolve(__dirname, 'modules.json')
   try {
     const raw = readFileSync(path, 'utf-8')
-    const payload = JSON.parse(raw) as { layers?: string[], modules?: { name: string }[] }
+    const payload = JSON.parse(raw) as {
+      layers?: string[]
+      modules?: { name: string, routes?: string[] }[]
+    }
+    const modules = Array.isArray(payload.modules) ? payload.modules : []
+    // Route pattern → owning module (issue #326): the module-gate route
+    // middleware 404s pages of baked-but-uninstalled modules.
+    const routes: Record<string, string> = {}
+    for (const m of modules) {
+      for (const r of m.routes ?? []) routes[r] = m.name
+    }
     return {
       layers: Array.isArray(payload.layers) ? payload.layers : [],
-      names: Array.isArray(payload.modules) ? payload.modules.map(m => m.name) : []
+      names: modules.map(m => m.name),
+      routes
     }
   } catch (err: unknown) {
     const code = (err as { code?: string }).code
     if (code !== 'ENOENT') {
       console.warn('[nuxt.config] modules.json is malformed, using empty layers:', err)
     }
-    return { layers: [], names: [] }
+    return { layers: [], names: [], routes: {} }
   }
 }
 
-const { layers: moduleLayers, names: moduleLayerNames } = loadModuleLayers()
+const { layers: moduleLayers, names: moduleLayerNames, routes: moduleRoutes } = loadModuleLayers()
 const modulesJsonPath = resolve(__dirname, 'modules.json')
 // Layers referenced by a path inside this directory (`./module_layers/...`,
 // the symlink CI and ESLint use). Nuxt only auto-includes layers that live
@@ -95,7 +110,8 @@ export default defineNuxtConfig({
       // Module layers baked into this build. `usePermissions().can()`
       // hides their permissions while the backend reports the module as
       // not installed (prod bakes every layer — see Dockerfile.prod).
-      moduleLayers: moduleLayerNames
+      moduleLayers: moduleLayerNames,
+      moduleRoutes
     }
   },
   srcDir: 'app',

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Időpont-emlékeztető - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Kedves {{ patient_name }}!</h2>
+
+<p>Emlékeztetjük, hogy előjegyzett időpontja van nálunk:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Dátum</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Időpont</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelőorvos</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if cabinet_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelőhelyiség</div>
+            <div class="value">{{ cabinet_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if treatment_type %}
+    <div class="info-row">
+        <div>
+            <div class="label">Kezelés</div>
+            <div class="value">{{ treatment_type }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="alert alert-info">
+    <strong>Ne feledje:</strong> kérjük, érkezzen 10 perccel az időpontja előtt.
+</div>
+
+{% if notes %}
+<p><strong>Megjegyzés:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Ha nem tud megjelenni, kérjük, időben jelezze, hogy az időpontot másnak adhassuk.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Időpont megerősítése</a>
+</div>
+{% endif %}
+
+<p>Szeretettel várjuk!</p>
+{% endblock %}

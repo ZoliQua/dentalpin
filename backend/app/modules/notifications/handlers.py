@@ -23,6 +23,8 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.i18n_names import catalog_name
+
 logger = logging.getLogger(__name__)
 
 
@@ -343,9 +345,7 @@ class NotificationHandlers:
                     names = (catalog_item.names or {}) if catalog_item else {}
                     treatments.append(
                         {
-                            "name": names.get("es")
-                            or names.get("en")
-                            or next(iter(names.values()), "Tratamiento"),
+                            "name": catalog_name(names) or "Tratamiento",
                             "tooth": item.tooth_number,
                             "price": float(item.line_total),
                         }

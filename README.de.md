@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Open-Source-Software für die Verwaltung von Zahnarztpraxen.** Patienten, Zahnschema,
+**Software für die Verwaltung von Zahnarztpraxen mit offengelegtem Quellcode (BSL 1.1), die vier Jahre nach Veröffentlichung unter Apache 2.0 übergeht.** Patienten, Zahnschema,
 Terminplanung, Behandlungspläne, Abrechnung und ein integrierter KI-Copilot — modular,
 self-hosted, API-first.
 
@@ -33,11 +33,11 @@ DentalPin beruht auf einer einfachen Prämisse: **eine offene Plattform für Zah
 
 ### Warum jetzt?
 
-KI hat grundlegend verändert, was kleine Teams bauen können. Funktionen, die früher große Entwicklungsabteilungen erforderten, lassen sich heute in Tagen umsetzen. Das ist unser Zeitfenster, um die Open-Source-Dentalsoftware zu schaffen, die es schon vor Jahren hätte geben sollen — bevor Praxen in Altsystemen gefangen sind, aus denen sie nicht mehr herauskommen.
+KI hat grundlegend verändert, was kleine Teams bauen können. Funktionen, die früher große Entwicklungsabteilungen erforderten, lassen sich heute in Tagen umsetzen. Das ist unser Zeitfenster, um die Dentalsoftware mit offengelegtem Quellcode (BSL 1.1, vier Jahre nach Veröffentlichung Apache 2.0) zu schaffen, die es schon vor Jahren hätte geben sollen — bevor Praxen in Altsystemen gefangen sind, aus denen sie nicht mehr herauskommen.
 
 ### Unsere Prinzipien
 
-- **Open Source** — Die Daten Ihrer Praxis gehören Ihnen. Ihre Software sollte es auch.
+- **Offengelegter Quellcode (BSL 1.1)** — Die Daten Ihrer Praxis gehören Ihnen. Ihre Software sollte es auch.
 - **Modular** — Starten Sie einfach, ergänzen Sie, was Sie brauchen. Zahlen Sie nicht für Funktionen, die Sie nie nutzen werden.
 - **Global by Design** — Von Tag eins für Lokalisierung gebaut. Derselbe Kern, jede Sprache, jedes Land.
 - **API-First** — Jede Funktion ist eine API. Integrieren Sie alles, automatisieren Sie alles.
@@ -156,7 +156,7 @@ Alle Details zu den Demo-Daten finden Sie in [docs/user-manual/en/demo.md](docs/
 | Ebene | Technologie |
 |-------|------------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Datenbank | PostgreSQL 15 |
 | Auth | JWT mit Refresh-Tokens |
 

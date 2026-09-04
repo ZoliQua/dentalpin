@@ -2,9 +2,59 @@
 
 ## Unreleased
 
-- Initial module (Phase 1 of issue #65): webhook subscription CRUD,
-  outbox-backed delivery with retry/backoff/auto-disable, Stripe-style
-  HMAC-SHA256 signing, and one working trigger (`patient.created`).
+### CI hygiene (ruff 0.16.5 drift)
+
+- Reformatted the two multi-line `client.get(...)` calls in
+  `tests/modules/integrations/test_public_api.py` that the newest (unpinned)
+  ruff `format --check` flags — keeps `backend-lint` green for any PR built on
+  the current tree.
+
+### Phase 2 follow-up (ported from PR #348)
+
+- `GET /public/ping` — token introspection (clinic, name, scopes); the
+  auth test a Zapier/Make app calls. Valid token required, no scope.
+- Authenticated public requests now stamp `ApiToken.last_used_at`
+  (the column existed since `int_0002` but was never written).
+- `GET /public/patients` grows format-tolerant exact-match params
+  `phone` / `email` / `national_id` (whitespace/dash/case ignored) —
+  the find leg of the search-or-create pattern (issue #65 §5).
+  The generic `search` filter is unchanged.
+
+### Phase 2 (issue #65)
+
+- **Six new webhook triggers** (appointment.scheduled, appointment.cancelled,
+  appointment.no_show, budget.sent, budget.accepted, budget.rejected) — all
+  transactional (published with `db=`; ADR 0019 guard test covers them).
+  Deferred (emit without `db=`, blocked): patient.updated, invoice.issued,
+  invoice.paid, payment.recorded.
+- **Stable `event_id`** on every `WebhookDelivery` (migration `int_0003`):
+  all deliveries queued for the same source event publish share one UUID,
+  so a receiver can dedupe across subscriptions (issue #65 §1).
+- **Token-authenticated public data-read API** (`/api/v1/integrations/public/`):
+  `GET /public/patients` (list/search by name/phone/email/national_id) and
+  `GET /public/patients/{id}` — authenticated via `Authorization: Bearer dp_...`,
+  scope-enforced (`patients:read`), rate-limited per token (60/min, 1000/day,
+  surfaced in `X-RateLimit-*` headers), clinic-scoped off the token's own
+  `clinic_id`. Reuses `PatientService.list_patients` (no logic duplicated).
+- **Frozen sample payloads** — one `sample_payloads/<event>.json` per
+  supported trigger, loaded by `sample_payload_loader.py`; tests assert
+  100 % coverage and `clinic_id` parseability (issue #65 §3).
+- `PublicPatientResponse` schema — PII-aware curated subset (id, names,
+  contact, national_id, date_of_birth, status; no billing fields or notes).
+- `schemas.py` error message updated to drop "Phase 1" wording now that
+  Phase 2 events are supported.
+- `triggers.py` expanded: `SUPPORTED_EVENT_TYPES` grows from 2 to 8 events;
+  `SUPPORTED_TOKEN_SCOPES` unchanged (`patients:read`).
+- `test_uninstall_roundtrip.py` downgrade target updated to `integrations@-3`.
+- `test_unsupported_event_type_rejected` now uses `invoice.issued` (a real
+  but unsupported/deferred bus event) instead of `budget.sent`, which became
+  a supported trigger in Phase 2.
+
+### Phase 1 (issue #65)
+
+- Initial module: webhook subscription CRUD, outbox-backed delivery with
+  retry/backoff/auto-disable, Stripe-style HMAC-SHA256 signing, and one
+  working trigger (`patient.created`).
 - Added second Phase 1 trigger `appointment.completed`, sharing an
   `_enqueue` helper with `on_patient_created` (identical apart from
   the `EventType`).

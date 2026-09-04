@@ -1,0 +1,90 @@
+{
+  "migrationImport": {
+    "settingsCard": {
+      "title": "Adatmigráció (dental-bridge)",
+      "description": "A dental-bridge által előállított DPMF-fájl importálása (páciensek, időpontok, árajánlatok, fizetések, dokumentumok)."
+    },
+    "page": {
+      "title": "Adatmigráció",
+      "subtitle": "A dental-bridge által kinyert adatok importálása ebbe a rendelőbe."
+    },
+    "upload": {
+      "dropFile": "Húzza ide a .dpm fájlt, vagy kattintson a kiválasztáshoz",
+      "passphrase": "Jelmondat (csak titkosított fájlokhoz)",
+      "passphraseHelp": "Csak .dpm.enc / .dpm.zst.enc esetén szükséges",
+      "submit": "Feltöltés és ellenőrzés",
+      "uploading": "Feltöltés…",
+      "error": "A feltöltés nem sikerült"
+    },
+    "validate": {
+      "running": "Fájl ellenőrzése…",
+      "ok": "A fájl érvényes",
+      "failed": "Az ellenőrzés nem sikerült"
+    },
+    "preview": {
+      "title": "Előnézet",
+      "entities": "Entitások",
+      "samples": "Minták",
+      "warnings": "Figyelmeztetések",
+      "files": "Csatolt fájlok",
+      "filesTotal": "Összesen",
+      "filesWithSha": "sha256-tal",
+      "filesWithoutSha": "sha256 nélkül",
+      "verifactuCheckbox": "Verifactu jogi adatok importálása",
+      "verifactuHelp": "Megőrzi a számlák jogi hasheit (Verifactu). Csak akkor érhető el, ha a Verifactu modul telepítve van, és a fájl tartalmazza ezeket az adatokat.",
+      "confirm": "Megerősítés és importálás",
+      "warning": "Ez a művelet nem vonható vissza. Megerősítés előtt ellenőrizze az adatokat."
+    },
+    "filters": {
+      "title": "Kezelőorvosok szűrése",
+      "description": "A kiszűrt munkatársak inaktívként kerülnek importálásra (a korábbi hivatkozások miatt megmaradnak, de a naptárban nem jelennek meg). Később újraaktiválhatja őket a Beállítások → Felhasználók menüben.",
+      "totalLabel": "Összesen",
+      "deactivatedLabel": "Inaktív a forrásban",
+      "orphansLabel": "Csak naptárban létező oszlopok",
+      "stale24mLabel": "Nincs aktivitás az elmúlt 24 hónapban",
+      "minActivityLabel": "Minimális aktivitás (hónap)",
+      "minActivityHelp": "Azon kezelőorvosok lágy inaktiválása, akiknek ennyi hónapon belül nincs klinikai nyomuk. A kikapcsoláshoz állítsa 0-ra.",
+      "excludeOrphans": "Valódi munkatársi rekord nélküli, csak naptárban létező oszlopok kihagyása",
+      "excludeInactive": "A forrásban inaktívként jelölt kezelőorvosok kihagyása",
+      "excludeNonClinical": "Csak fogorvosok és dentálhigiénikusok importálása (asszisztensek és adminisztratív munkatársak kihagyása)"
+    },
+    "execute": {
+      "running": "Importálás…",
+      "progress": "{processed} / {total} entitás",
+      "ok": "Importálás befejezve",
+      "failed": "Az importálás nem sikerült"
+    },
+    "proposals": {
+      "title": "Katalógus-hozzárendelések áttekintése",
+      "subtitle": "Importálás előtt kapcsolja össze az egyes Gesdén-kezeléseket a DentalPin-katalógussal.",
+      "build": "Javaslatok kiszámítása",
+      "building": "Számítás…",
+      "summary": "{total} javaslat: {link} összekapcsolva, {fuzzy} hozzávetőleges, {create} létrehozandó",
+      "bulkAccept": "Minden legalább 0,9 megbízhatóságú találat elfogadása",
+      "accepted": "{n} javaslat elfogadva.",
+      "columnSource": "Gesdén-kezelés",
+      "columnProposed": "Javaslat",
+      "columnAction": "Művelet",
+      "columnStatus": "Állapot",
+      "actionLink": "Katalógushoz kapcsolás",
+      "actionFuzzy": "Hozzávetőleges találat",
+      "actionCreate": "Új létrehozása",
+      "operatorPending": "Függőben",
+      "operatorAccepted": "Elfogadva",
+      "operatorRelinked": "Újrakapcsolva",
+      "operatorCreated": "Új létrehozása",
+      "operatorIgnored": "Kihagyva",
+      "acceptRow": "Elfogadás",
+      "ignoreRow": "Kihagyás"
+    },
+    "status": {
+      "uploaded": "Feltöltve",
+      "validating": "Ellenőrzés",
+      "validated": "Ellenőrizve",
+      "previewing": "Előnézet",
+      "executing": "Importálás",
+      "completed": "Befejezve",
+      "failed": "Sikertelen"
+    }
+  }
+}

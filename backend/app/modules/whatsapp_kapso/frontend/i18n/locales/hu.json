@@ -1,0 +1,53 @@
+{
+  "whatsapp_kapso": {
+    "settings": {
+      "title": "WhatsApp (Kapso)",
+      "description": "Kapcsolja össze a rendelő WhatsApp-számát a Kapso segítségével üzenetek küldéséhez és fogadásához."
+    },
+    "connection": "Kapcsolat",
+    "verified": "Ellenőrizve",
+    "notVerified": "Nincs ellenőrizve",
+    "apiKey": "Kapso API-kulcs",
+    "phoneNumberId": "Telefonszám-azonosító",
+    "businessAccountId": "Üzleti fiók azonosítója",
+    "businessAccountHelp": "A jóváhagyott sablonok szinkronizálásához szükséges.",
+    "displayPhone": "Megjelenített szám",
+    "webhookSecret": "Webhook titkos kulcs",
+    "secretStored": "Elmentve. Hagyja üresen, ha nem kívánja módosítani.",
+    "webhook": "Webhook",
+    "webhookHelp": "Illessze be ezt az URL-t a Kapso webhook-beállításaiba az állapotok és a válaszok fogadásához.",
+    "copy": "Másolás",
+    "copied": "URL másolva",
+    "templates": "Sablonok",
+    "sync": "Szinkronizálás",
+    "noTemplates": "Nincs jóváhagyott sablon. Szinkronizáljon a Kapsóból való lekérésükhöz.",
+    "notificationType": "Értesítés típusa",
+    "template": "Sablon",
+    "map": "Hozzárendelés",
+    "mapped": "Sablon hozzárendelve",
+    "mapError": "Nem sikerült hozzárendelni a sablont",
+    "test": "Tesztküldés",
+    "sendTest": "Teszt küldése",
+    "testOk": "Tesztüzenet elküldve",
+    "testFail": "Nem sikerült elküldeni a tesztet",
+    "saved": "Beállítások mentve",
+    "saveError": "Nem sikerült menteni",
+    "synced": "{n} sablon szinkronizálva",
+    "syncError": "Nem sikerült szinkronizálni",
+    "types": {
+      "appointment_confirmation": "Időpont-visszaigazolás",
+      "appointment_reminder": "Időpont-emlékeztető",
+      "appointment_cancelled": "Időpont lemondása",
+      "budget_sent": "Árajánlat elküldve",
+      "budget_accepted": "Árajánlat elfogadva",
+      "budget_reminder": "Árajánlat-emlékeztető",
+      "invoice_sent": "Számla elküldve",
+      "recall_reminder": "Visszahívási emlékeztető",
+      "welcome": "Üdvözlés"
+    },
+    "onboarding": {
+      "label": "WhatsApp-küldés",
+      "description": "A WhatsApp a rendelő preferált csatornája, de a Kapso még nincs összekapcsolva. Kapcsolja össze, hogy az automatikus üzenetek kimehessenek."
+    }
+  }
+}

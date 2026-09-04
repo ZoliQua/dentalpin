@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Kostenvoranschlag angenommen - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ patient_name }},</h2>
+
+<p>wir haben die Annahme Ihres Kostenvoranschlags erhalten. Vielen Dank für Ihr Vertrauen.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Kostenvoranschlag Nr.</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Angenommen am</div>
+            <div class="value">{{ accepted_date }}</div>
+        </div>
+    </div>
+    <div class="info-row">
+        <div>
+            <div class="label">Gesamtbetrag der Behandlung</div>
+            <div class="value" style="font-size: 20px; color: #3b82f6;">{{ total }} €</div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-success">
+    <strong>Nächster Schritt:</strong> Wir melden uns bei Ihnen, um die für Ihre Behandlung erforderlichen Termine zu vereinbaren.
+</div>
+
+{% if notes %}
+<p><strong>Hinweise:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Wenn Sie Fragen haben oder Ihren ersten Termin vereinbaren möchten, kontaktieren Sie uns gerne.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Termin vereinbaren</a>
+</div>
+{% endif %}
+
+<p>Vielen Dank, dass Sie sich für uns entschieden haben!</p>
+{% endblock %}

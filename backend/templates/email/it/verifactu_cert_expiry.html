@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_expired %}Il certificato Verifactu è già scaduto{% else %}Il certificato Verifactu sta per scadere{% endif %}{% endblock %}
+
+{% block content %}
+<h2>Gentile {{ admin_name }},</h2>
+
+{% if is_expired %}
+<div class="alert alert-error">
+    Il certificato digitale dello studio <strong>{{ clinic_name }}</strong> utilizzato per firmare gli invii all'AEAT (Veri*Factu) <strong>è già scaduto</strong>. Finché non verrà rinnovato, i registri resteranno in coda e l'AEAT respingerà qualsiasi invio.
+</div>
+{% else %}
+<div class="alert alert-warning">
+    Il certificato digitale dello studio <strong>{{ clinic_name }}</strong> utilizzato per firmare gli invii all'AEAT (Veri*Factu) scade tra <strong>{{ days_left }} giorn{% if days_left != 1 %}i{% else %}o{% endif %}</strong>. Le consigliamo di rinnovarlo prima della scadenza, per evitare interruzioni della fatturazione.
+</div>
+{% endif %}
+
+<div class="info-box">
+    <div class="label">Intestatario del certificato</div>
+    <div class="value">{{ subject_cn or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Data di scadenza</div>
+    <div class="value">{{ valid_until.strftime('%d/%m/%Y') }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Cosa deve fare?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    <li style="margin-bottom: 8px;">Richieda un nuovo certificato alla FNMT (Rappresentante di Persona Giuridica, Persona Fisica o Sigillo d'Impresa).</li>
+    <li style="margin-bottom: 8px;">Acceda a DentalPin come amministratore ed entri in <em>Impostazioni → Verifactu → Certificato</em>.</li>
+    <li style="margin-bottom: 8px;">Carichi il nuovo file <code>.pfx</code> e ne inserisca la password. Il certificato precedente viene archiviato ai fini di audit.</li>
+</ol>
+
+<p>Se ha bisogno di assistenza, risponda a questa email e La guideremo passo dopo passo.</p>
+{% endblock %}

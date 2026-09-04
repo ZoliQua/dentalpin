@@ -28,6 +28,7 @@ For deeper rationale on any line, follow the link.
 ## Migrations
 
 - [ ] Migrations live in `backend/app/modules/<name>/migrations/versions/`
+- [ ] Module's migrations directory registered in `backend/alembic.ini` `[alembic]` `version_locations` (M1 trap — the Alembic CLI resolves graphs from this static list; env.py's runtime discovery override is too late). Guard test: `test_every_module_migrations_dir_is_registered_in_alembic_ini`
 - [ ] First migration of the module sets `branch_labels = ("<name>",)`
 - [ ] No revision threads through another module's chain (uninstall safety, issue #56 — see ADR 0002)
 - [ ] Cross-module FKs only against modules in `manifest.depends`

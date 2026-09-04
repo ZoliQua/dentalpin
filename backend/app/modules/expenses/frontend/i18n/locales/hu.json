@@ -1,0 +1,24 @@
+{
+  "expenses": {
+    "title": "Kiadások",
+    "add": "Kiadás hozzáadása",
+    "date": "Dátum",
+    "category": "Kategória",
+    "amount": "Összeg",
+    "description": "Leírás",
+    "filterByCategory": "Szűrés kategória szerint",
+    "delete": "Törlés",
+    "deleteTitle": "Kiadás törlése",
+    "deleteMessage": "Törli ezt a kiadást? Ez a művelet nem vonható vissza.",
+    "categories": {
+      "rent": "Bérleti díj",
+      "utilities": "Rezsi",
+      "salaries": "Bérek",
+      "supplies": "Anyagok",
+      "equipment": "Eszközök",
+      "insurance": "Biztosítás",
+      "maintenance": "Karbantartás",
+      "other": "Egyéb"
+    }
+  }
+}

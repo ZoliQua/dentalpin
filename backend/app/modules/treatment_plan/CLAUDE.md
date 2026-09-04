@@ -98,12 +98,17 @@ Clinical-note created events (`clinical_notes.{administrative,diagnosis,treatmen
 ## Agenda planned-work provider
 
 ``agenda_provider.py`` implements agenda's ``PlannedWorkProvider``
-protocol (registered at import time in ``__init__.py``, issue #309):
-eager-load options for ``AppointmentTreatment.planned_item``, the
+protocol (registered in ``on_activate()`` — ADR 0020, issues #309/#325/#337):
+the full ``Appointment.treatments`` eager-load options, the
 booking-time validation rules (draft/pending/active plans bookable —
-#108 — items only while ``pending``), and the catalog-item snapshot
-for booking. Keep its validation in sync with the state machine above;
-agenda calls it blind through the registry.
+#108 — items only while ``pending``), creation of the link rows with
+their catalog snapshot, and the clinic-scoped row lookup for agenda's
+visit-note editor. Since #337 this module also OWNS
+``AppointmentTreatment`` (``appointment_treatments``): the
+planned-item FK is NOT NULL, so the table is the plan's visit bridge;
+its ``appointment`` relationship installs ``Appointment.treatments``
+by backref. The table was created by agenda's ag_0001 and needs no
+migration — future ALTERs live on the ``tp`` Alembic branch.
 
 ## Frontend slots consumed
 

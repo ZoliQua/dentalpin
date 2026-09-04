@@ -15,28 +15,13 @@ from fastapi import APIRouter
 from app.core.events.types import EventType
 from app.core.plugins import BaseModule
 from app.core.scheduling import ScheduledJob
-from app.modules.agenda.planned_work import planned_work_registry as _planned_work_registry
 
 from .models import (
+    AppointmentTreatment,
     PlannedTreatmentItem,
     TreatmentPlan,
 )
-from .owner_resolvers import register as _register_attachment_owners
 from .router import router
-
-# Register the ``plan_item`` attachment owner_type with media at import
-# time. Safe because ``media`` is in ``manifest.depends`` and Python
-# import order resolves it first.
-_register_attachment_owners()
-
-# Agenda's planned-work provider (issue #309): the agenda↔treatment_plan
-# product dependency is two-way, but only this direction is declarable
-# (agenda ∈ manifest.depends; the reverse would be a manifest cycle).
-# Import-time registration, idempotent — mirrors the attachment owners
-# above.
-from .agenda_provider import TreatmentPlanPlannedWorkProvider  # noqa: E402
-
-_planned_work_registry.register(TreatmentPlanPlannedWorkProvider())
 
 
 class TreatmentPlanModule(BaseModule):
@@ -94,11 +79,24 @@ class TreatmentPlanModule(BaseModule):
         },
     }
 
+    def on_activate(self) -> None:
+        # In-memory cross-module registrations, re-attached on every boot
+        # the module is installed (ADR 0020, issue #325 — these used to
+        # run at import time, which would go live for an uninstalled
+        # module because discovery imports every package on disk).
+        from app.modules.agenda.planned_work import planned_work_registry
+
+        from .agenda_provider import TreatmentPlanPlannedWorkProvider
+        from .owner_resolvers import register as register_attachment_owners
+
+        # ``plan_item`` attachment owner_type with media (media ∈ depends).
+        register_attachment_owners()
+        # Agenda's planned-work provider (issue #309): only this direction
+        # is declarable (agenda ∈ depends; the reverse is a manifest cycle).
+        planned_work_registry.register(TreatmentPlanPlannedWorkProvider())
+
     def get_models(self) -> list:
-        return [
-            TreatmentPlan,
-            PlannedTreatmentItem,
-        ]
+        return [TreatmentPlan, PlannedTreatmentItem, AppointmentTreatment]
 
     def get_router(self) -> APIRouter:
         return router

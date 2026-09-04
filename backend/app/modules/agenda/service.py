@@ -23,7 +23,6 @@ from .models import (
     Appointment,
     AppointmentCabinetEvent,
     AppointmentStatusEvent,
-    AppointmentTreatment,
     Cabinet,
 )
 from .planned_work import planned_work_registry
@@ -55,10 +54,12 @@ def _plain_excerpt(text: str, limit: int = 200) -> str:
     return collapsed[:limit]
 
 
-def _planned_item_loader_options() -> list:
-    """Loader options for ``AppointmentTreatment.planned_item`` from the
-    planned-work provider; empty (relationship stays lazy) when no
-    provider is registered."""
+def _treatments_loader_options() -> list:
+    """Complete loader options for ``Appointment.treatments`` from the
+    planned-work provider — the relationship itself is installed by the
+    provider's module (#337), so both the attribute and its eager-load
+    graph live on the owning side. Empty when no provider is registered
+    (the attribute then doesn't exist and must not be referenced)."""
     provider = planned_work_registry.get()
     return provider.appointment_loader_options() if provider else []
 
@@ -191,12 +192,9 @@ class AppointmentService:
             .options(
                 selectinload(Appointment.patient),
                 selectinload(Appointment.professional),
-                selectinload(Appointment.treatments).options(
-                    # Planned-item graph comes from the provider so agenda
-                    # never imports treatment_plan models (#309).
-                    *_planned_item_loader_options(),
-                    selectinload(AppointmentTreatment.catalog_item),
-                ),
+                # The whole treatments graph (relationship + planned-item
+                # chain + catalog item) comes from the provider (#309/#337).
+                *_treatments_loader_options(),
             )
             .where(Appointment.clinic_id == clinic_id)
         )
@@ -287,12 +285,9 @@ class AppointmentService:
             .options(
                 selectinload(Appointment.patient),
                 selectinload(Appointment.professional),
-                selectinload(Appointment.treatments).options(
-                    # Planned-item graph comes from the provider so agenda
-                    # never imports treatment_plan models (#309).
-                    *_planned_item_loader_options(),
-                    selectinload(AppointmentTreatment.catalog_item),
-                ),
+                # The whole treatments graph (relationship + planned-item
+                # chain + catalog item) comes from the provider (#309/#337).
+                *_treatments_loader_options(),
             )
             .where(
                 Appointment.id == appointment_id,
@@ -466,19 +461,8 @@ class AppointmentService:
 
         if planned_item_ids:
             provider = planned_work_registry.get()
-            for order, planned_item_id in enumerate(planned_item_ids):
-                catalog_item_id = (
-                    await provider.catalog_item_id_for(db, planned_item_id) if provider else None
-                )
-
-                treatment = AppointmentTreatment(
-                    appointment_id=appointment.id,
-                    planned_treatment_item_id=planned_item_id,
-                    catalog_item_id=catalog_item_id,
-                    display_order=order,
-                )
-                db.add(treatment)
-            await db.flush()
+            if provider:
+                await provider.attach_planned_items(db, appointment.id, planned_item_ids)
 
         await event_bus.publish(
             EventType.APPOINTMENT_SCHEDULED,
@@ -572,19 +556,8 @@ class AppointmentService:
             await db.flush()
 
             provider = planned_work_registry.get()
-            for order, planned_item_id in enumerate(planned_item_ids):
-                catalog_item_id = (
-                    await provider.catalog_item_id_for(db, planned_item_id) if provider else None
-                )
-
-                treatment = AppointmentTreatment(
-                    appointment_id=appointment.id,
-                    planned_treatment_item_id=planned_item_id,
-                    catalog_item_id=catalog_item_id,
-                    display_order=order,
-                )
-                db.add(treatment)
-            await db.flush()
+            if provider:
+                await provider.attach_planned_items(db, appointment.id, planned_item_ids)
 
             await db.refresh(appointment, ["treatments"])
             for treatment in appointment.treatments:
@@ -806,21 +779,21 @@ class AppointmentService:
         *,
         notes: str | None = None,
         completed_in_appointment: bool | None = None,
-    ) -> AppointmentTreatment | None:
-        """Update visit-level clinical note on an AppointmentTreatment.
+    ) -> object | None:
+        """Update visit-level clinical note on an appointment-treatment row.
+
+        The row type is treatment_plan-owned (#337); agenda handles it
+        duck-typed through the planned-work provider.
 
         Publishes ``AGENDA_VISIT_NOTE_UPDATED`` so ``patient_timeline`` and
         other subscribers can record the change without importing agenda.
         """
-        result = await db.execute(
-            select(AppointmentTreatment, Appointment)
-            .join(Appointment, AppointmentTreatment.appointment_id == Appointment.id)
-            .where(
-                AppointmentTreatment.id == appointment_treatment_id,
-                Appointment.clinic_id == clinic_id,
-            )
+        provider = planned_work_registry.get()
+        row = (
+            await provider.visit_note_row(db, clinic_id, appointment_treatment_id)
+            if provider
+            else None
         )
-        row = result.first()
         if row is None:
             return None
         apt_treatment, appointment = row

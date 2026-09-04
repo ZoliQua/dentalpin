@@ -33,22 +33,11 @@ MODULES_ROOT = Path(_modules_pkg.__file__).resolve().parent
 # ``(source_module, table, column, target_table, target_module)``.
 # agenda→treatment_plan mirrors the import already tracked in
 # test_module_isolation.KNOWN_VIOLATIONS (the appointment↔plan-item link).
-KNOWN_FK_VIOLATIONS: set[tuple[str, str, str, str, str]] = {
-    # CYCLE-BOUND (#309): treatment_plan.depends already contains agenda,
-    # so this edge can never become a manifest entry. The code-level
-    # import was inverted through agenda/planned_work.py; the FK can only
-    # become legal by moving column ownership into a treatment_plan-owned
-    # link table (a real migration through the booking flow — tracked as
-    # the follow-up on #309). Both modules are non-removable, so the
-    # uninstall hazard the ratchet guards against cannot occur today.
-    (
-        "agenda",
-        "appointment_treatments",
-        "planned_treatment_item_id",
-        "planned_treatment_items",
-        "treatment_plan",
-    ),
-}
+# Empty since #337: appointment_treatments moved to treatment_plan (its
+# planned-item FK is NOT NULL — the table was always the plan's visit
+# bridge, never agenda data), which makes every one of its FKs
+# declarable. Keep draining; never grow.
+KNOWN_FK_VIOLATIONS: set[tuple[str, str, str, str, str]] = set()
 
 
 def _list_modules() -> list[str]:

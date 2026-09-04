@@ -11,7 +11,7 @@ resolver (see ``url_safety.py``). It's validated in ``service.py``
 instead, at create/update, before the row is written.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field, field_validator
@@ -107,3 +107,36 @@ class ApiTokenCreated(ApiTokenResponse):
     """Create response only — carries the plaintext token exactly once."""
 
     token: str = Field(description="Shown once. Store it now; it cannot be retrieved again.")
+
+
+class PublicTokenInfo(BaseModel):
+    """``GET /public/ping`` — token introspection for a consumer's auth
+    test (Zapier/Make call this to validate the pasted token)."""
+
+    clinic_id: UUID
+    token_name: str
+    scopes: list[str]
+
+
+class PublicPatientResponse(BaseModel):
+    """Patient record exposed through the token-authenticated public API.
+
+    A deliberate subset of ``patients.PatientResponse``: identity + core
+    contact fields only. Billing details, photo, notes and internal
+    lifecycle flags are not exposed to third-party token holders (issue #65
+    §2/§12). Multi-tenancy is enforced by the router (queries are
+    clinic-scoped off the token).
+    """
+
+    id: UUID
+    first_name: str
+    last_name: str
+    phone: str | None
+    email: str | None
+    national_id: str | None
+    date_of_birth: date | None
+    status: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}

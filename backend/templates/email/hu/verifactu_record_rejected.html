@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Az AEAT elutasított egy számlát — beavatkozás szükséges{% endblock %}
+
+{% block content %}
+<h2>Tisztelt {{ admin_name }}!</h2>
+
+<div class="alert alert-error">
+    Az AEAT <strong>elutasította</strong> a(z) <strong>{{ clinic_name }}</strong> rendelő <strong>{{ invoice_number }}</strong> számú számlájának Verifactu rekordját.
+    Amíg nem rendezi ezt a hibát, <strong>nem tud új számlákat kiállítani</strong> (a lenyomatlánc sérülne).
+</div>
+
+<div class="info-box">
+    <div class="label">Számla</div>
+    <div class="value">{{ invoice_number }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">AEAT hibakód</div>
+    <div class="value">{{ codigo_error or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Ok</div>
+    <div class="value">{{ friendly_message }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Mi a teendő?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    {% if suggested_cta == 'edit_clinic' %}
+    <li style="margin-bottom: 8px;">Nyissa meg a <em>Beállítások → Rendelő</em> menüpontot, és ellenőrizze a rendelő CIF/NIF azonosítóját.</li>
+    <li style="margin-bottom: 8px;">Térjen vissza a <em>Beállítások → Verifactu → Várólista</em> oldalra, és kattintson az <strong>„Újragenerálás és újraküldés”</strong> gombra.</li>
+    {% elif suggested_cta == 'edit_billing_party' %}
+    <li style="margin-bottom: 8px;">Nyissa meg a(z) {{ invoice_number }} számú számlát, és kattintson a piros sávban az <strong>„Ügyféladatok szerkesztése”</strong> gombra.</li>
+    <li style="margin-bottom: 8px;">Mentés után a rekord automatikusan újraküldésre kerül.</li>
+    {% elif suggested_cta == 'edit_lines' %}
+    <li style="margin-bottom: 8px;">Ellenőrizze az ÁFA-hozzárendelést és a(z) {{ invoice_number }} számú számla összegeit.</li>
+    <li style="margin-bottom: 8px;">Állítson ki helyesbítő számlát, ha a számla már ki volt fizetve, vagy állítsa ki újra, ha még piszkozat volt.</li>
+    {% else %}
+    <li style="margin-bottom: 8px;">Nyissa meg a <em>Beállítások → Verifactu → Várólista</em> menüpontot az elutasítás részleteinek megtekintéséhez.</li>
+    <li style="margin-bottom: 8px;">Ha az ok nem egyértelmű, forduljon az ügyfélszolgálathoz, és mellékelje a hibakódot.</li>
+    {% endif %}
+</ol>
+
+{% if queue_url %}
+<p style="margin-top: 20px;">
+    <a href="{{ queue_url }}" style="display: inline-block; padding: 10px 16px; background: #18181b; color: #fff; text-decoration: none; border-radius: 6px;">Verifactu várólista megnyitása</a>
+</p>
+{% endif %}
+{% endblock %}

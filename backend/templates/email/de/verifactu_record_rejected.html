@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Rechnung von der AEAT abgelehnt — Handlung erforderlich{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ admin_name }},</h2>
+
+<div class="alert alert-error">
+    die AEAT hat den Verifactu-Datensatz der Rechnung <strong>{{ invoice_number }}</strong> der Praxis <strong>{{ clinic_name }}</strong> <strong>abgelehnt</strong>.
+    Solange Sie dieses Problem nicht beheben, <strong>können Sie keine neuen Rechnungen ausstellen</strong> (die Hash-Kette würde sonst beschädigt).
+</div>
+
+<div class="info-box">
+    <div class="label">Rechnung</div>
+    <div class="value">{{ invoice_number }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">AEAT-Fehlercode</div>
+    <div class="value">{{ codigo_error or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Grund</div>
+    <div class="value">{{ friendly_message }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Was ist jetzt zu tun?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    {% if suggested_cta == 'edit_clinic' %}
+    <li style="margin-bottom: 8px;">Öffnen Sie <em>Einstellungen → Praxis</em> und überprüfen Sie die CIF/NIF der Praxis.</li>
+    <li style="margin-bottom: 8px;">Gehen Sie zurück zu <em>Einstellungen → Verifactu → Warteschlange</em> und klicken Sie auf <strong>„Neu erzeugen und erneut senden“</strong>.</li>
+    {% elif suggested_cta == 'edit_billing_party' %}
+    <li style="margin-bottom: 8px;">Öffnen Sie die Rechnung {{ invoice_number }} und klicken Sie im roten Banner auf <strong>„Kundendaten bearbeiten“</strong>.</li>
+    <li style="margin-bottom: 8px;">Nach dem Speichern wird der Datensatz automatisch erneut übermittelt.</li>
+    {% elif suggested_cta == 'edit_lines' %}
+    <li style="margin-bottom: 8px;">Überprüfen Sie die Steuerzuordnung (IVA) und die Beträge der Rechnung {{ invoice_number }}.</li>
+    <li style="margin-bottom: 8px;">Erstellen Sie eine Korrekturrechnung, falls die Rechnung bereits bezahlt war, oder stellen Sie sie neu aus, falls es ein Entwurf war.</li>
+    {% else %}
+    <li style="margin-bottom: 8px;">Öffnen Sie <em>Einstellungen → Verifactu → Warteschlange</em>, um die Details der Ablehnung einzusehen.</li>
+    <li style="margin-bottom: 8px;">Wenn die Ursache unklar ist, wenden Sie sich unter Angabe des Fehlercodes an den Support.</li>
+    {% endif %}
+</ol>
+
+{% if queue_url %}
+<p style="margin-top: 20px;">
+    <a href="{{ queue_url }}" style="display: inline-block; padding: 10px 16px; background: #18181b; color: #fff; text-decoration: none; border-radius: 6px;">Verifactu-Warteschlange öffnen</a>
+</p>
+{% endif %}
+{% endblock %}

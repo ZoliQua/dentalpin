@@ -1,0 +1,26 @@
+{
+  "whatsapp_webhook": {
+    "settings": {
+      "title": "WhatsApp via webhook",
+      "description": "Invia le notifiche WhatsApp tramite un hook Zapier / Make / n8n — senza account di un fornitore."
+    },
+    "connection": "Connessione",
+    "targetUrl": "URL dell'hook",
+    "targetUrlHelp": "URL HTTPS che riceve ogni notifica come JSON firmato (Zapier, Make, n8n…).",
+    "active": "Attivo",
+    "delivering": "In consegna",
+    "lastErrorBadge": "Errore di consegna",
+    "secret": "Segreto di firma",
+    "secretShownOnce": "Copia questo segreto adesso: viene mostrato una sola volta. Usalo per verificare l'header X-DentalPin-Signature nella tua automazione.",
+    "rotateSecret": "Rigenera segreto",
+    "copy": "Copia",
+    "copied": "Copiato negli appunti",
+    "saved": "Impostazioni salvate",
+    "saveError": "Impossibile salvare le impostazioni",
+    "test": "Invio di prova",
+    "testHelp": "Invia un payload di prova firmato al tuo hook per configurare l'automazione.",
+    "sendTest": "Invia prova",
+    "testOk": "Payload di prova consegnato",
+    "testFail": "Invio di prova non riuscito"
+  }
+}

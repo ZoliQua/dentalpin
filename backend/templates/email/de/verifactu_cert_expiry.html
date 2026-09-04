@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_expired %}Ihr Verifactu-Zertifikat ist abgelaufen{% else %}Ihr Verifactu-Zertifikat läuft bald ab{% endif %}{% endblock %}
+
+{% block content %}
+<h2>Hallo {{ admin_name }},</h2>
+
+{% if is_expired %}
+<div class="alert alert-error">
+    Das digitale Zertifikat der Praxis <strong>{{ clinic_name }}</strong>, mit dem die Übermittlungen an die AEAT (Veri*Factu) signiert werden, ist <strong>bereits abgelaufen</strong>. Solange Sie es nicht erneuern, bleiben die Datensätze in der Warteschlange und die AEAT lehnt jede Übermittlung ab.
+</div>
+{% else %}
+<div class="alert alert-warning">
+    Das digitale Zertifikat der Praxis <strong>{{ clinic_name }}</strong>, mit dem die Übermittlungen an die AEAT (Veri*Factu) signiert werden, läuft in <strong>{{ days_left }} Tag{% if days_left != 1 %}en{% endif %}</strong> ab. Wir empfehlen, es vor Ablauf der Frist zu erneuern, damit die Rechnungsstellung nicht unterbrochen wird.
+</div>
+{% endif %}
+
+<div class="info-box">
+    <div class="label">Zertifikatsinhaber</div>
+    <div class="value">{{ subject_cn or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Ablaufdatum</div>
+    <div class="value">{{ valid_until.strftime('%d/%m/%Y') }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Was müssen Sie tun?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    <li style="margin-bottom: 8px;">Beantragen Sie ein neues Zertifikat bei der FNMT (Representante de Persona Jurídica, Persona Física oder Sello de Empresa).</li>
+    <li style="margin-bottom: 8px;">Melden Sie sich als Administrator bei DentalPin an und öffnen Sie <em>Einstellungen → Verifactu → Zertifikat</em>.</li>
+    <li style="margin-bottom: 8px;">Laden Sie die neue <code>.pfx</code>-Datei hoch und geben Sie das zugehörige Passwort ein. Das alte Zertifikat wird zu Prüfzwecken archiviert.</li>
+</ol>
+
+<p>Wenn Sie Hilfe benötigen, antworten Sie einfach auf diese E-Mail — wir begleiten Sie Schritt für Schritt.</p>
+{% endblock %}

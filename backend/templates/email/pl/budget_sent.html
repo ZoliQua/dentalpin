@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Kosztorys - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Dzień dobry, {{ patient_name }}!</h2>
+
+<p>Przesyłamy szczegółowy kosztorys Twojego leczenia stomatologicznego.</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Nr kosztorysu</div>
+            <div class="value">{{ budget_number }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Data</div>
+            <div class="value">{{ budget_date }}</div>
+        </div>
+    </div>
+</div>
+
+{% if treatments %}
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+    <thead>
+        <tr style="border-bottom: 2px solid #e4e4e7;">
+            <th style="text-align: left; padding: 12px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #71717a;">Zabieg</th>
+            <th style="text-align: right; padding: 12px 0; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #71717a;">Kwota</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for treatment in treatments %}
+        <tr style="border-bottom: 1px solid #f4f4f5;">
+            <td style="padding: 12px 0;">
+                <div style="font-weight: 500;">{{ treatment.name }}</div>
+                {% if treatment.tooth %}
+                <div style="font-size: 14px; color: #71717a;">Ząb: {{ treatment.tooth }}</div>
+                {% endif %}
+            </td>
+            <td style="text-align: right; padding: 12px 0;">{{ treatment.price }} €</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        {% if subtotal and total != subtotal %}
+        <tr>
+            <td style="padding: 12px 0; text-align: right; font-weight: 500;">Suma częściowa:</td>
+            <td style="padding: 12px 0; text-align: right;">{{ subtotal }} €</td>
+        </tr>
+        {% endif %}
+        {% if discount_amount %}
+        <tr>
+            <td style="padding: 12px 0; text-align: right; font-weight: 500; color: #22c55e;">Rabat:</td>
+            <td style="padding: 12px 0; text-align: right; color: #22c55e;">-{{ discount_amount }} €</td>
+        </tr>
+        {% endif %}
+        <tr style="border-top: 2px solid #18181b;">
+            <td style="padding: 16px 0; text-align: right; font-size: 18px; font-weight: 600;">Razem:</td>
+            <td style="padding: 16px 0; text-align: right; font-size: 18px; font-weight: 600;">{{ total }} €</td>
+        </tr>
+    </tfoot>
+</table>
+{% endif %}
+
+{% if validity_days %}
+<div class="alert alert-info">
+    <strong>Ważność:</strong> kosztorys jest ważny przez {{ validity_days }} dni od daty wystawienia.
+</div>
+{% endif %}
+
+{% if notes %}
+<p><strong>Uwagi:</strong> {{ notes }}</p>
+{% endif %}
+
+<p>Jeśli masz pytania dotyczące kosztorysu lub chcesz umówić się na leczenie, skontaktuj się z nami.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Skontaktuj się z nami</a>
+</div>
+{% endif %}
+
+<p>Pozostajemy do Twojej dyspozycji.</p>
+{% endblock %}

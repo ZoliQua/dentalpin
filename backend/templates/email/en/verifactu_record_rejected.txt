@@ -1,0 +1,27 @@
+Hello {{ admin_name }},
+
+The AEAT has REJECTED the Verifactu record for invoice {{ invoice_number }} of the clinic "{{ clinic_name }}".
+Until you resolve it, you will not be able to issue new invoices (it would break the hash chain).
+
+Invoice: {{ invoice_number }}
+AEAT code: {{ codigo_error or '—' }}
+Reason: {{ friendly_message }}
+
+Steps:
+{% if suggested_cta == 'edit_clinic' -%}
+1. Go to Settings → Clinic and check the CIF/NIF.
+2. Return to Settings → Verifactu → Queue and click "Regenerate and resend".
+{% elif suggested_cta == 'edit_billing_party' -%}
+1. Open invoice {{ invoice_number }} and click "Edit customer details" in the banner.
+2. After saving, it is resent automatically.
+{% elif suggested_cta == 'edit_lines' -%}
+1. Check the VAT mapping and the invoice amounts.
+2. Create a corrective invoice if the invoice was already paid.
+{% else -%}
+1. Go to Settings → Verifactu → Queue to see the details.
+2. If it is not clear, contact support and attach the error code.
+{% endif %}
+
+{% if queue_url -%}
+Verifactu queue: {{ queue_url }}
+{%- endif %}

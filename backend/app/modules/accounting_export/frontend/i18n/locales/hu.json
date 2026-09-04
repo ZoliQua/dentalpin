@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "accountingExport": "Könyvelői export"
+  },
+  "accountingExport": {
+    "title": "Könyvelői export",
+    "subtitle": "Töltse le az időszak számláit és befizetéseit, hogy átadhassa a könyvelőnek.",
+    "period": "Időszak",
+    "from": "Ettől",
+    "to": "Eddig",
+    "presets": {
+      "currentMonth": "Aktuális hónap",
+      "previousMonth": "Előző hónap",
+      "currentQuarter": "Aktuális negyedév",
+      "previousQuarter": "Előző negyedév",
+      "yearToDate": "Év elejétől",
+      "custom": "Egyéni"
+    },
+    "actions": {
+      "preview": "Előnézet",
+      "download": "Letöltés (.zip)"
+    },
+    "counters": {
+      "invoices": "Számlák",
+      "payments": "Befizetések",
+      "base": "Adóalap",
+      "total": "Összesen"
+    },
+    "cols": {
+      "numero": "Sorszám",
+      "fecha_emision": "Dátum",
+      "cliente": "Vevő",
+      "nif": "Adószám",
+      "base": "Adóalap",
+      "cuota_iva": "ÁFA",
+      "total": "Összesen",
+      "estado": "Állapot"
+    }
+  }
+}

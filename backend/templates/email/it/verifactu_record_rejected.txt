@@ -1,0 +1,27 @@
+Gentile {{ admin_name }},
+
+L'AEAT ha RESPINTO il registro Verifactu della fattura {{ invoice_number }} dello studio "{{ clinic_name }}".
+Finché non verrà risolto, non sarà possibile emettere nuove fatture (si romperebbe la catena delle impronte).
+
+Fattura: {{ invoice_number }}
+Codice AEAT: {{ codigo_error or '—' }}
+Motivo: {{ friendly_message }}
+
+Passaggi:
+{% if suggested_cta == 'edit_clinic' -%}
+1. Entri in Impostazioni → Studio e verifichi il CIF/NIF.
+2. Torni in Impostazioni → Verifactu → Coda e prema "Rigenera e reinvia".
+{% elif suggested_cta == 'edit_billing_party' -%}
+1. Apra la fattura {{ invoice_number }} e prema "Modifica dati del cliente" nel banner.
+2. Dopo il salvataggio, il reinvio avviene automaticamente.
+{% elif suggested_cta == 'edit_lines' -%}
+1. Verifichi la mappatura dell'IVA e gli importi della fattura.
+2. Emetta una nota di rettifica se la fattura era già stata pagata.
+{% else -%}
+1. Entri in Impostazioni → Verifactu → Coda per consultare il dettaglio.
+2. Se la causa non è chiara, contatti il supporto allegando il codice di errore.
+{% endif %}
+
+{% if queue_url -%}
+Coda Verifactu: {{ queue_url }}
+{%- endif %}

@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Nyílt forráskódú fogászati rendelőirányító szoftver.** Páciensek, fogtérkép,
+**Elérhető forráskódú (BSL 1.1) fogászati rendelőirányító szoftver, amely a megjelenés után négy évvel Apache 2.0 licencre vált.** Páciensek, fogtérkép,
 időpontkezelés, kezelési tervek, számlázás és beépített AI copilot — moduláris,
 self-hosted, API-first.
 
@@ -34,11 +34,11 @@ A DentalPin egyszerű alapvetésre épül: **egyetlen nyílt platform a fogorvos
 
 ### Miért most?
 
-Az MI alapjaiban változtatta meg, hogy mire képesek a kis csapatok. Azok a funkciók, amelyekhez korábban nagy fejlesztői részlegek kellettek, ma napok alatt megvalósíthatók. Ez a mi lehetőségünk arra, hogy megalkossuk azt a nyílt forráskódú fogászati szoftvert, amelynek már évekkel ezelőtt léteznie kellett volna — mielőtt a rendelők olyan örökölt rendszerekbe záródtak, amelyekből nincs kiút.
+Az MI alapjaiban változtatta meg, hogy mire képesek a kis csapatok. Azok a funkciók, amelyekhez korábban nagy fejlesztői részlegek kellettek, ma napok alatt megvalósíthatók. Ez a mi lehetőségünk arra, hogy megalkossuk azt az elérhető forráskódú (BSL 1.1, a megjelenés után négy évvel Apache 2.0) fogászati szoftvert, amelynek már évekkel ezelőtt léteznie kellett volna — mielőtt a rendelők olyan örökölt rendszerekbe záródtak, amelyekből nincs kiút.
 
 ### Alapelveink
 
-- **Nyílt forráskód** — A rendelője adatai Önt illetik. A szoftverének is így kellene lennie.
+- **Elérhető forráskód (BSL 1.1)** — A rendelője adatai Önt illetik. A szoftverének is így kellene lennie.
 - **Moduláris** — Kezdje egyszerűen, és adja hozzá, amire szüksége van. Ne fizessen olyan funkciókért, amelyeket soha nem fog használni.
 - **Alapból globális** — Az első naptól lokalizációra tervezve. Ugyanaz a mag, bármely nyelven, bármely országban.
 - **API-first** — Minden funkció egy API. Integrálható bármivel, automatizálható minden.
@@ -157,7 +157,7 @@ A demóadatok teljes leírását lásd: [docs/user-manual/en/demo.md](docs/user-
 | Réteg | Technológia |
 |-------|-------------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Adatbázis | PostgreSQL 15 |
 | Hitelesítés | JWT refresh tokenekkel |
 

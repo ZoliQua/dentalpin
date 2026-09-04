@@ -1,0 +1,27 @@
+Dzień dobry, {{ admin_name }}!
+
+AEAT ODRZUCIŁA rejestr Verifactu faktury {{ invoice_number }} gabinetu "{{ clinic_name }}".
+Do czasu rozwiązania tego problemu nie będzie można wystawiać nowych faktur (naruszyłoby to łańcuch odcisków).
+
+Faktura: {{ invoice_number }}
+Kod AEAT: {{ codigo_error or '—' }}
+Powód: {{ friendly_message }}
+
+Kroki:
+{% if suggested_cta == 'edit_clinic' -%}
+1. Przejdź do Konfiguracja → Klinika i sprawdź numer CIF/NIF.
+2. Wróć do Konfiguracja → Verifactu → Kolejka i kliknij "Wygeneruj ponownie i wyślij".
+{% elif suggested_cta == 'edit_billing_party' -%}
+1. Otwórz fakturę {{ invoice_number }} i kliknij "Edytuj dane klienta" na banerze.
+2. Po zapisaniu rejestr zostanie ponownie wysłany automatycznie.
+{% elif suggested_cta == 'edit_lines' -%}
+1. Sprawdź mapowanie stawek VAT (IVA) oraz kwoty na fakturze.
+2. Wystaw fakturę korygującą, jeśli faktura była już opłacona.
+{% else -%}
+1. Przejdź do Konfiguracja → Verifactu → Kolejka, aby zobaczyć szczegóły.
+2. Jeśli przyczyna nie jest jasna, skontaktuj się z pomocą techniczną, podając kod błędu.
+{% endif %}
+
+{% if queue_url -%}
+Kolejka Verifactu: {{ queue_url }}
+{%- endif %}

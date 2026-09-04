@@ -1,0 +1,26 @@
+{
+  "clinic_id": "b5d1f2a3-7c8e-4d9f-a0b1-c2d3e4f5a6b7",
+  "budget_id": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
+  "patient_id": "3f8b2c1d-4a5e-4b6f-8c7d-9e0f1a2b3c4d",
+  "budget_number": "BUD-2026-0001",
+  "total": "1250.00",
+  "accepted_by": "7d2e3f4a-5b6c-4d7e-8f9a-0b1c2d3e4f5a",
+  "accepted_via": "email",
+  "plan_id": "2c3d4e5f-6a7b-8c9d-0e1f-2a3b4c5d6e7f",
+  "items": [
+    {
+      "service_id": "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      "description": "Limpieza dental",
+      "quantity": 1,
+      "unit_price": "80.00",
+      "total": "80.00"
+    },
+    {
+      "service_id": "c3d4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f",
+      "description": "Empaste composite",
+      "quantity": 2,
+      "unit_price": "585.00",
+      "total": "1170.00"
+    }
+  ]
+}

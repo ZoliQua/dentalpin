@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_expired %}A Verifactu tanúsítványa lejárt{% else %}A Verifactu tanúsítványa hamarosan lejár{% endif %}{% endblock %}
+
+{% block content %}
+<h2>Tisztelt {{ admin_name }}!</h2>
+
+{% if is_expired %}
+<div class="alert alert-error">
+    A(z) <strong>{{ clinic_name }}</strong> rendelőnek az AEAT felé történő beküldések (Veri*Factu) aláírásához használt digitális tanúsítványa <strong>már lejárt</strong>. Amíg nem újítja meg, a rekordok a várakozási sorban maradnak, és az AEAT minden beküldést elutasít.
+</div>
+{% else %}
+<div class="alert alert-warning">
+    A(z) <strong>{{ clinic_name }}</strong> rendelőnek az AEAT felé történő beküldések (Veri*Factu) aláírásához használt digitális tanúsítványa <strong>{{ days_left }} nap múlva</strong> lejár. Javasoljuk, hogy a határidő előtt újítsa meg, hogy a számlázás ne szakadjon meg.
+</div>
+{% endif %}
+
+<div class="info-box">
+    <div class="label">A tanúsítvány tulajdonosa</div>
+    <div class="value">{{ subject_cn or '—' }}</div>
+</div>
+
+<div class="info-box">
+    <div class="label">Lejárat dátuma</div>
+    <div class="value">{{ valid_until.strftime('%d/%m/%Y') }}</div>
+</div>
+
+<h3 style="margin-top: 24px; margin-bottom: 12px; font-size: 16px; font-weight: 600;">Mi a teendő?</h3>
+
+<ol style="padding-left: 20px; color: #3f3f46;">
+    <li style="margin-bottom: 8px;">Igényeljen új tanúsítványt az FNMT-nél (Representante de Persona Jurídica, Persona Física vagy Sello de Empresa).</li>
+    <li style="margin-bottom: 8px;">Jelentkezzen be a DentalPinbe adminisztrátorként, és nyissa meg a <em>Beállítások → Verifactu → Tanúsítvány</em> menüpontot.</li>
+    <li style="margin-bottom: 8px;">Töltse fel az új <code>.pfx</code> fájlt, és adja meg a hozzá tartozó jelszót. A korábbi tanúsítványt auditálási célból archiváljuk.</li>
+</ol>
+
+<p>Ha segítségre van szüksége, válaszoljon erre az e-mailre, és lépésről lépésre végigvezetjük a folyamaton.</p>
+{% endblock %}

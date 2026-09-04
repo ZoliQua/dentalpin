@@ -35,7 +35,7 @@ from sqlalchemy.orm import selectinload
 from app.core.auth.models import Clinic, ClinicMembership, User
 from app.core.auth.service import hash_password
 from app.database import async_session_maker
-from app.modules.agenda.models import Appointment, AppointmentTreatment
+from app.modules.agenda.models import Appointment
 from app.modules.billing.models import Invoice, InvoiceItem, InvoicePayment, InvoiceSeries
 from app.modules.budget.models import Budget, BudgetItem, BudgetSignature
 from app.modules.catalog.models import TreatmentCatalogItem
@@ -58,6 +58,7 @@ from app.modules.patients_clinical.models import (
 )
 from app.modules.payments.models import PatientEarnedEntry, Payment, PaymentAllocation
 from app.modules.treatment_plan.models import (
+    AppointmentTreatment,
     PlannedTreatmentItem,
     PlannedTreatmentItemSession,
     TreatmentPlan,

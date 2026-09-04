@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Potwierdzenie wizyty - {{ clinic_name }}{% endblock %}
+
+{% block content %}
+<h2>Dzień dobry, {{ patient_name }}!</h2>
+
+<p>Twoja wizyta została potwierdzona. Oto szczegóły:</p>
+
+<div class="info-box">
+    <div class="info-row">
+        <div style="flex: 1;">
+            <div class="label">Data</div>
+            <div class="value">{{ appointment_date }}</div>
+        </div>
+        <div style="flex: 1;">
+            <div class="label">Godzina</div>
+            <div class="value">{{ appointment_time }}</div>
+        </div>
+    </div>
+    {% if professional_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Specjalista</div>
+            <div class="value">{{ professional_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if cabinet_name %}
+    <div class="info-row">
+        <div>
+            <div class="label">Gabinet</div>
+            <div class="value">{{ cabinet_name }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% if treatment_type %}
+    <div class="info-row">
+        <div>
+            <div class="label">Zabieg</div>
+            <div class="value">{{ treatment_type }}</div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if notes %}
+<div class="alert alert-info">
+    <strong>Uwagi:</strong> {{ notes }}
+</div>
+{% endif %}
+
+<p>Prosimy o przybycie 10 minut przed wizytą. Jeśli zajdzie potrzeba odwołania lub zmiany terminu, prosimy o informację co najmniej 24 godziny wcześniej.</p>
+
+{% if clinic_phone %}
+<div class="button-container">
+    <a href="tel:{{ clinic_phone }}" class="button">Zadzwoń do gabinetu</a>
+</div>
+{% endif %}
+
+<p>Do zobaczenia!</p>
+{% endblock %}

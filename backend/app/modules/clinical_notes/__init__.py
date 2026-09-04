@@ -27,13 +27,7 @@ from fastapi import APIRouter
 from app.core.plugins import BaseModule
 
 from .models import ClinicalNote
-from .owner_resolvers import register as _register_attachment_owners
 from .router import router
-
-# Register attachment owner_types with media.attachment_registry. Safe at
-# import time because ``media`` is in ``manifest.depends`` and Python
-# import order resolves it first.
-_register_attachment_owners()
 
 
 class ClinicalNotesModule(BaseModule):
@@ -63,6 +57,14 @@ class ClinicalNotesModule(BaseModule):
             "navigation": [],
         },
     }
+
+    def on_activate(self) -> None:
+        # Attachment owner_types with media.attachment_registry —
+        # re-attached per boot while installed (ADR 0020, issue #325;
+        # used to run at import time).
+        from .owner_resolvers import register as register_attachment_owners
+
+        register_attachment_owners()
 
     def get_models(self) -> list:
         return [ClinicalNote]

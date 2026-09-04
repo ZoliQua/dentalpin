@@ -10,7 +10,7 @@
 [![pl](https://img.shields.io/badge/lang-pl-lightgrey.svg)](./README.pl.md)
 [![it](https://img.shields.io/badge/lang-it-blueviolet.svg)](./README.it.md)
 
-**Software open source de gestão de clínicas dentárias.** Pacientes, odontograma,
+**Software de gestão de clínicas dentárias com código-fonte disponível (BSL 1.1), que passa a Apache 2.0 quatro anos após a publicação.** Pacientes, odontograma,
 agenda, planos de tratamento, faturação e um Copilot de IA integrado — modular,
 self-hosted e API-first.
 
@@ -33,11 +33,11 @@ O DentalPin assenta numa premissa simples: **uma plataforma aberta para clínica
 
 ### Porquê agora?
 
-A IA mudou fundamentalmente o que as equipas pequenas conseguem construir. Funcionalidades que antes exigiam grandes departamentos de desenvolvimento podem agora ser implementadas em dias. Esta é a nossa janela para criar o software dentário open source que já devia existir há anos — antes de as clínicas ficarem presas a sistemas legacy dos quais não conseguem escapar.
+A IA mudou fundamentalmente o que as equipas pequenas conseguem construir. Funcionalidades que antes exigiam grandes departamentos de desenvolvimento podem agora ser implementadas em dias. Esta é a nossa janela para criar o software dentário com código-fonte disponível (BSL 1.1, que passa a Apache 2.0 quatro anos após a publicação) que já devia existir há anos — antes de as clínicas ficarem presas a sistemas legacy dos quais não conseguem escapar.
 
 ### Os nossos princípios
 
-- **Open Source** — Os dados da sua clínica pertencem-lhe. O seu software também.
+- **Código-fonte disponível (BSL 1.1)** — Os dados da sua clínica pertencem-lhe. O seu software também.
 - **Modular** — Comece simples, adicione o que precisar. Não pague por funcionalidades que nunca vai usar.
 - **Global por Design** — Construído para a localização desde o primeiro dia. O mesmo núcleo, qualquer idioma, qualquer país.
 - **API-First** — Cada funcionalidade é uma API. Integre com tudo, automatize tudo.
@@ -155,7 +155,7 @@ Consulte [docs/user-manual/en/demo.md](docs/user-manual/en/demo.md) para todos o
 | Camada | Tecnologia |
 |--------|-----------|
 | Backend | FastAPI (Python 3.11+) |
-| Frontend | Nuxt 3 + Nuxt UI |
+| Frontend | Nuxt 4 + Nuxt UI |
 | Base de dados | PostgreSQL 15 |
 | Autenticação | JWT com refresh tokens |
 

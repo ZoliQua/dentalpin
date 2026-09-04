@@ -102,7 +102,9 @@
       "bank_transfer": "Przelew",
       "direct_debit": "Polecenie zapłaty",
       "insurance": "Ubezpieczenie",
-      "other": "Inna"
+      "other": "Inna",
+      "upi": "UPI",
+      "netbanking": "Bankowość internetowa"
     },
     "refund": {
       "title": "Zwrot płatności",
@@ -254,6 +256,7 @@
       "unknownProfessional": "Nieprzypisane",
       "countShort": "{n} transakcji",
       "countPatients": "{n} pacjentów",
+      "loadError": "Nie udało się załadować raportów płatności.",
       "granularity": {
         "day": "Dzień",
         "week": "Tydzień",
@@ -282,8 +285,11 @@
       "drilldown": {
         "viewPayments": "Zobacz płatności z okresu",
         "viewPatients": "Zobacz pacjentów z zadłużeniem"
-      },
-      "loadError": "Nie udało się wczytać raportów."
+      }
+    },
+    "followup": {
+      "collect": "Przyjmij płatność",
+      "collected": "Płatność zarejestrowana."
     },
     "target": {
       "label": "Zastosuj do",
@@ -299,10 +305,6 @@
       "submit": "Przypisz",
       "success": "Płatność przypisana do kosztorysu",
       "error": "Nie udało się ponownie przypisać płatności. Spróbuj ponownie."
-    },
-    "followup": {
-      "collect": "Przyjmij płatność",
-      "collected": "Płatność zarejestrowana."
     }
   }
 }

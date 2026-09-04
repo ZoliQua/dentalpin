@@ -27,6 +27,7 @@ import importlib.util
 import json
 import logging
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -48,6 +49,10 @@ class LayerEntry:
 
     module_name: str
     path: str
+    # Route paths the layer's pages contribute ("[id]" → ":id") — the
+    # frontend's module-gate middleware 404s routes of modules that are
+    # baked but not installed (#326).
+    routes: tuple[str, ...] = ()
 
 
 def resolve_layer_path(module: BaseModule) -> Path | None:
@@ -104,6 +109,34 @@ def _translate_for_frontend(path: Path) -> str:
     return str(mount / rel)
 
 
+def _layer_routes(layer_dir: Path) -> tuple[str, ...]:
+    """Route paths the layer's ``pages/`` contributes.
+
+    Mirrors the traversal in ``frontend/scripts/modules-json.mjs`` (one
+    sorted walk, dirs recursed in place, ``index.vue`` → parent path,
+    ``[param]`` → ``:param``) so runtime rewrites are byte-identical to
+    the build-time generator's output (#264 determinism contract).
+    """
+    pages = layer_dir / "pages"
+    if not pages.is_dir():
+        return ()
+    routes: list[str] = []
+
+    def walk(directory: Path, segments: list[str]) -> None:
+        for entry in sorted(directory.iterdir(), key=lambda p: p.name):
+            if entry.is_dir():
+                walk(entry, [*segments, entry.name])
+            elif entry.name.endswith(".vue"):
+                leaf = entry.name[:-4]
+                parts = segments if leaf == "index" else [*segments, leaf]
+                routes.append(
+                    "/" + "/".join(re.sub(r"\[(?:\.\.\.)?([^\]]+)\]", r":\1", p) for p in parts)
+                )
+
+    walk(pages, [])
+    return tuple(routes)
+
+
 def collect_layers(modules: list[BaseModule]) -> list[LayerEntry]:
     """Run :func:`resolve_layer_path` for every module with one."""
     entries: list[LayerEntry] = []
@@ -111,7 +144,13 @@ def collect_layers(modules: list[BaseModule]) -> list[LayerEntry]:
         path = resolve_layer_path(module)
         if path is None:
             continue
-        entries.append(LayerEntry(module_name=module.name, path=_translate_for_frontend(path)))
+        entries.append(
+            LayerEntry(
+                module_name=module.name,
+                path=_translate_for_frontend(path),
+                routes=_layer_routes(path),
+            )
+        )
     return entries
 
 
@@ -125,7 +164,9 @@ def build_payload(entries: list[LayerEntry]) -> dict[str, object]:
     return {
         "version": MODULES_JSON_SCHEMA_VERSION,
         "layers": [e.path for e in ordered],
-        "modules": [{"name": e.module_name, "path": e.path} for e in ordered],
+        "modules": [
+            {"name": e.module_name, "path": e.path, "routes": list(e.routes)} for e in ordered
+        ],
     }
 
 

@@ -1,8 +1,8 @@
 # Production stack from prebuilt images. No repo clone, no build.
 #
-#   curl -O https://raw.githubusercontent.com/martinezsalmeron/dentalpin/main/docker-compose.prod.yml
-#   curl -O https://raw.githubusercontent.com/martinezsalmeron/dentalpin/main/Caddyfile
-#   curl -o .env https://raw.githubusercontent.com/martinezsalmeron/dentalpin/main/.env.prod.example
+#   curl -O https://raw.githubusercontent.com/dentalpin/dentalpin/main/docker-compose.prod.yml
+#   curl -O https://raw.githubusercontent.com/dentalpin/dentalpin/main/Caddyfile
+#   curl -o .env https://raw.githubusercontent.com/dentalpin/dentalpin/main/.env.prod.example
 #   # edit .env, then:
 #   docker compose -f docker-compose.prod.yml up -d
 #
@@ -28,7 +28,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: ghcr.io/martinezsalmeron/dentalpin-backend:${DENTALPIN_VERSION:-latest}
+    image: ghcr.io/dentalpin/dentalpin-backend:${DENTALPIN_VERSION:-latest}
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dental}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-dental_clinic}
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
@@ -55,7 +55,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: ghcr.io/martinezsalmeron/dentalpin-frontend:${DENTALPIN_VERSION:-latest}
+    image: ghcr.io/dentalpin/dentalpin-frontend:${DENTALPIN_VERSION:-latest}
     environment:
       # Nuxt overrides runtimeConfig.public.apiBaseUrl from this at boot,
       # so one image serves every deployment — nothing is baked in.

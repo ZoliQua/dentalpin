@@ -1,0 +1,9 @@
+{
+  "clinic_id": "b5d1f2a3-7c8e-4d9f-a0b1-c2d3e4f5a6b7",
+  "budget_id": "9a8b7c6d-5e4f-3a2b-1c0d-9e8f7a6b5c4d",
+  "patient_id": "3f8b2c1d-4a5e-4b6f-8c7d-9e0f1a2b3c4d",
+  "budget_number": "BUD-2026-0001",
+  "plan_id": "2c3d4e5f-6a7b-8c9d-0e1f-2a3b4c5d6e7f",
+  "rejection_reason": "price",
+  "rejection_note": "El paciente considera el precio demasiado alto."
+}

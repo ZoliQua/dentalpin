@@ -82,6 +82,9 @@ Subscription only — copilot never imports the publisher (ADR 0003), so
   to what routers enforce. Every tool call re-checks at the chokepoint.
 - **PHI redaction is mandatory** by default (`copilot_settings.redaction_enabled`).
   Tools flagged `exposes_free_text` are excluded from the cloud path.
+  What the redactor does and does not guarantee (pseudonymization, the
+  free-text gap, cross-session correlation):
+  `docs/technical/copilot-agentic-architecture.md` §15.
 - **SSE owns its DB session.** Streaming endpoints open their own
   `async_session_maker` session for the stream, not `Depends(get_db)`.
 - **Morning digest (proactivity v1).** `tasks.py::send_morning_digests`

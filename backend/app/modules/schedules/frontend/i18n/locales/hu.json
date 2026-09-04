@@ -1,0 +1,88 @@
+{
+  "schedules": {
+    "nav": {
+      "clinicHours": "Nyitvatartás",
+      "professionalSchedules": "Kezelőorvosi beosztások"
+    },
+    "settingsCards": {
+      "clinicHoursTitle": "Nyitvatartás",
+      "clinicHoursDescription": "Adja meg a rendelő heti nyitvatartását és a különleges napokat (ünnepnapok, rövidített nyitvatartás).",
+      "professionalHoursTitle": "Kezelőorvosi beosztások",
+      "professionalHoursDescription": "Állítson be egyéni beosztást minden kezelőorvosnak, és kezelje a szabadságokat és egyéb távolléteket."
+    },
+    "clinicHours": {
+      "title": "Nyitvatartás",
+      "subtitle": "Adja meg, hogy a rendelő a hét egyes napjain mikor tart nyitva.",
+      "weeklyTemplate": "Heti sablon",
+      "overrides": "Különleges napok",
+      "addOverride": "Különleges nap hozzáadása",
+      "editOverride": "Különleges nap szerkesztése",
+      "save": "Módosítások mentése",
+      "saved": "Beosztás frissítve",
+      "savedError": "Nem sikerült menteni a beosztást"
+    },
+    "professionalHours": {
+      "title": "Kezelőorvosi beosztások",
+      "selectProfessional": "Válasszon kezelőorvost",
+      "weeklyTemplate": "Heti beosztás",
+      "overrides": "Távollétek és rendkívüli munkaidő",
+      "addOverride": "Távollét hozzáadása",
+      "editOverride": "Távollét szerkesztése",
+      "save": "Módosítások mentése",
+      "saved": "Beosztás frissítve"
+    },
+    "weekday": {
+      "0": "Hétfő",
+      "1": "Kedd",
+      "2": "Szerda",
+      "3": "Csütörtök",
+      "4": "Péntek",
+      "5": "Szombat",
+      "6": "Vasárnap",
+      "closed": "Zárva",
+      "addShift": "Műszak hozzáadása",
+      "removeShift": "Műszak eltávolítása",
+      "start": "Kezdés",
+      "end": "Befejezés"
+    },
+    "overrides": {
+      "startDate": "Kezdő dátum",
+      "endDate": "Záró dátum",
+      "kind": "Típus",
+      "reason": "Indok",
+      "reasonPlaceholder": "Például: karácsony, konferencia…",
+      "closed": "Zárva",
+      "customHours": "Egyedi nyitvatartás",
+      "unavailable": "Nem elérhető",
+      "noOverrides": "Nincs ütemezett különleges nap",
+      "delete": "Törlés",
+      "confirmDelete": "Törli ezt az időszakot?",
+      "add": "Hozzáadás",
+      "save": "Mentés",
+      "cancel": "Mégse"
+    },
+    "analytics": {
+      "occupancyTitle": "Foglaltság kezelőnként",
+      "utilizationTitle": "Kihasználtság kezelőorvosonként",
+      "peakHoursTitle": "Csúcsidőszakok",
+      "bookedMinutes": "Foglalt percek",
+      "availableMinutes": "Szabad percek",
+      "rate": "Foglaltság",
+      "noData": "Nincs adat a kiválasztott időszakban"
+    },
+    "availability": {
+      "clinicClosed": "A rendelő zárva",
+      "professionalOff": "A kezelőorvos nem elérhető",
+      "outsideHours": "A beállított munkaidőn kívül",
+      "confirmOutside": "Ez az idősáv munkaidőn kívül esik. Mégis létrehozza az időpontot?",
+      "confirm": "Létrehozás mindenképp",
+      "cancel": "Mégse"
+    },
+    "onboarding": {
+      "hoursLabel": "Nyitvatartás",
+      "hoursDescription": "A naptár jelenleg 0–24 nyitva van. Állítsa be a valós nyitvatartást.",
+      "presetSplit": "H–P 9–14 és 16–20",
+      "presetContinuous": "H–P 9–18"
+    }
+  }
+}

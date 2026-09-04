@@ -62,6 +62,7 @@ export default defineNuxtPlugin(() => {
     descriptionKey: 'schedules.onboarding.hoursDescription',
     icon: 'i-lucide-clock',
     to: '/settings/workspace/clinic-hours',
+    permission: 'schedules.clinic_hours.read',
     order: 30,
     severity: 'info',
     modal: () => import('../components/settings/ClinicHoursQuickModal.vue'),
