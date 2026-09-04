@@ -26,6 +26,28 @@ jobs:
       - name: Run ruff format check
         run: ruff format --check backend/
 
+  python-lock-freshness:
+    # backend/uv.lock is the reproducible-build contract (#356): the
+    # Dockerfile installs with `uv sync --frozen`, so a pyproject.toml
+    # dependency change without a regenerated lock must fail here, not
+    # at the next prod build. Authors fix drift with:
+    #   cd backend && uv lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install "uv==0.12.9"
+
+      - name: Lock is in sync with pyproject.toml
+        working-directory: backend
+        run: uv lock --check
+
   backend-test:
     runs-on: ubuntu-latest
     services:
