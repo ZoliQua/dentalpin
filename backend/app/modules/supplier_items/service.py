@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.contacts.models import Contact
 from app.modules.inventory.models import InventoryItem
+from app.modules.suppliers.models import Supplier
 
 from .models import SupplierItem
 from .schemas import SupplierItemCreate, SupplierItemUpdate
@@ -26,17 +27,19 @@ class SupplierItemService:
         Returns (link, supplier_name, item_name) so routers/tools can build
         the denormalized response without extra queries.
         """
-        supplier = (
+        # Validate against the suppliers row (the FK target), not just the
+        # Contact: a Contact(type='supplier') without its 1:1 extension would
+        # pass a Contact-only check and then fail the FK as a misleading 409.
+        supplier_row = (
             await db.execute(
-                select(Contact).where(
-                    Contact.id == payload.supplier_id,
-                    Contact.clinic_id == clinic_id,
-                    Contact.contact_type == "supplier",
-                )
+                select(Supplier, Contact.name)
+                .join(Contact, Contact.id == Supplier.id)
+                .where(Supplier.id == payload.supplier_id, Supplier.clinic_id == clinic_id)
             )
-        ).scalar_one_or_none()
-        if not supplier:
+        ).first()
+        if not supplier_row:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Supplier not found")
+        supplier_name: str = supplier_row[1]
 
         item = (
             await db.execute(
@@ -51,14 +54,32 @@ class SupplierItemService:
                 status_code=status.HTTP_404_NOT_FOUND, detail="Inventory item not found"
             )
 
-        link = SupplierItem(
-            clinic_id=clinic_id,
-            supplier_id=payload.supplier_id,
-            inventory_item_id=payload.inventory_item_id,
-            supplier_sku=payload.supplier_sku,
-            price=payload.price,
-        )
-        db.add(link)
+        # A soft-deleted link for the same pair is revived with the new
+        # SKU/price instead of tripping the UNIQUE constraint — otherwise a
+        # deactivated pair could never be linked again.
+        link = (
+            await db.execute(
+                select(SupplierItem).where(
+                    SupplierItem.clinic_id == clinic_id,
+                    SupplierItem.supplier_id == payload.supplier_id,
+                    SupplierItem.inventory_item_id == payload.inventory_item_id,
+                    SupplierItem.is_active.is_(False),
+                )
+            )
+        ).scalar_one_or_none()
+        if link:
+            link.is_active = True
+            link.supplier_sku = payload.supplier_sku
+            link.price = payload.price
+        else:
+            link = SupplierItem(
+                clinic_id=clinic_id,
+                supplier_id=payload.supplier_id,
+                inventory_item_id=payload.inventory_item_id,
+                supplier_sku=payload.supplier_sku,
+                price=payload.price,
+            )
+            db.add(link)
         try:
             await db.commit()
         except IntegrityError:
@@ -69,7 +90,7 @@ class SupplierItemService:
             )
         await db.refresh(link)
 
-        return link, supplier.name, item.name
+        return link, supplier_name, item.name
 
     @staticmethod
     async def get_link(

@@ -10,8 +10,8 @@ Returned by `SupplierItemsModule.get_permissions()`
 
 | Permission | Allows | Required by |
 |------------|--------|-------------|
-| `supplier_items.read` | List and view supplier-item links | `GET /api/v1/supplier-items`, `GET /api/v1/supplier-items/{id}` |
-| `supplier_items.write` | Create, update, or soft-delete a link | `POST /api/v1/supplier-items`, `PATCH /api/v1/supplier-items/{id}`, `DELETE /api/v1/supplier-items/{id}` |
+| `supplier_items.read` | List and view supplier-item links | `GET /api/v1/supplier_items`, `GET /api/v1/supplier_items/{id}` |
+| `supplier_items.write` | Create, update, or soft-delete a link | `POST /api/v1/supplier_items`, `PATCH /api/v1/supplier_items/{id}`, `DELETE /api/v1/supplier_items/{id}` |
 
 ## Role assignment
 

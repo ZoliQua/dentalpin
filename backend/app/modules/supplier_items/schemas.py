@@ -4,9 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+
+if TYPE_CHECKING:
+    from .models import SupplierItem
 
 
 class SupplierItemCreate(BaseModel):
@@ -47,7 +51,9 @@ class SupplierItemResponse(BaseModel):
     updated_at: datetime
 
     @classmethod
-    def from_link(cls, link, supplier_name: str, item_name: str) -> SupplierItemResponse:
+    def from_link(
+        cls, link: SupplierItem, supplier_name: str, item_name: str
+    ) -> SupplierItemResponse:
         return cls(
             id=link.id,
             clinic_id=link.clinic_id,

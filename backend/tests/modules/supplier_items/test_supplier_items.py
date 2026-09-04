@@ -10,6 +10,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.models import Clinic
+from app.modules.contacts.models import Contact
 from app.modules.inventory.schemas import InventoryItemCreate
 from app.modules.inventory.service import InventoryService
 from app.modules.supplier_items.schemas import SupplierItemCreate, SupplierItemUpdate
@@ -55,6 +56,11 @@ async def test_create_list_update_deactivate_happy_path(
     assert link.supplier_sku == "ACME-COMPOSITE-A2"
     assert link.price == Decimal("9.99")
     assert link.is_active is True
+
+    fetched = await SupplierItemService.get_link(db_session, test_clinic.id, link.id)
+    assert fetched is not None
+    assert fetched[0].id == link.id
+    assert fetched[1:] == ("Acme Supplies", "Composite A2")
 
     rows, total = await SupplierItemService.list_links(db_session, test_clinic.id)
     assert total == 1
@@ -230,3 +236,52 @@ async def test_cross_clinic_isolation(db_session: AsyncSession, test_clinic: Cli
 
     result = await SupplierItemService.get_link(db_session, test_clinic.id, link.id)
     assert result is None
+
+
+@pytest.mark.asyncio
+async def test_relink_after_deactivate_revives_row(db_session: AsyncSession, test_clinic: Clinic):
+    """Soft delete must not lock the (supplier, item) pair behind the UNIQUE."""
+    _, supplier = await _make_supplier(db_session, test_clinic.id)
+    item = await _make_item(db_session, test_clinic.id)
+    link, _, _ = await SupplierItemService.create_link(
+        db_session,
+        test_clinic.id,
+        SupplierItemCreate(supplier_id=supplier.id, inventory_item_id=item.id, price=Decimal("1")),
+    )
+    await SupplierItemService.deactivate_link(db_session, link)
+
+    revived, _, _ = await SupplierItemService.create_link(
+        db_session,
+        test_clinic.id,
+        SupplierItemCreate(
+            supplier_id=supplier.id,
+            inventory_item_id=item.id,
+            supplier_sku="NEW",
+            price=Decimal("2"),
+        ),
+    )
+    assert revived.id == link.id  # same row, revived
+    assert revived.is_active is True
+    assert revived.supplier_sku == "NEW"
+    assert revived.price == Decimal("2")
+    _, total = await SupplierItemService.list_links(db_session, test_clinic.id)
+    assert total == 1
+
+
+@pytest.mark.asyncio
+async def test_create_rejects_contact_without_supplier_row(
+    db_session: AsyncSession, test_clinic: Clinic
+):
+    """A Contact(type='supplier') with no suppliers row is not a valid FK target -> 404."""
+    contact = Contact(clinic_id=test_clinic.id, name="Bare contact", contact_type="supplier")
+    db_session.add(contact)
+    await db_session.commit()
+    item = await _make_item(db_session, test_clinic.id)
+
+    with pytest.raises(HTTPException) as exc:
+        await SupplierItemService.create_link(
+            db_session,
+            test_clinic.id,
+            SupplierItemCreate(supplier_id=contact.id, inventory_item_id=item.id),
+        )
+    assert exc.value.status_code == 404

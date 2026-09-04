@@ -1,4 +1,4 @@
-"""supplier_items HTTP surface — mounted at ``/api/v1/supplier-items/``."""
+"""supplier_items HTTP surface — mounted at ``/api/v1/supplier_items/``."""
 
 from __future__ import annotations
 

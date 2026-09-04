@@ -8,18 +8,19 @@ item" model and feeds `purchase_orders` (#227-3) and `inventory_reorder`
 
 ## What it does
 
-Routes mounted at `/api/v1/supplier-items/`.
+Routes mounted at `/api/v1/supplier_items/`.
 
-- `GET    /supplier-items`          — list, filterable by `supplier_id` and `inventory_item_id`; `supplier_items.read`
-- `GET    /supplier-items/{id}`     — single link (SKU + price); `supplier_items.read`
-- `POST   /supplier-items`          — create a link (201); `supplier_items.write`
-- `PATCH  /supplier-items/{id}`     — update SKU / price; `supplier_items.write`
-- `DELETE /supplier-items/{id}`     — soft-delete (sets `is_active=false`, returns 204); `supplier_items.write`
+- `GET    /supplier_items`          — list, filterable by `supplier_id` and `inventory_item_id`; `supplier_items.read`
+- `GET    /supplier_items/{id}`     — single link (SKU + price); `supplier_items.read`
+- `POST   /supplier_items`          — create a link (201); `supplier_items.write`
+- `PATCH  /supplier_items/{id}`     — update SKU / price; `supplier_items.write`
+- `DELETE /supplier_items/{id}`     — soft-delete (sets `is_active=false`, returns 204); `supplier_items.write`
 
 Deletion is soft (not a real database delete) so historical purchase orders
 can still reference which supplier/item the link described, even after the
 link is removed. A `(supplier, item)` pair is unique — a duplicate surfaces
-as a 409 from the UNIQUE constraint.
+as a 409 from the UNIQUE constraint. Creating a link for a pair whose row
+was soft-deleted revives that row with the new SKU/price (same `id`).
 
 ## Data model
 
@@ -40,9 +41,9 @@ row per pair.
 ## Dependencies
 
 `manifest.depends = ["contacts", "inventory", "suppliers"]`. The module
-imports `Contact` (for the supplier `name` join and in-clinic validation),
-`InventoryItem` (the item end of the link), and references `suppliers.id`
-via FK. All three are declared deps.
+imports `Supplier` (the FK target, validated in-clinic at creation),
+`Contact` (for the supplier `name` join) and `InventoryItem` (the item end
+of the link). All three are declared deps.
 
 ## Permissions
 

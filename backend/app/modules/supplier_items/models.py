@@ -13,7 +13,6 @@ filter active rows; ``delete`` deactivates.
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from sqlalchemy import ForeignKey, Numeric, String, UniqueConstraint
@@ -21,9 +20,6 @@ from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base, TimestampMixin
-
-if TYPE_CHECKING:
-    pass
 
 
 class SupplierItem(Base, TimestampMixin):

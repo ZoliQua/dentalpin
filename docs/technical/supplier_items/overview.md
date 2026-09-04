@@ -12,16 +12,16 @@ inventory_reorder (#227-4).
 
 ## What it is
 
-Admin-authenticated CRUD under `/api/v1/supplier-items/` (JWT + RBAC).
+Admin-authenticated CRUD under `/api/v1/supplier_items/` (JWT + RBAC).
 A clinic links its suppliers to inventory items, one pricing row per
 `(supplier, item)` pair.
 
 Routes:
-- `GET /api/v1/supplier-items` — list with `supplier_id` / `inventory_item_id` filtering
-- `GET /api/v1/supplier-items/{id}` — get one
-- `POST /api/v1/supplier-items` — create a link (201)
-- `PATCH /api/v1/supplier-items/{id}` — update SKU / price
-- `DELETE /api/v1/supplier-items/{id}` — soft-delete the link (204, sets `is_active=false`)
+- `GET /api/v1/supplier_items` — list with `supplier_id` / `inventory_item_id` filtering
+- `GET /api/v1/supplier_items/{id}` — get one
+- `POST /api/v1/supplier_items` — create a link (201)
+- `PATCH /api/v1/supplier_items/{id}` — update SKU / price
+- `DELETE /api/v1/supplier_items/{id}` — soft-delete the link (204, sets `is_active=false`)
 
 ## Data model
 
@@ -37,8 +37,9 @@ depending on `suppliers@supp_0001` + `inventory@inv_0002`.
 ## Service layer
 
 `SupplierItemService` encapsulates the link lifecycle:
-- `create_link`: Validates both ends exist in-clinic (supplier must be
-  `contact_type='supplier'`), returns `(link, supplier_name, item_name)` so
+- `create_link`: Validates both ends exist in-clinic (the `suppliers` row
+  and the `inventory_items` row), revives a soft-deleted row for the same
+  pair instead of 409ing, and returns `(link, supplier_name, item_name)` so
   routers/tools build denormalized responses without extra queries.
 - `list_links`: Paginated join query, optional `supplier_id` /
   `inventory_item_id` filters, active-only.
@@ -69,8 +70,8 @@ in-clinic at creation (L1).
 ## Constraints
 
 Own Alembic branch (`supplier_items`) depending on `suppliers@supp_0001` +
-`inventory@inv_0002` — the module imports the `Supplier` (via `contacts.
-Contact`) and `InventoryItem` models. `manifest.depends =
+`inventory@inv_0002` — the module imports the `Supplier`, `Contact` and
+`InventoryItem` models. `manifest.depends =
 ["contacts", "inventory", "suppliers"]`.
 
 See [`./permissions.md`](./permissions.md) and [`./events.md`](./events.md)

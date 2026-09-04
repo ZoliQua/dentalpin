@@ -30,3 +30,6 @@
   `version_locations` so the Alembic CLI graph (heads/upgrade) resolves
   `sui_0001` (CI parity), and as a `dentalpin.modules` entry point in
   `backend/pyproject.toml` (production loader parity).
+- Review fixes: `create_link` validates the `suppliers` row (FK target)
+  rather than only the Contact, and revives a soft-deleted row for the same
+  pair instead of returning 409 — a deactivated pair can be linked again.
