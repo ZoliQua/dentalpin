@@ -43,6 +43,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `reports` | 0.1.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 3 | 0 | 0 | yes |
 | `schedules` | 0.1.0 | official | agenda | auto | yes | 8 | 0 | 4 | yes |
 | `staff_tasks` | 0.1.0 | community | — | manual | yes | 2 | 2 | 0 | yes |
+| `supplier_items` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 0 | 0 | no |
 | `suppliers` | 0.1.0 | official | contacts | manual | yes | 2 | 0 | 0 | no |
 | `telephony` | 0.1.0 | community | patients | manual | yes | 4 | 5 | 0 | yes |
 | `treatment_consumables` | 0.1.0 | community | catalog, inventory | manual | yes | 2 | 0 | 1 | yes |
@@ -826,6 +827,23 @@ Staff handoff board — internal tasks and handoffs between team members.
   - `staff_task.status_changed`
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/staff_tasks/CLAUDE.md`](../backend/app/modules/staff_tasks/CLAUDE.md)
+
+### `supplier_items` — v0.1.0
+
+Links inventory items to suppliers (multi-vendor, SKU and price).
+
+- **Author:** lamanji
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `contacts`, `inventory`, `suppliers`
+- **Frontend layer:** —
+- **Permissions:**
+  - `supplier_items.read`
+  - `supplier_items.write`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/supplier_items/CLAUDE.md`](../backend/app/modules/supplier_items/CLAUDE.md)
 
 ### `suppliers` — v0.1.0
 
