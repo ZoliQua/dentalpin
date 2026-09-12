@@ -63,10 +63,14 @@ def warn_if_host_only(request: Request | None) -> None:
 
     A cookie without ``Domain`` is host-only. When the app is served from
     another host than the API, the browser keeps the session cookies for
-    the API host: client-side calls still work, but a server-rendered page
-    load carries no cookie at all, so every reload lands on ``/login``.
-    Nothing fails loudly at deploy time, so say it here, once, with the
-    value to set.
+    the API host. Client-side reads still work, because the browser
+    attaches them to the API host itself, so the deployment looks healthy;
+    what breaks is everything that needs the cookies on the app's own
+    origin. A server-rendered page load carries no cookie at all and lands
+    on ``/login`` (#444), and ``dp_csrf`` - the JS-readable half of the
+    double-submit pair - is unreadable there, so every unsafe request goes
+    out without ``X-CSRF-Token`` and is refused with 403 (#448). Nothing
+    fails at deploy time, so say it here, once, with the value to set.
     """
     global _HOST_ONLY_WARNED
     if _HOST_ONLY_WARNED or _domain() or request is None:
@@ -85,8 +89,9 @@ def warn_if_host_only(request: Request | None) -> None:
     )
     logger.warning(
         "Session cookies are host-only: the app (%s) and the API (%s) are different hosts "
-        "and COOKIE_DOMAIN is empty, so the browser never sends dp_access/dp_refresh to the "
-        "app and every page reload will redirect to /login - %s.",
+        "and COOKIE_DOMAIN is empty, so the browser never sends them to the app. Every "
+        "server-rendered page load will redirect to /login (#444) and every write will fail "
+        "with 403 CSRF token missing, because the app cannot read dp_csrf either (#448) - %s.",
         app_host,
         api_host,
         fix,
