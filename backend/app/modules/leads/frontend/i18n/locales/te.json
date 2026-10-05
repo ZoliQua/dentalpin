@@ -92,6 +92,10 @@
       "rotate": "కీ రూపొందించండి / మార్చండి",
       "rotateWarning": "కీని మార్చడం లీక్ అయిన కీని వెంటనే ఆపుతుంది. కొత్త కీని మీ వెబ్‌సైట్‌లో అతికించడం గుర్తుంచుకోండి — అప్పటి వరకు ఫారం పని చేయదు.",
       "rotateCopyOnce": "ఈ కీని ఇప్పుడే కాపీ చేయండి: ఇది ఒకసారి మాత్రమే చూపబడుతుంది.",
+      "confirmRotate": {
+        "title": "Rotate intake key?",
+        "message": "The current key stops working immediately. Any website still using it will fail until you paste the new key in."
+      },
       "copied": "కాపీ అయింది",
       "activate": "ఇన్‌టేక్ ప్రారంభించండి",
       "deactivate": "ఇన్‌టేక్ నిలిపివేయండి",
