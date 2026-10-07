@@ -63,7 +63,7 @@ way patient invoices are issued. That is the opposite of what the
 XDENT comparison implied, and the docs/marketing sentence should say
 so.
 
-### 2. Format: FatturaPA v1.9, schema VFPR12 1.2.2 (vendored)
+### 2. Format: FatturaPA v1.9, FPR12 per the vendored 1.2.2 XSD
 
 - The current AdE "Specifiche tecniche" are **version 1.9**, in force
   since 1 April 2025 (allegato A to provvedimento AdE, downloaded as
@@ -190,8 +190,8 @@ configuration recommendation, not a code constraint.
    **only invoices whose recipient is a soggetto passivo IVA / PA**.
    Invoices to natural persons are never queued; the hook enforces
    this from the recipient's fiscal identity, not from a checkbox.
-2. XML: FatturaPA v1.9 / VFPR12 1.2.2, `FPR12`, unsigned, validated
-   against the vendored XSD in tests. Catalog items carry an IVA
+2. XML: FatturaPA v1.9 / `FPR12` per `Schema_del_file_xml_FatturaPA_v1.2.2.xsd`,
+   unsigned, validated against the vendored XSD in tests. Catalog items carry an IVA
    treatment (`N4` exempt art. 10 n. 18 / 22%); exempt invoices over
    €77.47 get `DatiBollo`.
 3. Transport is a driver interface with three implementations, in
