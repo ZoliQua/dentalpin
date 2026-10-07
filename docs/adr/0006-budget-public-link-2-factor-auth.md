@@ -77,9 +77,11 @@ authenticated request.
   cannot lock the legitimate patient's link. Recovery is staff-side:
   reception clears the lock with `unlock-public`
   (`POST /budgets/{id}/unlock-public`, `budget.write`), which nulls
-  `public_locked_at` so the existing token works again; reissue (new
-  version, new token, old token permanently dead) remains the answer
-  when the link itself is considered burned.
+  `public_locked_at` and drops the budget's failed-attempt rows (else
+  the all-time counter would re-lock on the next wrong guess), so the
+  existing token works again; reissue (new version, new token, old
+  token permanently dead) remains the answer when the link itself is
+  considered burned.
 - 20 failed attempts per IP per hour → 429 across all public endpoints.
 
 ## Consequences

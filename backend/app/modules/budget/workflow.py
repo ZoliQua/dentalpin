@@ -685,8 +685,22 @@ class BudgetWorkflowService:
         db: AsyncSession,
         budget: Budget,
     ) -> Budget:
-        """Clear ``public_locked_at`` so the existing token works again."""
+        """Clear ``public_locked_at`` so the existing token works again.
+
+        Also drops the budget's *failed* access rows: the lockout counts
+        all-time failures, so without this the next wrong guess would
+        re-lock instantly and the recovery would be one-shot. Success
+        rows (views, downloads, decisions) stay for audit.
+        """
+        from sqlalchemy import delete as _delete
+
         budget.public_locked_at = None
+        await db.execute(
+            _delete(BudgetAccessLog).where(
+                BudgetAccessLog.budget_id == budget.id,
+                BudgetAccessLog.success.is_(False),
+            )
+        )
         await db.flush()
         return budget
 

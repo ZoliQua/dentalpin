@@ -390,6 +390,26 @@ async def test_lockout_partitioned_by_attacker_ip(db_session: AsyncSession, t1_s
 
 
 @pytest.mark.asyncio
+async def test_unlock_clears_failure_counter(db_session: AsyncSession, t1_setup: dict) -> None:
+    """Unlocked links stay unlocked: the counter rows go with the flag (#531)."""
+    from app.modules.budget.workflow import BudgetWorkflowService
+
+    budget = t1_setup["budget"]
+    await _seed_failures(db_session, budget.id, "attacker-ip", 9)
+    ok, code = await BudgetWorkflowService.verify_public_access(
+        db_session, budget, "phone_last4", "0000", "attacker-ip"
+    )
+    assert (ok, code) == (False, "locked")
+    await BudgetWorkflowService.unlock_public(db_session, budget)
+    assert budget.public_locked_at is None
+    ok, code = await BudgetWorkflowService.verify_public_access(
+        db_session, budget, "phone_last4", "0000", "attacker-ip"
+    )
+    assert (ok, code) == (False, "invalid")
+    assert budget.public_locked_at is None
+
+
+@pytest.mark.asyncio
 async def test_lockout_ignores_other_ips_failures(db_session: AsyncSession, t1_setup: dict) -> None:
     """Nine failures from A do not lock out B: B's bad guess is invalid (#531)."""
     from app.modules.budget.workflow import BudgetWorkflowService
