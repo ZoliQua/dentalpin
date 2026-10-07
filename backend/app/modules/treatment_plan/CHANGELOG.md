@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- refactor: the nine `event_bus.publish` call sites that named their event
+  with a string literal now use the matching `EventType` constant
+  (`treatment_plan.created`, `.status_changed`, `.treatment_added`,
+  `.treatment_removed`, `.treatment_completed`,
+  `.budget_sync_requested`). Identical strings, so no behaviour change —
+  but a typo in a literal publishes to nobody and raises nothing, and
+  this module was the only one still publishing that way. A new guard,
+  `tests/test_event_name_constants.py`, fails on any literal publish
+  under `app/`.
+
 - fix(#590): the professional-membership validation tolerates duplicated
   membership rows (`.limit(1)` existence read, same fix as #598 for
   orthodontics). `clinic_memberships` has no unique `(clinic_id, user_id)`
