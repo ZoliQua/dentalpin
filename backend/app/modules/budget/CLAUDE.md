@@ -16,7 +16,7 @@ Routes mounted at `/api/v1/budget/`. Authenticated subset:
 - `GET  /budgets/{id}/signature` — signature metadata (no raw PNG).
 
 Public subset (no staff auth, 2-factor verification — ADR 0006) under
-`/api/v1/public/budgets/{token}/`:
+`/api/v1/budget/public/budgets/{token}/`:
 
 - `GET    /meta`
 - `POST   /verify`           (rate-limited; sets HttpOnly cookie)

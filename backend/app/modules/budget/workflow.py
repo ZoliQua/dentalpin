@@ -41,7 +41,7 @@ PUBLIC_REJECTION_REASONS: set[str] = {"price", "time", "second_opinion", "other"
 # Lockout / rate-limit policy. See ADR 0006.
 PUBLIC_AUTH_FAIL_LIMIT_WINDOW = 5  # failures inside the rolling window
 PUBLIC_AUTH_FAIL_WINDOW = timedelta(minutes=15)
-PUBLIC_AUTH_TOTAL_FAIL_LOCKOUT = 10  # total failures → permanent token lock
+PUBLIC_AUTH_TOTAL_FAIL_LOCKOUT = 10  # same-IP total failures → token lock
 PUBLIC_SESSION_TTL = timedelta(minutes=30)
 
 # Default budget validity period when the clinic has no override.
@@ -747,8 +747,8 @@ class BudgetWorkflowService:
         - ``method_mismatch`` — caller used the wrong method.
         - ``invalid`` — wrong value.
 
-        On the 10th total failed attempt the function sets
-        ``public_locked_at`` and returns ``(False, "locked")``.
+        On the 10th failed attempt from the same IP hash the function
+        sets ``public_locked_at`` and returns ``(False, "locked")``.
         """
         if budget.public_locked_at is not None:
             return False, "locked"
@@ -786,10 +786,13 @@ class BudgetWorkflowService:
         await db.flush()
 
         if not ok:
+            # Partition the permanent lockout by (budget, IP): failures from
+            # one machine must not lock the victim's link for everyone (#531).
             total_fail_count = (
                 await db.execute(
                     select(func.count(BudgetAccessLog.id)).where(
                         BudgetAccessLog.budget_id == budget.id,
+                        BudgetAccessLog.ip_hash == ip_hash,
                         BudgetAccessLog.success.is_(False),
                     )
                 )

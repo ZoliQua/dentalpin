@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- fix(#531): the verify permanent lockout counts failures per (budget,
+  IP hash) so one attacker's guesses cannot lock the patient's link;
+  the staff `unlock-public` recovery path is now documented in ADR 0006.
+- fix(#538): `BUDGET_PUBLIC_SECRET_KEY` is hard-required in production
+  (refuses to sign public sessions with the staff-JWT key); dev-only
+  fallback otherwise.
+- feat(#540): public accept/reject decisions are logged to
+  `BudgetAccessLog` like the other public actions.
 - feat(i18n): Telugu (`te`) quote PDF labels.
 - fix: the public `/meta` patient-name lookup is now clinic-scoped
   (`AND clinic_id`). The id already comes from the budget's own row so this

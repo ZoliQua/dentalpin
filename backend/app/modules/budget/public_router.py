@@ -63,11 +63,19 @@ public_router = APIRouter()
 def _public_secret() -> str:
     """Resolve the secret used to sign public budget session cookies.
 
-    Production deploys must set ``BUDGET_PUBLIC_SECRET_KEY``. In
-    development we fall back to ``SECRET_KEY`` so local runs work
-    without extra setup, but this is logged once on startup.
+    Production deploys must set ``BUDGET_PUBLIC_SECRET_KEY`` — serving
+    public routes without it would sign patient sessions with the
+    staff-JWT key. In development we fall back to ``SECRET_KEY`` so
+    local runs work without extra setup.
     """
-    return settings.BUDGET_PUBLIC_SECRET_KEY or settings.SECRET_KEY
+    if settings.BUDGET_PUBLIC_SECRET_KEY:
+        return settings.BUDGET_PUBLIC_SECRET_KEY
+    if settings.ENVIRONMENT == "production":
+        raise RuntimeError(
+            "BUDGET_PUBLIC_SECRET_KEY is required in production: refusing to "
+            "sign public budget sessions with the staff-JWT key."
+        )
+    return settings.SECRET_KEY
 
 
 def _cookie_name(token: UUID) -> str:
@@ -378,6 +386,16 @@ async def accept_public_budget(
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    from .models import BudgetAccessLog
+
+    db.add(
+        BudgetAccessLog(
+            budget_id=budget.id,
+            ip_hash=_hash_ip(request.client.host if request.client else None),
+            success=True,
+            method_attempted="accept",
+        )
+    )
     await db.commit()
     return ApiResponse(
         data=PublicBudgetMeta(
@@ -509,6 +527,16 @@ async def reject_public_budget(
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
+    from .models import BudgetAccessLog
+
+    db.add(
+        BudgetAccessLog(
+            budget_id=budget.id,
+            ip_hash=_hash_ip(request.client.host if request.client else None),
+            success=True,
+            method_attempted="reject",
+        )
+    )
     await db.commit()
     return ApiResponse(
         data=PublicBudgetMeta(

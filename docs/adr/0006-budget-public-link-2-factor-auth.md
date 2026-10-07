@@ -61,19 +61,25 @@ The public budget link is protected by **two factors**:
    `public_auth_method = "none"` for new budgets.
 
 Successful verification issues an **HttpOnly + Secure + SameSite=Strict
-cookie** scoped to `/api/v1/public/budgets/<token>`, signed with a
-dedicated secret `BUDGET_PUBLIC_SECRET_KEY` independent of the global
-`SECRET_KEY` used for staff JWTs. TTL: 30 minutes, renewed on every
+cookie** scoped to `/api/v1/budget/public/budgets/<token>`, signed
+with a dedicated secret `BUDGET_PUBLIC_SECRET_KEY` independent of the
+global `SECRET_KEY` used for staff JWTs (hard-required in production;
+dev-only fallback otherwise). TTL: 30 minutes, renewed on every
 authenticated request.
 
 **Rate limiting and lockout** are enforced server-side over a new
 `budget_access_logs` table:
 
 - 5 failed attempts per token in 15 minutes → 429.
-- 10 total failed attempts → `budgets.public_locked_at` is set, the
-  token becomes invalid, the budget moves to "needs reissue", and
-  reception receives a notification. Reissue creates a new budget
-  version with a new token; the old token is permanently dead.
+- 10 total failed attempts **from the same IP hash against the same
+  budget** → `budgets.public_locked_at` is set and the token stops
+  verifying. Partitioning by (budget, IP) means one attacker's guesses
+  cannot lock the legitimate patient's link. Recovery is staff-side:
+  reception clears the lock with `unlock-public`
+  (`POST /budgets/{id}/unlock-public`, `budget.write`), which nulls
+  `public_locked_at` so the existing token works again; reissue (new
+  version, new token, old token permanently dead) remains the answer
+  when the link itself is considered burned.
 - 20 failed attempts per IP per hour → 429 across all public endpoints.
 
 ## Consequences
