@@ -105,6 +105,17 @@ class ErasureRequest(BaseModel):
     rationale: str | None = Field(default=None, max_length=2000)
 
 
+#: Coverage limitation recorded on every erasure result (#546): only
+#: patient-row identity fields are blanked. Notes, budgets, media and
+#: other module data are untouched, and no module subscribes to
+#: ``gdpr.erasure.executed`` — a completed DSR must never read as
+#: full coverage.
+ERASURE_COVERAGE_NOTE = (
+    "Patient-row identity fields only; notes, budgets, media and other "
+    "module data are not touched (no cross-module fan-out)."
+)
+
+
 class ErasureResult(BaseModel):
     """Result of a partial erasure run."""
 
@@ -113,6 +124,7 @@ class ErasureResult(BaseModel):
     audit_log_id: UUID
     # Patient identity fields kept under the legal-hold gate, if any.
     retained_categories: list[str] = Field(default_factory=list)
+    coverage_note: str = ERASURE_COVERAGE_NOTE
 
 
 class ErasureAuditResponse(BaseModel):

@@ -29,6 +29,14 @@ operator runs — not the Python internals.
   suffixes: browsers treat each subdomain as a different site and reject
   `COOKIE_DOMAIN=.onrender.com`, so login answers 200 and `/auth/me` 401.
   Put a custom domain on both services, or serve them from one origin.
+- **No custom domain (Render, Railway, Vercel…)?** Let the frontend proxy
+  `/api/v1` to the backend, so the browser only ever talks to the app's
+  origin and the cookies are host-only. On the **frontend** service:
+  `NUXT_API_PROXY=true`, `NUXT_PUBLIC_API_BASE_URL=https://<app-host>`
+  (the app's own URL) and `NUXT_API_BASE_URL_SERVER=https://<api-host>`.
+  On the **backend**: `ALLOWED_ORIGINS=https://<app-host>`, `ENVIRONMENT=production`,
+  `COOKIE_DOMAIN` empty. The API host stays reachable directly; see #623
+  for restricting which proxies the backend trusts for client IPs.
 
 Smoke-check:
 
@@ -352,7 +360,7 @@ DELETE FROM alembic_version;
 | Uninstall blocked: "required by ..." | Reverse dependency exists | Uninstall dependents first, or `--force` |
 | Logged out on every page refresh, while clicking around works | App and API on different hosts with `COOKIE_DOMAIN` empty, so the session cookies never reach the app | Set `COOKIE_DOMAIN` to the shared parent domain (e.g. `.example.com`) and restart the backend |
 | Every save answers `403 CSRF token missing or invalid`, while reading works | Same cause: the app cannot read the `dp_csrf` cookie, so the `X-CSRF-Token` header is never sent | Same fix: set `COOKIE_DOMAIN` to the shared parent domain |
-| Login answers 200, then `/auth/me` 401 and back to the login screen | App and API on a hosting domain that is a public suffix (`*.onrender.com`, `*.vercel.app`…): the browser rejects the cookies | Put a custom domain on both (`app.example.com` + `api.example.com`) and set `COOKIE_DOMAIN=.example.com` |
+| Login answers 200, then `/auth/me` 401 and back to the login screen | App and API on a hosting domain that is a public suffix (`*.onrender.com`, `*.vercel.app`…): the browser rejects the cookies | Put a custom domain on both (`app.example.com` + `api.example.com`) and set `COOKIE_DOMAIN=.example.com`, or turn on the frontend's same-origin proxy (`NUXT_API_PROXY=true`, §1) |
 
 ---
 

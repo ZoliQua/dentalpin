@@ -11,7 +11,7 @@ const { can } = usePermissions()
 const route = useRoute()
 const router = useRouter()
 const { fetchStudies } = useImagingViewer()
-const { fetchImports, triggerScan, approveImport, rejectImport, fetchLinks, deleteLink } = useRvgImport()
+const { fetchImports, fetchImportCounts, triggerScan, approveImport, rejectImport, fetchLinks, deleteLink } = useRvgImport()
 const toast = useToast()
 const api = useApi()
 
@@ -112,12 +112,17 @@ function formatStudyDate(s: ImagingStudy) {
   return d.toLocaleDateString(locale.value, { timeZone: 'UTC' })
 }
 
+const queueStatuses = ['pending', 'approved', 'rejected', 'failed'] as const
+type QueueStatus = typeof queueStatuses[number]
+const activeQueueTab = ref<QueueStatus>('pending')
+const queueCounts = ref<Record<string, number>>({})
+
 async function loadQueue() {
   if (!canRvgRead.value) return
   queueLoading.value = true
   actionError.value = null
   try {
-    const res = await fetchImports('pending')
+    const res = await fetchImports(activeQueueTab.value)
     queue.value = res.data
     queueTotal.value = res.total
   } catch {
@@ -125,6 +130,18 @@ async function loadQueue() {
   } finally {
     queueLoading.value = false
   }
+  try {
+    queueCounts.value = await fetchImportCounts()
+  } catch {
+    // Counts are decorative: a failed counts call must not blank the list.
+    queueCounts.value = {}
+  }
+}
+
+function selectQueueTab(status: QueueStatus) {
+  if (activeQueueTab.value === status) return
+  activeQueueTab.value = status
+  void loadQueue()
 }
 
 async function scanNow() {
@@ -324,7 +341,7 @@ onMounted(() => {
     <UCard v-if="canRvgRead">
       <template #header>
         <div class="flex items-center justify-between">
-          <span class="font-medium">{{ t('imagingViewer.rvg.title', { total: queueTotal }) }}</span>
+          <span class="font-medium">{{ t('imagingViewer.rvg.title') }}</span>
           <UButton
             v-if="canRvgWrite"
             icon="i-lucide-refresh-cw"
@@ -335,6 +352,24 @@ onMounted(() => {
           </UButton>
         </div>
       </template>
+      <div class="flex flex-wrap gap-1">
+        <UButton
+          v-for="s in queueStatuses"
+          :key="s"
+          size="xs"
+          :variant="activeQueueTab === s ? 'solid' : 'soft'"
+          @click="selectQueueTab(s)"
+        >
+          {{ t(`imagingViewer.rvg.status.${s}`) }}
+          <UBadge
+            size="xs"
+            :color="activeQueueTab === s ? 'neutral' : 'info'"
+            variant="soft"
+          >
+            {{ queueCounts[s] ?? 0 }}
+          </UBadge>
+        </UButton>
+      </div>
       <UAlert
         v-if="actionError"
         color="error"
@@ -362,12 +397,21 @@ onMounted(() => {
             <p class="text-sm font-medium">
               {{ row.filename }}
             </p>
-            <p class="text-xs text-gray-500">
+            <p
+              v-if="activeQueueTab === 'pending'"
+              class="text-xs text-gray-500"
+            >
               {{ suggestionLabel(row) }}
+            </p>
+            <p
+              v-if="row.error"
+              class="text-xs text-red-500"
+            >
+              {{ row.error }}
             </p>
           </div>
           <div
-            v-if="canRvgWrite"
+            v-if="canRvgWrite && activeQueueTab === 'pending'"
             class="flex gap-2"
           >
             <UButton

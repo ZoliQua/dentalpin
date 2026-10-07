@@ -14,7 +14,6 @@
       "showAll": "Afficher tous les statuts"
     },
     "receivedAt": "Reçu",
-    "availability": "Disponibilité",
     "newLead": "Nouvelle demande",
     "websiteForm": "Formulaire web",
     "status": {
@@ -42,7 +41,6 @@
     },
     "convert": {
       "title": "Convertir en patient",
-      "subtitle": "Vérifiez la demande et complétez la fiche du patient",
       "enquiry": "Demande",
       "patient": "Patient",
       "createPatient": "Créer le patient",
@@ -66,7 +64,6 @@
       "evening": "Soirées"
     },
     "routing": {
-      "explainer": "Les demandes dont le téléphone ou l'e-mail appartient déjà à un patient ne créent pas de nouvelle demande — elles sont ajoutées aux Rappels sous forme d'appel à effectuer.",
       "recallQueued": "{name} est déjà patient — un appel a été ajouté aux Rappels.",
       "openRecalls": "Ouvrir les Rappels"
     },
@@ -82,7 +79,6 @@
       "atLimit": "L'entrée est en pause jusqu'à demain : la limite du jour est atteinte.",
       "capLoweredWarning": "Abaisser la limite en dessous du nombre du jour bloque l'entrée immédiatement.",
       "keyTitle": "Clé d'entrée",
-      "keyConfigured": "Configurée",
       "keyMissing": "Pas encore de clé : l'entrée est fermée jusqu'à ce que vous en créiez une.",
       "keyPrefix": "Préfixe",
       "keyActive": "Active",
@@ -98,7 +94,6 @@
       "rotateCopyOnce": "Copiez cette clé maintenant : elle ne s'affiche qu'une seule fois.",
       "copied": "Copié",
       "activate": "Activer l'entrée",
-      "deactivate": "Désactiver l'entrée",
       "intakeUrl": "URL d'entrée",
       "example": "Exemple de requête",
       "routingNote": "Les demandes dont le téléphone ou l'e-mail appartient déjà à un patient ne créent pas de nouvelle demande — elles sont ajoutées aux Rappels pour un appel à effectuer.",
@@ -107,7 +102,6 @@
       "copy": "Copier"
     },
     "errors": {
-      "load": "Les demandes n'ont pas pu être chargées",
       "save": "La demande n'a pas pu être enregistrée",
       "convert": "Le patient n'a pas pu être créé",
       "settingsLoad": "Les paramètres n'ont pas pu être chargés",

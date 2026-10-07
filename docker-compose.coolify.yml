@@ -23,6 +23,18 @@ services:
       SERVICE_FQDN_BACKEND_8000: ${BACKEND_FQDN}
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dental}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-dental_clinic}
       SECRET_KEY: ${SECRET_KEY}
+      # `console` logs the whole message and reports it sent (#614).
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-console}
+      EMAIL_ENABLED: ${EMAIL_ENABLED:-true}
+      EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST:-smtp.gmail.com}
+      EMAIL_SMTP_PORT: ${EMAIL_SMTP_PORT:-587}
+      # Real default, not ${X:-}: an empty value fails pydantic bool parsing
+      # at boot (#604).
+      EMAIL_SMTP_TLS: ${EMAIL_SMTP_TLS:-true}
+      EMAIL_SMTP_USER: ${EMAIL_SMTP_USER:-}
+      EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD:-}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-noreply@dentalpin.com}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-DentalPin}
       ENVIRONMENT: production
       ALLOWED_ORIGINS: ${FRONTEND_URL}
       # App and API live on different hosts here, so the session cookies

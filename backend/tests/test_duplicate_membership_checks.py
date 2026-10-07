@@ -1,12 +1,10 @@
-"""Duplicate clinic_memberships rows must not break membership checks.
+"""Membership checks accept members and reject non-members.
 
-``clinic_memberships`` has no unique ``(clinic_id, user_id)`` constraint,
-so a duplicated row used to make every ``scalar_one_or_none()`` existence
-check raise ``MultipleResultsFound`` and 500 the request — the bug
-reported for orthodontics in #590. PR #598 fixed the orthodontics
-checks; these tests pin the same tolerance for the remaining existence
-checks (treatment_plan, schedules professional hours, agenda), which
-share the identical query shape.
+Duplicated ``clinic_memberships`` rows used to make existence checks
+raise ``MultipleResultsFound`` (#590); since core 0009 the unique
+``(clinic_id, user_id)`` constraint makes duplicates impossible, so
+these tests pin the checks against single memberships (plus the
+constraint itself in ``test_membership_unique.py``).
 """
 
 from __future__ import annotations
@@ -23,7 +21,7 @@ from app.modules.schedules.services.professional_hours import ProfessionalHoursS
 from app.modules.treatment_plan.service import _validate_professional_in_clinic
 
 
-async def _professional_with_duplicate_membership(db_session: AsyncSession, clinic_id) -> User:
+async def _professional_member(db_session: AsyncSession, clinic_id) -> User:
     user = User(
         id=uuid4(),
         email=f"dup-{uuid4().hex[:6]}@t.c",
@@ -34,36 +32,34 @@ async def _professional_with_duplicate_membership(db_session: AsyncSession, clin
     )
     db_session.add(user)
     await db_session.flush()
-    for _ in range(2):
-        db_session.add(
-            ClinicMembership(id=uuid4(), user_id=user.id, clinic_id=clinic_id, role="dentist")
-        )
+    db_session.add(
+        ClinicMembership(id=uuid4(), user_id=user.id, clinic_id=clinic_id, role="dentist")
+    )
     await db_session.commit()
     return user
 
 
 @pytest.mark.asyncio
-async def test_treatment_plan_professional_check_tolerates_duplicate_membership(
+async def test_treatment_plan_professional_check_accepts_member(
     db_session: AsyncSession, test_clinic: Clinic
 ):
-    doc = await _professional_with_duplicate_membership(db_session, test_clinic.id)
-    # Must not raise MultipleResultsFound.
+    doc = await _professional_member(db_session, test_clinic.id)
     await _validate_professional_in_clinic(db_session, test_clinic.id, doc.id)
 
 
 @pytest.mark.asyncio
-async def test_professional_hours_is_professional_tolerates_duplicate_membership(
+async def test_professional_hours_is_professional_accepts_member(
     db_session: AsyncSession, test_clinic: Clinic
 ):
-    doc = await _professional_with_duplicate_membership(db_session, test_clinic.id)
+    doc = await _professional_member(db_session, test_clinic.id)
     assert await ProfessionalHoursService.is_professional(db_session, test_clinic.id, doc.id)
 
 
 @pytest.mark.asyncio
-async def test_agenda_professional_access_tolerates_duplicate_membership(
+async def test_agenda_professional_access_accepts_member(
     db_session: AsyncSession, test_clinic: Clinic
 ):
-    doc = await _professional_with_duplicate_membership(db_session, test_clinic.id)
+    doc = await _professional_member(db_session, test_clinic.id)
     assert await AppointmentService.validate_professional_access(db_session, test_clinic.id, doc.id)
 
 

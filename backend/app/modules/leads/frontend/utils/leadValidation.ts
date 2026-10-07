@@ -84,7 +84,6 @@ export interface LeadFormValues {
   email: string
   motive: string
   description?: string
-  availability?: string
 }
 
 export type LeadFormErrors = Partial<Record<keyof LeadFormValues, ValidationKey>>

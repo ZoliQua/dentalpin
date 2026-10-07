@@ -15,11 +15,16 @@ document as accepted, or archive-then-delete.
 
 ## Decision
 
-Accepted as-is. The deleted rows are exact duplicates produced by the
-double-charge bug that `pay_0004` itself repairs (same clinic, patient,
-treatment and session with no distinguishing payload), in a pre-production
-database with no live clinics. Re-running the scenarios that created them
-reproduces nothing once the idempotency guard exists.
+Accepted as-is. The deleted rows are the double-charge bug's output,
+removed in the two steps `pay_0004`'s own docstring describes: step 1
+deletes the NULL-session full-price row where per-session rows exist
+for the same treatment (the double-booked full price, held under a
+different session key and a different amount; the per-session rows are
+the source of truth); step 2 dedupes multiple NULL-session rows per
+treatment, keeping the earliest. This ran at the time of the migration
+(2026-08-01) against a pre-production database with no live clinics.
+Re-running the scenarios that created them reproduces nothing once the
+idempotency guard exists.
 
 ## Consequences
 

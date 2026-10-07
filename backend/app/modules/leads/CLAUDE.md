@@ -262,9 +262,10 @@ Two surfaces, and the cap is not in the environment:
   app are different origins whenever they are not served together, and the
   SPA origin answers the clinic's website with a login redirect. The backend
   returns the path only — it deliberately does not guess hostnames.
-- **slowapi is disabled outside production** (`ENVIRONMENT=production` and not
-  `TESTING`), so no test can assert a 429 from the rate limiter; do not remove
-  the decorators either — they are the production guard.
+- **slowapi is disabled only under `TESTING`** (pytest via conftest, CI e2e
+  via its `.env`), so a 429 CAN be asserted by flipping `limiter.enabled`
+  (see `tests/test_rate_limit.py`); do not remove the decorators either —
+  they are the guard in every other environment (#530).
 
 ## Related ADRs
 

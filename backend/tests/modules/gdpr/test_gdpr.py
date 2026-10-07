@@ -164,6 +164,10 @@ async def test_partial_erasure_blanks_identity_and_never_hard_deletes(
     )
     assert result.erased_categories == ["email"]
     assert result.retained_categories == []
+    # The result records its own partial coverage (#546): a completed
+    # run must never read as full DSR coverage.
+    assert "Patient-row" in result.coverage_note
+    assert "not touched" in result.coverage_note
 
     # Row still exists (never hard-deleted).
     from sqlalchemy import select as sel

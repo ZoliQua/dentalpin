@@ -14,7 +14,6 @@
       "showAll": "Mostrar todos os estados"
     },
     "receivedAt": "Recebido",
-    "availability": "Disponibilidade",
     "newLead": "Novo pedido",
     "websiteForm": "Formulário web",
     "status": {
@@ -42,7 +41,6 @@
     },
     "convert": {
       "title": "Converter em paciente",
-      "subtitle": "Reveja o pedido e complete a ficha do paciente",
       "enquiry": "Pedido",
       "patient": "Paciente",
       "createPatient": "Criar paciente",
@@ -66,7 +64,6 @@
       "evening": "Noites"
     },
     "routing": {
-      "explainer": "Os pedidos cujo telefone ou email já pertence a um paciente não criam um pedido novo — são adicionados às Reconvocações como uma chamada de retorno.",
       "recallQueued": "{name} já é paciente — foi adicionada uma chamada de retorno às Reconvocações.",
       "openRecalls": "Abrir Reconvocações"
     },
@@ -82,7 +79,6 @@
       "atLimit": "A receção de pedidos está em pausa até amanhã: o limite de hoje foi atingido.",
       "capLoweredWarning": "Baixar o limite para menos do que o número de hoje bloqueia de imediato a receção de pedidos.",
       "keyTitle": "Chave de receção de pedidos",
-      "keyConfigured": "Configurada",
       "keyMissing": "Ainda não existe chave — a receção de pedidos está fechada até criar uma.",
       "keyPrefix": "Prefixo",
       "keyActive": "Ativa",
@@ -98,7 +94,6 @@
       "rotateCopyOnce": "Copie esta chave agora: só é apresentada uma vez.",
       "copied": "Copiado",
       "activate": "Ativar receção de pedidos",
-      "deactivate": "Desativar receção de pedidos",
       "intakeUrl": "URL de receção",
       "example": "Exemplo de pedido",
       "routingNote": "Os pedidos cujo telefone ou email já pertence a um paciente não criam um pedido novo — são adicionados às Reconvocações para uma chamada de retorno.",
@@ -107,7 +102,6 @@
       "copy": "Copiar"
     },
     "errors": {
-      "load": "Não foi possível carregar os pedidos",
       "save": "Não foi possível guardar o pedido",
       "convert": "Não foi possível criar o paciente",
       "settingsLoad": "Não foi possível carregar as definições",

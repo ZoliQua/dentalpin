@@ -14,7 +14,6 @@
       "showAll": "Összes állapot megjelenítése"
     },
     "receivedAt": "Beérkezett",
-    "availability": "Elérhetőség",
     "newLead": "Új érdeklődés",
     "websiteForm": "Weboldali űrlap",
     "status": {
@@ -42,7 +41,6 @@
     },
     "convert": {
       "title": "Átalakítás pácienssé",
-      "subtitle": "Ellenőrizze az érdeklődést, és egészítse ki a páciens adatait",
       "enquiry": "Érdeklődés",
       "patient": "Páciens",
       "createPatient": "Páciens létrehozása",
@@ -66,7 +64,6 @@
       "evening": "Este"
     },
     "routing": {
-      "explainer": "Ha egy érdeklődés telefonszáma vagy e-mail-címe már egy pácienshez tartozik, nem jön létre új érdeklődés — helyette visszahívás kerül a Visszahívások közé.",
       "recallQueued": "{name} már páciens — egy visszahívás bekerült a Visszahívások közé.",
       "openRecalls": "Visszahívások megnyitása"
     },
@@ -82,7 +79,6 @@
       "atLimit": "A beküldés holnapig szünetel: elértük a mai limitet.",
       "capLoweredWarning": "Ha a limitet a mai darabszám alá csökkenti, a beküldés azonnal leáll.",
       "keyTitle": "Beküldési kulcs",
-      "keyConfigured": "Beállítva",
       "keyMissing": "Még nincs kulcs — a beküldés zárva van, amíg nem hoz létre egyet.",
       "keyPrefix": "Előtag",
       "keyActive": "Aktív",
@@ -98,7 +94,6 @@
       "rotateCopyOnce": "Másolja ki most ezt a kulcsot: csak egyszer jelenik meg.",
       "copied": "Másolva",
       "activate": "Beküldés engedélyezése",
-      "deactivate": "Beküldés letiltása",
       "intakeUrl": "Beküldési URL",
       "example": "Példakérés",
       "routingNote": "Ha egy érdeklődés telefonszáma vagy e-mail-címe már egy pácienshez tartozik, nem jön létre új érdeklődés — visszahívásként bekerül a Visszahívások közé.",
@@ -107,7 +102,6 @@
       "copy": "Másolás"
     },
     "errors": {
-      "load": "Az érdeklődéseket nem sikerült betölteni",
       "save": "Az érdeklődést nem sikerült elmenteni",
       "convert": "A pácienst nem sikerült létrehozni",
       "settingsLoad": "A beállításokat nem sikerült betölteni",

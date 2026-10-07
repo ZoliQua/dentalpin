@@ -25,7 +25,10 @@ selector muestra carga; un id irresoluble dice "Paciente desconocido",
 nunca un UUID. Las fechas salen en el idioma de la clínica y cada
 botón de borrar anotación tiene nombre accesible. Al lanzar un escaneo
 manual de la carpeta RVG se muestra un resumen (escaneados / nuevos /
-autoaprobados / fallidos). Debajo de la cola de
+autoaprobados / fallidos). La cola RVG tiene
+pestañas por estado (pendientes / aprobadas / rechazadas / fallidas)
+con conteos en vivo; las acciones solo se muestran en pendientes y las
+fallidas muestran su error. Debajo de la cola de
 importación se listan las identidades de sensor vinculadas con el nombre
 del paciente, con acción para desvincular un emparejamiento DICOM erróneo.
 

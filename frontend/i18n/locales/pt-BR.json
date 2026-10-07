@@ -484,7 +484,6 @@
       "save": "Salvar"
     },
     "routing": {
-      "explainer": "Os pedidos cujo telefone ou email já pertence a um paciente não criam um pedido novo — são adicionados aos Reagendamentos como uma chamada de retorno.",
       "recallQueued": "{name} já é paciente — foi adicionada uma chamada de retorno aos Reagendamentos.",
       "openRecalls": "Abrir Reagendamentos"
     },

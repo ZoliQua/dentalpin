@@ -150,6 +150,34 @@ jobs:
             exit 1
           }
 
+  node-image-freshness:
+    # A stale local Node image once hid a missing font package behind a
+    # traceless SSR death (#581), so the Dockerfile base and every CI
+    # setup-node pin must agree on the Node major. Bump them together:
+    # frontend/Dockerfile, frontend/Dockerfile.prod, the node-version
+    # lines below, and package.json engines.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check Node major agreement
+        run: |
+          docker_major=$(sed -n 's/^FROM node:\([0-9][0-9]*\)-.*/\1/p' frontend/Dockerfile | head -1)
+          prod_majors=$(sed -n 's/^FROM node:\([0-9][0-9]*\)-.*/\1/p' frontend/Dockerfile.prod | sort -u | tr '\n' ' ')
+          ci_majors=$(grep -o 'node-version: "[0-9]*"' .github/workflows/ci.yml | grep -o '[0-9]*' | sort -u | tr '\n' ' ')
+          fail=0
+          for got in $prod_majors $ci_majors; do
+            if [ "$got" != "$docker_major" ]; then
+              echo "::error::Node major $got disagrees with frontend/Dockerfile ($docker_major). Bump them together."
+              fail=1
+            fi
+          done
+          if [ -z "$docker_major" ]; then
+            echo "::error::could not read a Node major from frontend/Dockerfile."
+            fail=1
+          fi
+          exit $fail
+
   catalog-freshness:
     # Verifies docs/modules-catalog.md and docs/events-catalog.md are
     # in sync with the manifests + EventType enum + event_bus.publish

@@ -16,11 +16,13 @@ Issue #550 asked to document as accepted, or back up affected rows first.
 ## Decision
 
 Accepted as-is. Statuses outside the canonical set cannot be interpreted
-by the state machine (`VALID_TRANSITIONS`-style guards treat them as
-errors downstream), so preserving them would trade a loud, queryable
-migration for silent breakage later. The rewrite is logged per-row by
-the migration output, and clean installs (the only supported fresh
-shape) are untouched.
+by the state machine (the canonical map `VALID_TRANSITIONS` in
+`backend/app/modules/agenda/service.py:35`, enforced by
+`AppointmentService.transition` at `service.py:637-639`, which raises
+`InvalidTransitionError` for any other value), so preserving them would
+trade a loud, queryable migration for silent breakage later. The
+rewrite itself is silent (one bulk `UPDATE`, no per-row logging), and
+clean installs (the only supported fresh shape) are untouched.
 
 ## Consequences
 

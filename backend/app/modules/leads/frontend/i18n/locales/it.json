@@ -14,7 +14,6 @@
       "showAll": "Mostra tutti gli stati"
     },
     "receivedAt": "Ricevuta",
-    "availability": "Disponibilità",
     "newLead": "Nuova richiesta",
     "websiteForm": "Modulo web",
     "status": {
@@ -42,7 +41,6 @@
     },
     "convert": {
       "title": "Converti in paziente",
-      "subtitle": "Controlla la richiesta e completa la scheda del paziente",
       "enquiry": "Richiesta",
       "patient": "Paziente",
       "createPatient": "Crea paziente",
@@ -66,7 +64,6 @@
       "evening": "Sere"
     },
     "routing": {
-      "explainer": "Le richieste il cui telefono o e-mail appartiene già a un paziente non creano una nuova richiesta — vengono aggiunte ai Richiami come richiamata.",
       "recallQueued": "{name} è già un paziente — è stata aggiunta una richiamata ai Richiami.",
       "openRecalls": "Apri Richiami"
     },
@@ -82,7 +79,6 @@
       "atLimit": "La ricezione è in pausa fino a domani: il limite di oggi è stato raggiunto.",
       "capLoweredWarning": "Abbassare il limite sotto il numero di oggi blocca subito la ricezione.",
       "keyTitle": "Chiave di ricezione",
-      "keyConfigured": "Configurata",
       "keyMissing": "Nessuna chiave ancora — la ricezione è chiusa finché non ne crei una.",
       "keyPrefix": "Prefisso",
       "keyActive": "Attiva",
@@ -98,7 +94,6 @@
       "rotateCopyOnce": "Copia questa chiave adesso: viene mostrata una sola volta.",
       "copied": "Copiato",
       "activate": "Attiva ricezione",
-      "deactivate": "Disattiva ricezione",
       "intakeUrl": "URL di ricezione",
       "example": "Richiesta di esempio",
       "routingNote": "Le richieste il cui telefono o e-mail appartiene già a un paziente non creano una nuova richiesta — vengono aggiunte ai Richiami per una richiamata.",
@@ -107,7 +102,6 @@
       "copy": "Copia"
     },
     "errors": {
-      "load": "Impossibile caricare le richieste",
       "save": "Impossibile salvare la richiesta",
       "convert": "Impossibile creare il paziente",
       "settingsLoad": "Impossibile caricare le impostazioni",

@@ -187,6 +187,9 @@ class ClinicMembership(Base, TimestampMixin):
     """Association between users and clinics with role."""
 
     __tablename__ = "clinic_memberships"
+    __table_args__ = (
+        UniqueConstraint("clinic_id", "user_id", name="uq_clinic_memberships_clinic_user"),
+    )
 
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), index=True)

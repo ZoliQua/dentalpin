@@ -103,6 +103,9 @@ export default defineNuxtConfig({
     // Content-Security-Policy mode for the Nitro middleware (#355):
     // off | report | enforce — overridden at runtime by NUXT_CSP_MODE.
     cspMode: process.env.NUXT_CSP_MODE || 'off',
+    // Same-origin /api/v1 proxy to apiBaseUrlServer for split-domain PaaS
+    // hosts — see server/routes/api/v1/[...path].ts. NUXT_API_PROXY=true.
+    apiProxy: process.env.NUXT_API_PROXY || 'false',
     public: {
       // Client-side (browser)
       apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:8000',

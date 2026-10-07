@@ -380,6 +380,7 @@ DEMO_MODE=false           # public demo: blocks user edits/removal + module life
 
 - **"relation does not exist"** / tables wiped after tests: `./scripts/reset-db.sh` then `./scripts/seed-demo.sh`. Manual fallback: `DELETE FROM alembic_version;` then `python -m app.cli db upgrade`.
 - **Frontend changes not showing**: `docker-compose up -d --build frontend`.
+- **Traceless SSR death / stale Node image** (#581): an old anonymous `node_modules` volume or image can shadow the fresh lockfile (exactly one file missing is enough). Rebuild with `docker compose up -d --build frontend`; CI pins the Node major (`node-image-freshness`).
 - **Permission denied but should have access**: check `clinic_memberships` row, exact permission string, `/me` payload, then re-login.
 
 ---

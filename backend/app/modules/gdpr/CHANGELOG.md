@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#546): erasure results record their partial coverage on the
+  response (`coverage_note`): patient-row identity fields only, no
+  cross-module fan-out — a completed run never reads as full DSR
+  coverage.
 - Maintainer-review fixes (PR #374, part of #44): closed erasure
   vocabulary `ErasureCategory` (`email | phone | identity`, 422 on anything
   else) in the schema and tool args so an erasure can never report a

@@ -131,14 +131,22 @@ async def test_delete_blocks_when_role_assigned(client, auth_headers, test_clini
     ).json()["data"]
     role_id = created["id"]
 
-    # Assign a second membership in this role to the test user in test_clinic.
-    user_id = (await client.get("/api/v1/auth/me", headers=auth_headers)).json()["data"]["user"][
-        "id"
-    ]
+    # Assign this role to a second user in test_clinic (one membership per
+    # user per clinic since the unique constraint; the caller stays admin).
+    from app.core.auth.models import User
+
+    staff = User(
+        email=f"duty-{uuid4().hex[:8]}@test.clinic",
+        password_hash="not-a-real-hash",
+        first_name="Duty",
+        last_name="Staff",
+    )
+    db_session.add(staff)
+    await db_session.flush()
     db_session.add(
         ClinicMembership(
             id=uuid4(),
-            user_id=user_id,
+            user_id=staff.id,
             clinic_id=test_clinic.id,
             role="duty",
         )
@@ -235,11 +243,18 @@ async def test_rename_custom_role_follows_memberships(
             "/api/v1/roles", json={"name": "oldname", "permissions": []}, headers=auth_headers
         )
     ).json()["data"]
-    user_id = (await client.get("/api/v1/auth/me", headers=auth_headers)).json()["data"]["user"][
-        "id"
-    ]
+    from app.core.auth.models import User
+
+    staff = User(
+        email=f"oldname-{uuid4().hex[:8]}@test.clinic",
+        password_hash="not-a-real-hash",
+        first_name="Old",
+        last_name="Name",
+    )
+    db_session.add(staff)
+    await db_session.flush()
     db_session.add(
-        ClinicMembership(id=uuid4(), user_id=user_id, clinic_id=test_clinic.id, role="oldname")
+        ClinicMembership(id=uuid4(), user_id=staff.id, clinic_id=test_clinic.id, role="oldname")
     )
     await db_session.commit()
 

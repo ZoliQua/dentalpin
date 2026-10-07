@@ -55,7 +55,20 @@ class EmailService:
             logger.info("Email service using console provider (testing/disabled mode)")
         elif settings.EMAIL_PROVIDER == "console":
             self._provider = ConsoleProvider()
-            logger.info("Email service using console provider")
+            if settings.ENVIRONMENT == "production":
+                # The console provider prints the whole message — recipient,
+                # name, treatment, amount — at INFO, and reports SUCCESS, so
+                # the outbox marks it sent while the patient receives nothing
+                # (#614). EMAIL_PROVIDER is in no compose file and not in
+                # .env.example, so this is reached by omission, not choice.
+                logger.error(
+                    "EMAIL_PROVIDER=console in production: messages are written to "
+                    "the log instead of being delivered, and patient details end up "
+                    "in it. Set EMAIL_PROVIDER=smtp (see .env.example), or "
+                    "EMAIL_ENABLED=false if this instance is not meant to send mail."
+                )
+            else:
+                logger.info("Email service using console provider")
         elif settings.EMAIL_PROVIDER == "smtp":
             self._provider = SMTPProvider(
                 host=settings.EMAIL_SMTP_HOST,

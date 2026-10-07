@@ -18,7 +18,9 @@
       "active": "సక్రియం",
       "paused": "నిలిపివేయబడింది",
       "finished": "పూర్తయింది",
-      "transferred_out": "బయటకు బదిలీ చేయబడింది"
+      "transferred_out": "బయటకు బదిలీ చేయబడింది",
+      "session_pending": "Pending",
+      "session_completed": "Completed"
     },
     "inbox": {
       "title": "ఆర్థోడాంటిక్స్",
@@ -64,7 +66,10 @@
       "noNext": "తదుపరి కంట్రోల్ లేదు",
       "save": "కంట్రోల్ సేవ్ చేయండి",
       "history": "కంట్రోల్స్",
-      "empty": "ఇంకా కంట్రోల్స్ లేవు"
+      "empty": "ఇంకా కంట్రోల్స్ లేవు",
+      "appointment": "Appointment",
+      "session": "Linked session",
+      "sessionHint": "Reference only - collecting happens in Payments."
     },
     "card": {
       "title": "ఆర్థోడాంటిక్స్",
@@ -94,6 +99,29 @@
     "errors": {
       "saveFailed": "సేవ్ చేయలేకపోయాము. దయచేసి మళ్ళీ ప్రయత్నించండి.",
       "loadFailed": "ఆర్థోడాంటిక్ డేటాను లోడ్ చేయలేకపోయాము."
+    },
+    "plan": {
+      "title": "Treatment plan",
+      "link": "Link plan",
+      "unlink": "Unlink plan",
+      "noLink": "No plan linked (transfer patients can track without one)",
+      "completed": "{n} completed",
+      "pending": "{n} pending",
+      "generate": "Generate installments",
+      "collect": "Collect installment",
+      "confirmUnlink": "Unlink the treatment plan?",
+      "downPayment": "Down payment",
+      "installmentN": "Installment {n}",
+      "months": "Months",
+      "monthlyAmount": "Monthly amount",
+      "pendingTotal": "పెండింగ్ మొత్తం: {n}",
+      "closeSuggested": "Case transferred out with a linked plan: consider closing the plan."
+    },
+    "settings": {
+      "title": "Chip catalogs",
+      "wires": "Archwires (one per line)",
+      "procedures": "Procedures (one per line)",
+      "save": "Save catalogs"
     }
   }
 }

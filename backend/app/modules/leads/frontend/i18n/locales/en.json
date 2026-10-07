@@ -14,7 +14,6 @@
       "showAll": "Show all statuses"
     },
     "receivedAt": "Received",
-    "availability": "Availability",
     "newLead": "New lead",
     "websiteForm": "Website form",
     "status": {
@@ -42,7 +41,6 @@
     },
     "convert": {
       "title": "Convert into a patient",
-      "subtitle": "Review the enquiry and complete the patient record",
       "enquiry": "Enquiry",
       "patient": "Patient",
       "createPatient": "Create patient",
@@ -66,7 +64,6 @@
       "evening": "Evenings"
     },
     "routing": {
-      "explainer": "Enquiries whose phone or email already belongs to a patient do not create a lead — they are added to Recalls as a call-back.",
       "recallQueued": "{name} is already a patient — a call-back has been added to Recalls.",
       "openRecalls": "Open Recalls"
     },
@@ -82,7 +79,6 @@
       "atLimit": "Intake is paused until tomorrow: today's limit has been reached.",
       "capLoweredWarning": "Lowering the limit below today's count blocks intake immediately.",
       "keyTitle": "Intake key",
-      "keyConfigured": "Configured",
       "keyMissing": "No key yet — intake is closed until you create one.",
       "keyPrefix": "Prefix",
       "keyActive": "Active",
@@ -98,7 +94,6 @@
       "rotateCopyOnce": "Copy this key now: it is shown only once.",
       "copied": "Copied",
       "activate": "Enable intake",
-      "deactivate": "Disable intake",
       "intakeUrl": "Intake URL",
       "example": "Example request",
       "routingNote": "Enquiries whose phone or email already belongs to a patient do not create a lead — they are added to Recalls for a call-back.",
@@ -107,7 +102,6 @@
       "copy": "Copy"
     },
     "errors": {
-      "load": "The enquiries could not be loaded",
       "save": "The lead could not be saved",
       "convert": "The patient could not be created",
       "settingsLoad": "The settings could not be loaded",
