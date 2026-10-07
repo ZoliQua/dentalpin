@@ -356,8 +356,12 @@ jobs:
         run: |
           git config user.name "ci"
           git config user.email "ci@dentalpin.local"
-          git fetch origin ${{ github.base_ref }} --depth=0
-          if ! git merge --no-edit "origin/${{ github.base_ref }}"; then
+          # checkout already gave us full history (fetch-depth: 0); this
+          # just brings the base branch's current tip. FETCH_HEAD rather
+          # than origin/<base>: the pull_request checkout does not
+          # necessarily configure a remote-tracking ref for it.
+          git fetch --no-tags origin "${{ github.base_ref }}"
+          if ! git merge --no-edit FETCH_HEAD; then
             echo "conflict=true" >> "$GITHUB_OUTPUT"
             git merge --abort
           fi
