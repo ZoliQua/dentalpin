@@ -11,6 +11,27 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Security
+
+- **The backend no longer trusts `X-Forwarded-For` from any peer** (#623).
+  `backend/Dockerfile` and every compose file ran uvicorn with
+  `--forwarded-allow-ips *`; with `*` uvicorn takes the **leftmost**
+  `X-Forwarded-For` entry, which the client writes. The login rate limit
+  keys on `request.client.host` (`get_remote_address`), so a client
+  sending a fresh header per attempt got a fresh bucket per attempt and
+  the limit stopped existing — and the same value is stored as the
+  session's `client_ip`, so the audit trail could be forged with it.
+  The flag is gone; uvicorn now reads `FORWARDED_ALLOW_IPS`, which every
+  compose file sets to loopback plus Docker's address pools and which
+  deployments override for their own proxy chain
+  (`.env.example`, `docs/user-manual/{en,es}/operations.md` §1).
+  Restricted, uvicorn walks the header right-to-left and stops at the
+  first hop outside the list, so the real client is used whether the
+  proxy overwrites the header or appends to it — the append case is
+  spoofable under `*` even behind a proxy. `_client_ip()` no longer
+  re-parses the header, and the backend logs the effective value at
+  startup (error in production if it is still `*`).
+
 ## [2.8.0] - 2026-10-07
 
 ### Added
