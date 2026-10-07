@@ -100,7 +100,11 @@
       "routingNote": "ఫోన్ లేదా ఈమెయిల్ ఇప్పటికే రోగికి చెందిన విచారణలు లీడ్‌ను సృష్టించవు — అవి కాల్-బ్యాక్ కోసం రీకాల్స్‌కు జోడించబడతాయి.",
       "readOnly": "ఈ సెట్టింగ్‌లను మార్చడానికి మీకు అనుమతి లేదు.",
       "noPermission": "ఈ సెట్టింగ్‌లను చూడటానికి మీకు అనుమతి లేదు.",
-      "copy": "కాపీ"
+      "copy": "కాపీ",
+      "confirmRotate": {
+        "message": "The current key stops working immediately. Any website still using it will fail until you paste the new key in.",
+        "title": "Rotate intake key?"
+      }
     },
     "errors": {
       "load": "విచారణలను లోడ్ చేయలేకపోయాము",

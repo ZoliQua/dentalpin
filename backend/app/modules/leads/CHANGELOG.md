@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#622): 2 key(s) added to `te.json` as **English placeholders** so
+  `main` stops failing locale parity. They are not Telugu and must be
+  translated — #622 tracks it, and the rest of the file was verified by a
+  native speaker, so these are the only machine-written strings in it.
+
 ### Added
 
 - feat(i18n): Telugu (`te`) locale for the module's frontend layer.
