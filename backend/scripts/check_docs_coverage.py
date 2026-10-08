@@ -133,6 +133,20 @@ def _parse_frontmatter(text: str) -> dict[str, object]:
         if value == "":
             current_list_key = key
             out[key] = []
+        elif value.startswith("[") and value.endswith("]"):
+            # Flow sequence: `related_permissions: []` or `[a, b]`. This
+            # used to fall through to the string branch below, so `[]`
+            # became the two-character string "[]" and the consumers
+            # iterated it character by character, inventing permissions
+            # '[' and ']' (#543). Still no PyYAML — the schema is
+            # unchanged, only this one syntax was unhandled.
+            current_list_key = None
+            inner = value[1:-1].strip()
+            out[key] = (
+                [item.strip().strip("\"'") for item in inner.split(",") if item.strip()]
+                if inner
+                else []
+            )
         else:
             current_list_key = None
             out[key] = value.strip("\"'")
@@ -156,8 +170,18 @@ class ModuleFacts:
 
 
 HTTP_METHODS = ("get", "post", "put", "patch", "delete")
+# Both router objects a module can expose. `public_router` was invisible
+# here (#543), so every screen documenting an unauthenticated endpoint —
+# the budget public link, the push-subscribe page — was reported as
+# referencing something that does not exist.
 ROUTER_DECORATOR_RE = re.compile(
-    r"@router\.(?P<method>get|post|put|patch|delete)\(\s*[\"'](?P<path>[^\"']*)[\"']",
+    r"@(?P<obj>router|public_router)\."
+    r"(?P<method>get|post|put|patch|delete)\(\s*[\"'](?P<path>[^\"']*)[\"']",
+)
+# A router may carry its own prefix, e.g. `APIRouter(prefix="/public/push")`
+# in notifications. Without this the scanned path misses that segment.
+ROUTER_PREFIX_RE = re.compile(
+    r"(?P<obj>router|public_router)\s*=\s*APIRouter\((?P<args>[^)]*)\)", re.S
 )
 # First arg of an event_bus.publish(...) call. Captures the four shapes a
 # module can publish through so the "events.md required" rule below fires
@@ -178,13 +202,20 @@ def _scan_module_endpoints(mod_dir: Path, mount_prefix: str) -> list[tuple[str, 
     """Return [(METHOD, '/api/v1/<m>/<path>')] for every router decorator."""
     endpoints: list[tuple[str, str]] = []
     for py_file in mod_dir.rglob("*.py"):
-        text = py_file.read_text(encoding="utf-8", errors="replace")
-        if "@router." not in text:
+        if "__pycache__" in py_file.parts:
             continue
+        text = py_file.read_text(encoding="utf-8", errors="replace")
+        if "@router." not in text and "@public_router." not in text:
+            continue
+        own_prefix: dict[str, str] = {}
+        for decl in ROUTER_PREFIX_RE.finditer(text):
+            found = re.search(r"prefix\s*=\s*[\"']([^\"']*)[\"']", decl.group("args"))
+            own_prefix[decl.group("obj")] = found.group(1) if found else ""
         for match in ROUTER_DECORATOR_RE.finditer(text):
             method = match.group("method").upper()
             sub_path = match.group("path") or ""
-            full = f"{mount_prefix}{sub_path}".rstrip("/") or mount_prefix
+            inner = own_prefix.get(match.group("obj"), "")
+            full = f"{mount_prefix}{inner}{sub_path}".rstrip("/") or mount_prefix
             endpoints.append((method, full))
     return endpoints
 
@@ -296,15 +327,35 @@ class Findings:
         return not self.errors and not self.warnings
 
 
+def _scan_core_endpoints() -> list[tuple[str, str]]:
+    """Endpoints core mounts itself (auth, roles, modules, agents…).
+
+    ``app/core`` routers are included with ``prefix="/api/v1"`` in
+    ``app.main``, and each carries its own ``APIRouter(prefix=...)``.
+    A screen citing ``GET /api/v1/auth/users`` is documenting a real
+    endpoint, so the union below has to contain it (#543).
+    """
+    core_dir = Path(__file__).resolve().parents[1] / "app" / "core"
+    return _scan_module_endpoints(core_dir, mount_prefix="/api/v1")
+
+
 def _normalise_endpoint(method: str, path: str) -> str:
-    """`{patient_id}` and `:patient_id` and `[id]` all collapse to `<param>`."""
+    """`{patient_id}` and `:patient_id` and `[id]` all collapse to `<param>`.
+
+    A query string is dropped: screens document `?year=` to show the
+    caller what to pass, which is useful prose but never part of the
+    route FastAPI registers (#543).
+    """
+    path = path.split("?", 1)[0]
     norm = re.sub(r"\{[^}]+\}", "<param>", path)
     norm = re.sub(r":[a-zA-Z_][\w]*", "<param>", norm)
     norm = re.sub(r"\[[^\]]+\]", "<param>", norm)
     return f"{method.upper()} {norm.rstrip('/') or '/'}"
 
 
-def _check_module(facts: ModuleFacts, findings: Findings) -> None:
+def _check_module(
+    facts: ModuleFacts, findings: Findings, api_endpoints: set[str] | None = None
+) -> None:
     name = facts.name
     tech_dir = TECHNICAL_ROOT / name
 
@@ -348,7 +399,17 @@ def _check_module(facts: ModuleFacts, findings: Findings) -> None:
                 )
 
     # 5. Validate every screen MD frontmatter.
-    valid_endpoints = {_normalise_endpoint(m, p) for m, p in facts.endpoints}
+    # The whole API, not just this module's router (#543). A screen
+    # legitimately calls other modules' endpoints -- the billing
+    # invoice-from-budget screen reads `GET /api/v1/budget/budgets/{id}`,
+    # the purchase-orders screens drive `suppliers` and
+    # `supplier_items`. Validating against the owning module alone
+    # reported 18 of those as missing endpoints, which is what kept
+    # this check stuck on `warn`: promoting it would have failed CI on
+    # correct documentation. Whether a cross-module *reference* is
+    # architecturally allowed is `manifest.depends`, enforced by
+    # tests/test_module_isolation.py -- not this gate's job.
+    valid_endpoints = api_endpoints or {_normalise_endpoint(m, p) for m, p in facts.endpoints}
     for locale, docs in screens_by_locale.items():
         for screen in docs:
             fm = screen.frontmatter
@@ -379,16 +440,17 @@ def _check_module(facts: ModuleFacts, findings: Findings) -> None:
                 method, path = m.group(1), m.group(2).strip()
                 key = _normalise_endpoint(method, path)
                 if key not in valid_endpoints:
-                    findings.warn(
-                        f"{rel}: related_endpoint {method} {path} not found "
-                        f"on {name}'s router (after normalising path params)."
+                    findings.err(
+                        f"{rel}: related_endpoint {method} {path} is not a route "
+                        f"on any module's router or on core "
+                        f"(after normalising path params)."
                     )
 
             for perm in fm.get("related_permissions", []) or []:
                 # Accept both 'patients.read' and 'read'.
                 bare = str(perm).split(".", 1)[-1]
                 if bare not in facts.permissions:
-                    findings.warn(
+                    findings.err(
                         f"{rel}: related_permission {perm!r} not in "
                         f"{name}.get_permissions() = {facts.permissions}."
                     )
@@ -461,8 +523,15 @@ def run(strict: bool) -> int:
         )
 
     facts_by_name = {m.name: _collect_facts(m) for m in modules}
+    # One union of every route in the API, built once.
+    api_endpoints = {
+        _normalise_endpoint(method, path)
+        for facts in facts_by_name.values()
+        for method, path in facts.endpoints
+    }
+    api_endpoints |= {_normalise_endpoint(m, p) for m, p in _scan_core_endpoints()}
     for facts in facts_by_name.values():
-        _check_module(facts, findings)
+        _check_module(facts, findings, api_endpoints)
 
     _check_orphan_screens([m.name for m in modules], findings)
     _check_locale_parity(findings)

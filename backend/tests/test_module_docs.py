@@ -124,3 +124,87 @@ def test_locale_parity_holds_on_the_real_tree(docs_coverage) -> None:
     findings = docs_coverage.Findings()
     docs_coverage._check_locale_parity(findings)
     assert findings.errors == [], "\n".join(findings.errors)
+
+
+# ---------------------------------------------------------------------------
+# docs-coverage gate correctness (#543)
+# ---------------------------------------------------------------------------
+
+
+def test_frontmatter_parses_an_empty_flow_sequence(docs_coverage) -> None:
+    """``related_permissions: []`` used to become the *string* ``"[]"``.
+
+    Consumers then iterated it character by character and invented two
+    permissions, ``'['`` and ``']'`` — 4 of the gate's warnings were
+    that, and any screen using list syntax went unvalidated.
+    """
+    fm = docs_coverage._parse_frontmatter("---\nrelated_permissions: []\n---\n")
+    assert fm["related_permissions"] == []
+
+
+def test_frontmatter_parses_a_populated_flow_sequence(docs_coverage) -> None:
+    fm = docs_coverage._parse_frontmatter(
+        "---\nrelated_permissions: [budget.read, budget.write]\n---\n"
+    )
+    assert fm["related_permissions"] == ["budget.read", "budget.write"]
+
+
+def test_frontmatter_flow_sequence_tolerates_quotes_and_spacing(docs_coverage) -> None:
+    fm = docs_coverage._parse_frontmatter(
+        "---\nrelated_endpoints: [ 'GET /a' ,  \"POST /b\" ]\n---\n"
+    )
+    assert fm["related_endpoints"] == ["GET /a", "POST /b"]
+
+
+def test_frontmatter_still_parses_block_sequences(docs_coverage) -> None:
+    """The common syntax must keep working."""
+    fm = docs_coverage._parse_frontmatter(
+        "---\nrelated_endpoints:\n  - GET /api/v1/x\n  - POST /api/v1/y\n---\n"
+    )
+    assert fm["related_endpoints"] == ["GET /api/v1/x", "POST /api/v1/y"]
+
+
+def test_endpoint_normalisation_drops_the_query_string(docs_coverage) -> None:
+    """Screens document ``?year=`` to show the caller what to pass; it is
+    never part of the route FastAPI registers."""
+    with_query = docs_coverage._normalise_endpoint("GET", "/api/v1/payroll/reports/annual?year=")
+    without = docs_coverage._normalise_endpoint("GET", "/api/v1/payroll/reports/annual")
+    assert with_query == without
+
+
+def test_scanner_sees_public_router_and_its_own_prefix(docs_coverage, tmp_path: Path) -> None:
+    """``@public_router`` was invisible to the scanner, and a router's own
+    ``APIRouter(prefix=...)`` was ignored — so every screen documenting
+    an unauthenticated endpoint looked like it cited a missing route."""
+    mod = tmp_path / "fake_mod"
+    mod.mkdir()
+    (mod / "public_router.py").write_text(
+        "from fastapi import APIRouter\n"
+        'public_router = APIRouter(prefix="/public/push")\n'
+        '@public_router.get("/subscribe/{token}")\n'
+        "async def sub(): ...\n",
+        encoding="utf-8",
+    )
+    found = set(docs_coverage._scan_module_endpoints(mod, mount_prefix="/api/v1/fake_mod"))
+    assert ("GET", "/api/v1/fake_mod/public/push/subscribe/{token}") in found
+
+
+def test_scanner_still_sees_the_plain_router(docs_coverage, tmp_path: Path) -> None:
+    mod = tmp_path / "fake_mod2"
+    mod.mkdir()
+    (mod / "router.py").write_text(
+        "from fastapi import APIRouter\n"
+        "router = APIRouter()\n"
+        '@router.post("/things")\n'
+        "async def make(): ...\n",
+        encoding="utf-8",
+    )
+    found = set(docs_coverage._scan_module_endpoints(mod, mount_prefix="/api/v1/fake_mod2"))
+    assert ("POST", "/api/v1/fake_mod2/things") in found
+
+
+def test_the_real_tree_passes_in_strict_mode(docs_coverage) -> None:
+    """The point of the whole exercise: ``--strict`` has to be able to
+    fail, which means the tree it runs on must be clean. It used to pass
+    with 0 errors and ~74 warnings no matter what was wrong."""
+    assert docs_coverage.run(strict=True) == 0

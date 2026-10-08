@@ -3,17 +3,17 @@ module: budget
 screen: public
 route: /p/budget/[token]
 related_endpoints:
-  - GET /api/v1/public/budgets/{token}
-  - GET /api/v1/public/budgets/{token}/meta
-  - GET /api/v1/public/budgets/{token}/pdf/signed
-  - POST /api/v1/public/budgets/{token}/accept
-  - POST /api/v1/public/budgets/{token}/reject
-  - POST /api/v1/public/budgets/{token}/verify
+  - GET /api/v1/budget/public/budgets/{token}
+  - GET /api/v1/budget/public/budgets/{token}/meta
+  - GET /api/v1/budget/public/budgets/{token}/pdf/signed
+  - POST /api/v1/budget/public/budgets/{token}/accept
+  - POST /api/v1/budget/public/budgets/{token}/reject
+  - POST /api/v1/budget/public/budgets/{token}/verify
 related_permissions:
 related_paths:
   - backend/app/modules/budget/frontend/pages/p/budget/[token].vue
-  - backend/app/modules/budget/router.py
-last_verified_commit: a13bd29
+  - backend/app/modules/budget/public_router.py
+last_verified_commit: a5bfdefa
 ---
 
 # Aceptación pública del paciente
@@ -37,7 +37,7 @@ paciente cuando le pasan el enlace.
   desde el detalle del presupuesto, *Definir código público*). El
   endpoint `POST /verify` impone un *rate-limit* y, al acertar,
   guarda una cookie HttpOnly de sesión limitada al path
-  `/api/v1/public/budgets/{token}`. La cookie no sirve para abrir
+  `/api/v1/budget/public/budgets/{token}`. La cookie no sirve para abrir
   otro presupuesto distinto.
 - **Idempotente al primer visto.** La primera vez que el paciente
   abre la vista (tras verificar) publicamos `budget.viewed` con un

@@ -11,6 +11,25 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The docs-coverage gate enforced nothing** (#543). `--strict` runs in
+  CI but passed with 0 errors and 74 warnings no matter what was wrong,
+  because every endpoint and permission mismatch was classified `warn`.
+  Four separate parser/scanner bugs fed it: `related_permissions: []`
+  was stored as the *string* `"[]"` and iterated character by character
+  (inventing permissions `'['` and `']'`); `@public_router` routes and a
+  router's own `APIRouter(prefix=...)` were invisible to the scanner;
+  query strings (`?year=`) were compared literally; and references were
+  validated against the screen's **own** module only, so the 18
+  legitimate cross-module references (billing → budget/patients/payments,
+  purchase_orders → suppliers/supplier_items, payroll → core auth) looked
+  like missing endpoints. Endpoint and permission mismatches are now
+  errors, the tree is clean, and `--strict` fails on a bad reference.
+  Six genuinely wrong references are fixed too: the budget public-link
+  screen cited `/api/v1/public/budgets/...`, missing the module's
+  `/budget` mount segment.
+
 ## [2.8.0] - 2026-10-07
 
 ### Added
