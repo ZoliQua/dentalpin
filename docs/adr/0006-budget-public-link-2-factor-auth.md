@@ -154,15 +154,17 @@ authenticated request.
   another, the `none` method needing no cookie, the clinic-scoped
   `/meta` lookup, the budget-wide lockout total, and the accept/reject
   `BudgetAccessLog` rows.
-- The cascade resolution (`resolve_public_auth_method`) and the
-  constant-time comparisons (`secrets.compare_digest` on the phone
-  last-4 and on the DOB) have **no test coverage today** — no test in
-  `backend/tests/` references `manual_code`. They are verifiable by
-  reading `backend/app/modules/budget/workflow.py` (the resolver and
-  both `compare_digest` call sites). A change to either must add a test
-  to `backend/tests/test_public_route_scoping.py` in the same change;
-  an earlier revision of this section named test files that never
-  existed, which is exactly how a rule silently stops holding.
+- What the tests do and do not reach: `phone_last4` (the default method)
+  is exercised end to end over HTTP, including a wrong value and the
+  locked/decided/expired gates. The `dob` and `manual_code` branches and
+  the `resolve_public_auth_method` cascade itself have **no test
+  coverage today** — no test in `backend/tests/` sends `method: "dob"`
+  or `method: "manual_code"`. Both branches compare with
+  `secrets.compare_digest` (`backend/app/modules/budget/workflow.py`).
+  A change to either branch must add a test to
+  `backend/tests/test_public_route_scoping.py` in the same change; an
+  earlier revision of this section named test files that never existed,
+  which is exactly how a rule silently stops holding.
 - Every data-bearing route except `/meta` and `/verify` is guarded by
   the `_require_session` dependency in
   `backend/app/modules/budget/public_router.py`. To re-check the
@@ -178,6 +180,8 @@ authenticated request.
   verify_public_access).
 - `backend/app/modules/budget/router.py` (public endpoints, cookie
   dependency).
-- `backend/app/core/scheduler.py` (purge_budget_access_logs).
+- `backend/app/modules/budget/tasks.py` (`purge_budget_access_logs`),
+  registered as a scheduled job in
+  `backend/app/modules/budget/__init__.py`.
 - `docs/workflows/plan-budget-flow-tech-plan.md` §1.4, §5.2.
 - `docs/workflows/plan-budget-flow.md` (patient verification step).
