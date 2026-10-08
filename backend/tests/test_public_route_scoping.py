@@ -424,13 +424,23 @@ async def test_unlock_records_staff_history(
     from app.modules.budget.models import BudgetAccessLog, BudgetHistory
 
     budget = t1_setup["budget"]
-    await _seed_failures(db_session, budget.id, "attacker-ip", 9)
+    budget_id = budget.id
+    clinic_id = t1_setup["clinic"].id
     staff_id = UUID(
         (await client.get("/api/v1/auth/me", headers=auth_headers)).json()["data"]["user"]["id"]
     )
+    await _seed_failures(db_session, budget_id, "attacker-ip", 9)
+    budget.public_locked_at = datetime.now(UTC)
+    await db_session.commit()
 
     response = await client.post(
-        f"/api/v1/budget/budgets/{budget.id}/unlock-public",
+        f"/api/v1/budget/budgets/{budget_id}/unlock-public",
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+    await _seed_failures(db_session, budget_id, "attacker-ip", 9)
+    response = await client.post(
+        f"/api/v1/budget/budgets/{budget_id}/unlock-public",
         headers=auth_headers,
     )
     assert response.status_code == 200, response.text
@@ -439,7 +449,7 @@ async def test_unlock_records_staff_history(
         (
             await db_session.execute(
                 select(BudgetHistory).where(
-                    BudgetHistory.budget_id == budget.id,
+                    BudgetHistory.budget_id == budget_id,
                     BudgetHistory.action == "public_lock_cleared",
                 )
             )
@@ -447,16 +457,17 @@ async def test_unlock_records_staff_history(
         .scalars()
         .all()
     )
-    assert len(entries) == 1
-    assert entries[0].changed_by == staff_id
-    assert entries[0].previous_state == {"locked": False}
-    assert entries[0].new_state == {"locked": False}
+    assert len(entries) == 2
+    assert {entry.changed_by for entry in entries} == {staff_id}
+    assert {entry.clinic_id for entry in entries} == {clinic_id}
+    assert sorted(entry.previous_state["locked"] for entry in entries) == [False, True]
+    assert {entry.new_state["locked"] for entry in entries} == {False}
 
     failures = (
         (
             await db_session.execute(
                 select(BudgetAccessLog).where(
-                    BudgetAccessLog.budget_id == budget.id,
+                    BudgetAccessLog.budget_id == budget_id,
                     BudgetAccessLog.success.is_(False),
                 )
             )
@@ -494,6 +505,8 @@ def test_public_secret_hard_required_in_production(monkeypatch: pytest.MonkeyPat
     with pytest.raises(RuntimeError):
         _public_secret()
     monkeypatch.setattr(settings, "ENVIRONMENT", "development")
+    assert _public_secret() == settings.SECRET_KEY
+    monkeypatch.setattr(settings, "BUDGET_PUBLIC_SECRET_KEY", " " * 32)
     assert _public_secret() == settings.SECRET_KEY
 
 

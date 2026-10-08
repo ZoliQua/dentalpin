@@ -81,8 +81,8 @@ they do not issue a fresh cookie.
   partition would remove. Recovery is staff-side:
   reception clears the lock with `unlock-public`
   (`POST /budgets/{id}/unlock-public`, `budget.write`), which nulls
-  `public_locked_at` and drops the budget's failed-attempt rows (else
-  the all-time counter would re-lock on the next wrong guess), so the
+  `public_locked_at` and drops the budget's retained failed-attempt rows (else
+  the retained-failure counter would re-lock on the next wrong guess), so the
   existing token works again. Note the trade: clearing the counter
   also clears the evidence of those attempts, so reception can clear
   the forensic trail together with the lock; reissue (new version, new
@@ -108,18 +108,18 @@ they do not issue a fresh cookie.
   if one of the keys leaks; allows independent rotation.
 - Lockout policy converts brute force into an operational signal
   (reception notified) instead of silently allowing more attempts.
-- Auditable: every verification attempt is logged with a hashed IP and
+- Auditable: verification attempts are initially logged with a hashed IP and
   the method attempted, and the staff unlock route writes a
   `BudgetHistory` entry identifying the actor, budget, and previous
   lock state.
 
 ### Bad / accepted trade-offs
 
-- `unlock-public` erases the failed verification values and hashed IPs.
-  Clearing the lock also deletes those rows, but the route records who
-  performed the unlock, the affected budget, and the previous lock state
-  in `BudgetHistory`. The removed attempts themselves are not
-  recoverable afterward; success rows are retained.
+- `unlock-public` erases the failed verification metadata and hashed IPs.
+  Clearing the lock also deletes those rows: the stored method name, IP
+  hash, outcome, and count are no longer recoverable afterward. The route
+  records who performed the unlock, the affected budget, and the previous
+  lock state in `BudgetHistory`; success rows are retained.
 - Adds a small UX step for the patient before reading the budget.
   Mitigated by a mobile-first verify form with autofocus and clear
   copy.
@@ -187,7 +187,8 @@ they do not issue a fresh cookie.
 ## References
 
 - `backend/app/modules/budget/models.py` (Budget public_token,
-  public_auth_*, public_locked_at; BudgetAccessLog).
+  public_auth_*, public_locked_at; BudgetAccessLog; BudgetHistory for
+  staff unlocks).
 - `backend/app/modules/budget/workflow.py` (resolve_public_auth_method,
   verify_public_access).
 - `backend/app/modules/budget/public_router.py` (public endpoints, the

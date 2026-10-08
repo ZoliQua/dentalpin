@@ -3,24 +3,26 @@
 Implements the patient-facing flow described in
 ``docs/adr/0006-budget-public-link-2-factor-auth.md``:
 
-1. ``GET    /api/v1/public/budgets/{token}/meta``      → returns
+1. ``GET    /api/v1/budget/public/budgets/{token}/meta``      → returns
    the auth method the SPA should ask for (or ``none``), the
    ``locked``/``expired`` flags and the clinic name. No PII.
-2. ``POST   /api/v1/public/budgets/{token}/verify``    → patient
+2. ``POST   /api/v1/budget/public/budgets/{token}/verify``    → patient
    submits the verification value (phone last 4, DOB, or manual
    code). On success a signed cookie is set, scoped to the token.
-3. ``GET    /api/v1/public/budgets/{token}``           → returns
+3. ``GET    /api/v1/budget/public/budgets/{token}``           → returns
    the budget detail (only with cookie or method=none). Marks the
    budget as viewed on the first call.
-4. ``POST   /api/v1/public/budgets/{token}/accept``    → records
+4. ``POST   /api/v1/budget/public/budgets/{token}/accept``    → records
    acceptance + signature.
-5. ``POST   /api/v1/public/budgets/{token}/reject``    → records
+5. ``POST   /api/v1/budget/public/budgets/{token}/reject``    → records
    rejection.
 
-Rate limits via ``slowapi`` (``5/15minute`` per token, ``20/hour``
-per IP, ``60/minute`` for ``/meta``). Sessions are HS256 JWTs
-signed with ``settings.BUDGET_PUBLIC_SECRET_KEY`` (falls back to
-``SECRET_KEY`` only in dev).
+Rate limits via ``slowapi``: ``60/minute`` for ``/meta``;
+``5/15minute`` per token plus ``20/hour`` per IP for ``/verify``;
+``30/minute`` for detail; ``10/minute`` for ``accept`` and ``reject``;
+and ``10/minute`` per token for the signed-PDF download. Sessions are
+HS256 JWTs signed with ``settings.BUDGET_PUBLIC_SECRET_KEY`` (falls
+back to ``SECRET_KEY`` only in dev).
 """
 
 from __future__ import annotations
@@ -67,10 +69,12 @@ def _public_secret() -> str:
     Production deploys must set ``BUDGET_PUBLIC_SECRET_KEY`` — serving
     public routes without it would sign patient sessions with the
     staff-JWT key. In development we fall back to ``SECRET_KEY`` so
-    local runs work without extra setup.
+    local runs work without extra setup. A blank or whitespace-only
+    value is treated as unset.
     """
-    if settings.BUDGET_PUBLIC_SECRET_KEY:
-        return settings.BUDGET_PUBLIC_SECRET_KEY
+    key = settings.BUDGET_PUBLIC_SECRET_KEY or ""
+    if key.strip():
+        return key
     if settings.ENVIRONMENT == "production":
         raise RuntimeError(
             "BUDGET_PUBLIC_SECRET_KEY is required in production: refusing to "
