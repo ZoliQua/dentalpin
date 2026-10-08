@@ -81,6 +81,16 @@ def test_short_public_key_in_production_raises():
         )
 
 
+def test_whitespace_public_key_in_production_raises():
+    """Whitespace is not entropy for a production signing key (#538)."""
+    with pytest.raises(ValueError, match="must not be blank or whitespace"):
+        _make_settings(
+            SECRET_KEY=STRONG_KEY,
+            ENVIRONMENT="production",
+            BUDGET_PUBLIC_SECRET_KEY=" " * MIN_SECRET_KEY_LENGTH,
+        )
+
+
 def test_missing_public_key_outside_production_boots():
     settings = _make_settings(SECRET_KEY=STRONG_KEY, ENVIRONMENT="development")
     assert settings.BUDGET_PUBLIC_SECRET_KEY == ""

@@ -688,9 +688,10 @@ class BudgetWorkflowService:
         """Clear ``public_locked_at`` so the existing token works again.
 
         Also drops the budget's *failed* access rows: the lockout counts
-        all-time failures, so without this the next wrong guess would
+        retained failures, so without this the next wrong guess would
         re-lock instantly and the recovery would be one-shot. Success
-        rows (views, downloads, decisions) stay for audit.
+        rows (views, downloads, decisions) stay for audit. The staff
+        endpoint records the unlock itself in ``BudgetHistory``.
         """
         budget.public_locked_at = None
         await db.execute(
@@ -759,7 +760,7 @@ class BudgetWorkflowService:
         - ``method_mismatch`` — caller used the wrong method.
         - ``invalid`` — wrong value.
 
-        On the 10th total failed attempt the function sets
+        On the 10th retained failed attempt the function sets
         ``public_locked_at`` and returns ``(False, "locked")``.
         """
         if budget.public_locked_at is not None:

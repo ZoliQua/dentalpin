@@ -64,19 +64,21 @@ Successful verification issues an **HttpOnly + Secure + SameSite=Strict
 cookie** scoped to `/api/v1/budget/public/budgets/<token>`, signed
 with a dedicated secret `BUDGET_PUBLIC_SECRET_KEY` independent of the
 global `SECRET_KEY` used for staff JWTs (hard-required in production;
-dev-only fallback otherwise). TTL: 30 minutes, renewed on every
-authenticated request.
+dev-only fallback otherwise). TTL: 30 minutes from successful
+verification. Later requests reuse the same cookie until its `exp`;
+they do not issue a fresh cookie.
 
 **Rate limiting and lockout** are enforced server-side over a new
 `budget_access_logs` table:
 
 - 5 failed attempts per token in 15 minutes → 429.
-- 10 total failed attempts **against the same budget, from any IPs** →
+- 10 retained failed attempts **against the same budget, from any IPs** →
   `budgets.public_locked_at` is set and the token stops verifying. The
   lock is deliberately budget-wide: the token URL is a secret only the
   patient holds, so for health data a staff-recoverable lock beats a
-  weaker brute-force bound. This keeps the absolute cap (10 guesses,
-  ever) that a per-IP partition would remove. Recovery is staff-side:
+  weaker brute-force bound. This keeps a 10-recorded-failure cap,
+  bounded by the 90-day `budget_access_logs` retention, that a per-IP
+  partition would remove. Recovery is staff-side:
   reception clears the lock with `unlock-public`
   (`POST /budgets/{id}/unlock-public`, `budget.write`), which nulls
   `public_locked_at` and drops the budget's failed-attempt rows (else
@@ -107,21 +109,17 @@ authenticated request.
 - Lockout policy converts brute force into an operational signal
   (reception notified) instead of silently allowing more attempts.
 - Auditable: every verification attempt is logged with a hashed IP and
-  the method attempted.
+  the method attempted, and the staff unlock route writes a
+  `BudgetHistory` entry identifying the actor, budget, and previous
+  lock state.
 
 ### Bad / accepted trade-offs
 
-- `unlock-public` erases its own evidence. Clearing the lock also
-  deletes the failed-attempt rows it would otherwise re-lock on, and
-  nothing records that the counter was cleared, so reception can remove
-  a brute-force trail without a trace. Accepted for the budget-wide
-  lock this ADR chose; a `BudgetAccessLog` row per unlock is the
-  natural fix but needs a real home for it (`ip_hash` is NOT NULL and
-  documented as the requester's IP, so a staff row would need a
-  nullable column or a sentinel hash - a schema decision, not a
-  one-liner). Until then, treat a staff unlock as a privileged,
-  permission-gated action and rely on the surrounding staff audit
-  trail.
+- `unlock-public` erases the failed verification values and hashed IPs.
+  Clearing the lock also deletes those rows, but the route records who
+  performed the unlock, the affected budget, and the previous lock state
+  in `BudgetHistory`. The removed attempts themselves are not
+  recoverable afterward; success rows are retained.
 - Adds a small UX step for the patient before reading the budget.
   Mitigated by a mobile-first verify form with autofocus and clear
   copy.
@@ -167,17 +165,18 @@ authenticated request.
   `BudgetAccessLog` rows.
 - What the tests do and do not reach: `phone_last4` (the default method)
   is exercised end to end over HTTP, including a wrong value and the
-  locked/decided/expired gates. The `dob` and `manual_code` branches and
-  the `resolve_public_auth_method` cascade itself have **no test
-  coverage today** — no test in `backend/tests/` sends `method: "dob"`
-  or `method: "manual_code"`. `phone_last4` and `dob` compare with
-  `secrets.compare_digest`; `manual_code` is a bcrypt
-  `checkpw` against the stored hash
-  (`backend/app/modules/budget/workflow.py`). A change to any branch
-  must add a test to `backend/tests/test_public_route_scoping.py` in
-  the same change; an earlier revision of this section named test files
-  that never existed, which is exactly how a rule silently stops
-  holding.
+  locked/decided/expired gates. Creating or cloning any budget executes
+  the resolver, so its `phone_last4` default is exercised incidentally,
+  but without a focused assertion. The clinic opt-out, `dob`,
+  `manual_code`, and missing-patient arms have no coverage: no test in
+  `backend/tests/` sends `method: "dob"` or `method: "manual_code"`.
+  `phone_last4` and `dob` compare with `secrets.compare_digest`;
+  `manual_code` is a bcrypt `checkpw` against the stored hash
+  (`backend/app/modules/budget/workflow.py`). A change to the resolver
+  or one of those branches must add a test to
+  `backend/tests/test_public_route_scoping.py` in the same change; an
+  earlier revision of this section named test files that never existed,
+  which is exactly how a rule silently stops holding.
 - Every data-bearing route except `/meta` and `/verify` is guarded by
   the `_require_session` dependency in
   `backend/app/modules/budget/public_router.py`. To re-check the

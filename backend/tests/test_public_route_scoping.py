@@ -414,6 +414,60 @@ async def test_unlock_clears_failure_counter(db_session: AsyncSession, t1_setup:
 
 
 @pytest.mark.asyncio
+async def test_unlock_records_staff_history(
+    client: AsyncClient,
+    auth_headers: dict,
+    db_session: AsyncSession,
+    t1_setup: dict,
+) -> None:
+    """Staff unlocks leave a history entry even though failed rows are removed (#531)."""
+    from app.modules.budget.models import BudgetAccessLog, BudgetHistory
+
+    budget = t1_setup["budget"]
+    await _seed_failures(db_session, budget.id, "attacker-ip", 9)
+    staff_id = UUID(
+        (await client.get("/api/v1/auth/me", headers=auth_headers)).json()["data"]["user"]["id"]
+    )
+
+    response = await client.post(
+        f"/api/v1/budget/budgets/{budget.id}/unlock-public",
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+
+    entries = (
+        (
+            await db_session.execute(
+                select(BudgetHistory).where(
+                    BudgetHistory.budget_id == budget.id,
+                    BudgetHistory.action == "public_lock_cleared",
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert len(entries) == 1
+    assert entries[0].changed_by == staff_id
+    assert entries[0].previous_state == {"locked": False}
+    assert entries[0].new_state == {"locked": False}
+
+    failures = (
+        (
+            await db_session.execute(
+                select(BudgetAccessLog).where(
+                    BudgetAccessLog.budget_id == budget.id,
+                    BudgetAccessLog.success.is_(False),
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    assert failures == []
+
+
+@pytest.mark.asyncio
 async def test_correct_guess_succeeds_despite_old_failures(
     db_session: AsyncSession, t1_setup: dict
 ) -> None:

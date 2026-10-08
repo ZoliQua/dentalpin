@@ -3,9 +3,10 @@
 ## Unreleased
 
 - fix(#531): the verify permanent lockout stays budget-wide on purpose
-  (10 total failures lock the token), and the staff `unlock-public`
+  (10 retained failures lock the token), and the staff `unlock-public`
   recovery path is now documented in ADR 0006; unlocking also drops
-  the failed-attempt rows so the recovery is not one-shot.
+  the failed-attempt rows so the recovery is not one-shot, and writes
+  a `BudgetHistory` entry for the unlock itself.
 - fix(#538): `BUDGET_PUBLIC_SECRET_KEY` is hard-required in production
   (refuses to sign public sessions with the staff-JWT key); dev-only
   fallback otherwise.
