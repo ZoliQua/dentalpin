@@ -11,6 +11,21 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Security
+
+- **`allowed_tools` is now enforced, not just declared** (#558).
+  `BaseAgent.allowed_tools` existed with zero enforcement references
+  anywhere in `app/`, while `docs/technical/creating-modules.md` told
+  module authors it was "a hard list — the agent cannot invoke anything
+  outside it". `ToolRegistry.call` now checks it as step 2 of its
+  enforcement order (before guardrails, so a call the agent was never
+  allowed to make cannot consume its rate limit or open an approval
+  request) and audits the refusal as `BLOCKED`. The list reaches the
+  chokepoint through the new `AgentContext.allowed_tools`, where `None`
+  means "no subsetting" — what copilot and other conversational
+  surfaces use, so their behaviour is unchanged — and an empty list
+  permits nothing, which is `BaseAgent`'s default.
+
 ## [2.8.0] - 2026-10-07
 
 ### Added
