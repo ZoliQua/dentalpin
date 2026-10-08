@@ -159,12 +159,14 @@ authenticated request.
   locked/decided/expired gates. The `dob` and `manual_code` branches and
   the `resolve_public_auth_method` cascade itself have **no test
   coverage today** — no test in `backend/tests/` sends `method: "dob"`
-  or `method: "manual_code"`. Both branches compare with
-  `secrets.compare_digest` (`backend/app/modules/budget/workflow.py`).
-  A change to either branch must add a test to
-  `backend/tests/test_public_route_scoping.py` in the same change; an
-  earlier revision of this section named test files that never existed,
-  which is exactly how a rule silently stops holding.
+  or `method: "manual_code"`. `phone_last4` and `dob` compare with
+  `secrets.compare_digest`; `manual_code` is a bcrypt
+  `checkpw` against the stored hash
+  (`backend/app/modules/budget/workflow.py`). A change to any branch
+  must add a test to `backend/tests/test_public_route_scoping.py` in
+  the same change; an earlier revision of this section named test files
+  that never existed, which is exactly how a rule silently stops
+  holding.
 - Every data-bearing route except `/meta` and `/verify` is guarded by
   the `_require_session` dependency in
   `backend/app/modules/budget/public_router.py`. To re-check the
@@ -178,8 +180,9 @@ authenticated request.
   public_auth_*, public_locked_at; BudgetAccessLog).
 - `backend/app/modules/budget/workflow.py` (resolve_public_auth_method,
   verify_public_access).
-- `backend/app/modules/budget/router.py` (public endpoints, cookie
-  dependency).
+- `backend/app/modules/budget/public_router.py` (public endpoints, the
+  `_require_session` cookie dependency). `router.py` holds only the
+  staff side, including `unlock-public`.
 - `backend/app/modules/budget/tasks.py` (`purge_budget_access_logs`),
   registered as a scheduled job in
   `backend/app/modules/budget/__init__.py`.
