@@ -157,7 +157,10 @@ async def test_budget_expired_detail_410(
 ) -> None:
     budget = t1_setup["budget"]
     budget.public_auth_method = "none"
-    budget.valid_until = date.today() - timedelta(days=1)
+    # UTC: the route compares against datetime.now(UTC).date()
+    # (budget/public_router.py:328). A local "yesterday" east of UTC is
+    # that same day, so the link reads as live and answers 200.
+    budget.valid_until = datetime.now(UTC).date() - timedelta(days=1)
     await db_session.commit()
     response = await client.get(f"{BUDGET}/{budget.public_token}")
     assert response.status_code == 410
