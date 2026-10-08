@@ -10,7 +10,8 @@
   (refuses to sign public sessions with the staff-JWT key); dev-only
   fallback otherwise.
 - feat(#540): public accept/reject decisions are logged to
-  `BudgetAccessLog` like the other public actions.
+  `BudgetAccessLog` with `success=True` (so they do not count towards
+  the lockout), like the signed-PDF download.
 - feat(i18n): Telugu (`te`) quote PDF labels.
 - fix: the public `/meta` patient-name lookup is now clinic-scoped
   (`AND clinic_id`). The id already comes from the budget's own row so this

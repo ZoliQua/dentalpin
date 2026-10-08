@@ -17,7 +17,8 @@ frontend as a Nuxt layer under its own Python package.
   required. A production boot without it fails fast with an actionable
   message instead of signing public budget sessions with the staff-JWT
   `SECRET_KEY`. Set it (e.g. `openssl rand -hex 32`) before upgrading;
-  `docker-compose.coolify.yml` now enforces its presence.
+  `docker-compose.prod.yml` and `docker-compose.coolify.yml` now both
+  refuse to start without it.
 
 ## [2.8.0] - 2026-10-07
 

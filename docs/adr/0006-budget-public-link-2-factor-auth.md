@@ -86,7 +86,11 @@ authenticated request.
   the forensic trail together with the lock; reissue (new version, new
   token, old token permanently dead) remains the answer when the link
   itself is considered burned.
-- 20 failed attempts per IP per hour → 429 across all public endpoints.
+- 20 `POST /verify` requests per IP per hour → 429 (`slowapi` default
+  key, the remote address). This is a request counter, not a failure
+  counter, so it also throttles a patient who keeps mistyping; it does
+  not apply to the other public endpoints, which carry their own
+  per-token or per-IP-per-minute limits.
 
 ## Consequences
 
