@@ -31,6 +31,11 @@ frontend as a Nuxt layer under its own Python package.
   spoofable under `*` even behind a proxy. `_client_ip()` no longer
   re-parses the header, and the backend logs the effective value at
   startup (error in production if it is still `*`).
+- **Coolify: trust Traefik's 10.0.x networks** (follow-up to #623).
+  `docker-compose.coolify.yml` now defaults `FORWARDED_ALLOW_IPS` to also
+  include `10.0.0.0/8`. Coolify creates its Docker networks there, so the
+  previous default made every client resolve to Traefik's IP and turned
+  the login rate limit global.
 
 - **`allowed_tools` is now enforced, not just declared** (#558).
   `BaseAgent.allowed_tools` existed with zero enforcement references
