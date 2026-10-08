@@ -111,6 +111,17 @@ authenticated request.
 
 ### Bad / accepted trade-offs
 
+- `unlock-public` erases its own evidence. Clearing the lock also
+  deletes the failed-attempt rows it would otherwise re-lock on, and
+  nothing records that the counter was cleared, so reception can remove
+  a brute-force trail without a trace. Accepted for the budget-wide
+  lock this ADR chose; a `BudgetAccessLog` row per unlock is the
+  natural fix but needs a real home for it (`ip_hash` is NOT NULL and
+  documented as the requester's IP, so a staff row would need a
+  nullable column or a sentinel hash - a schema decision, not a
+  one-liner). Until then, treat a staff unlock as a privileged,
+  permission-gated action and rely on the surrounding staff audit
+  trail.
 - Adds a small UX step for the patient before reading the budget.
   Mitigated by a mobile-first verify form with autofocus and clear
   copy.
