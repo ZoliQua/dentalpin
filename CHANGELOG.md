@@ -32,6 +32,18 @@ frontend as a Nuxt layer under its own Python package.
   re-parses the header, and the backend logs the effective value at
   startup (error in production if it is still `*`).
 
+### Tests
+
+- **Four tests read the local clock while the code under test uses UTC**,
+  so they pass in CI (UTC) and fail east of UTC for part of every day —
+  `test_budget_expired_detail_410`, `test_strip_excludes_appointments_on_other_days`,
+  `test_get_odontogram_at_date_returns_empty_state` and
+  `test_opposition_roundtrip`. Each now uses `datetime.now(UTC).date()`,
+  matching the route it asserts against. No product code changed.
+  A new `backend-test-east-of-utc` CI job runs the clock-reading tests
+  under `TZ=Pacific/Kiritimati` (UTC+14), selecting the files at run time
+  so a new test of this shape is covered the day it lands.
+
 ## [2.8.0] - 2026-10-07
 
 ### Added
