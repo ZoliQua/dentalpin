@@ -80,9 +80,19 @@ class _SubsetFixtureModule(BaseModule):
 
 @pytest.fixture(autouse=True)
 def _register_fixture_tools():
+    """Register, then *unregister* -- ``tool_registry`` is a process-wide
+    singleton, so a fixture module left behind leaks into every later
+    test file. These tools gate on permissions that deliberately do not
+    exist in the real catalog, which makes
+    ``test_agents_tooling.py::test_every_tool_permission_exists`` fail
+    once it sees them (it walks the whole registry). Same register /
+    yield / unregister shape as ``test_agents_registry.py``.
+    """
+    tool_registry.register_from(_SubsetFixtureModule())
     reset_counters()
-    if "fixture_subset.allowed" not in tool_registry.list():
-        tool_registry.register_from(_SubsetFixtureModule())
+    yield
+    tool_registry.unregister_module("fixture_subset")
+    reset_counters()
 
 
 async def _agent_and_session(db: AsyncSession, clinic_id) -> tuple:
