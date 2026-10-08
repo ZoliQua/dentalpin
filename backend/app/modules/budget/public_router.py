@@ -40,6 +40,7 @@ from app.core.auth.router import limiter
 from app.core.schemas import ApiResponse
 from app.database import get_db
 
+from .models import BudgetAccessLog
 from .schemas import BudgetDetailResponse
 from .service import BudgetService
 from .workflow import (
@@ -386,8 +387,6 @@ async def accept_public_budget(
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
-    from .models import BudgetAccessLog
-
     db.add(
         BudgetAccessLog(
             budget_id=budget.id,
@@ -428,7 +427,7 @@ async def download_public_signed_budget_pdf(
 
     from sqlalchemy import select as _select
 
-    from .models import BudgetAccessLog, BudgetSignature
+    from .models import BudgetSignature
     from .pdf import BudgetPDFService
 
     sig_q = (
@@ -527,8 +526,6 @@ async def reject_public_budget(
     except Exception as e:
         await db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
-    from .models import BudgetAccessLog
-
     db.add(
         BudgetAccessLog(
             budget_id=budget.id,

@@ -71,17 +71,21 @@ authenticated request.
 `budget_access_logs` table:
 
 - 5 failed attempts per token in 15 minutes → 429.
-- 10 total failed attempts **from the same IP hash against the same
-  budget** → `budgets.public_locked_at` is set and the token stops
-  verifying. Partitioning by (budget, IP) means one attacker's guesses
-  cannot lock the legitimate patient's link. Recovery is staff-side:
+- 10 total failed attempts **against the same budget, from any IPs** →
+  `budgets.public_locked_at` is set and the token stops verifying. The
+  lock is deliberately budget-wide: the token URL is a secret only the
+  patient holds, so for health data a staff-recoverable lock beats a
+  weaker brute-force bound. This keeps the absolute cap (10 guesses,
+  ever) that a per-IP partition would remove. Recovery is staff-side:
   reception clears the lock with `unlock-public`
   (`POST /budgets/{id}/unlock-public`, `budget.write`), which nulls
   `public_locked_at` and drops the budget's failed-attempt rows (else
   the all-time counter would re-lock on the next wrong guess), so the
-  existing token works again; reissue (new version, new token, old
-  token permanently dead) remains the answer when the link itself is
-  considered burned.
+  existing token works again. Note the trade: clearing the counter
+  also clears the evidence of those attempts, so reception can clear
+  the forensic trail together with the lock; reissue (new version, new
+  token, old token permanently dead) remains the answer when the link
+  itself is considered burned.
 - 20 failed attempts per IP per hour → 429 across all public endpoints.
 
 ## Consequences

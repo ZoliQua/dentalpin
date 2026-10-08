@@ -11,6 +11,14 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Changed
+
+- **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
+  required. A production boot without it fails fast with an actionable
+  message instead of signing public budget sessions with the staff-JWT
+  `SECRET_KEY`. Set it (e.g. `openssl rand -hex 32`) before upgrading;
+  `docker-compose.coolify.yml` now enforces its presence.
+
 ## [2.8.0] - 2026-10-07
 
 ### Added

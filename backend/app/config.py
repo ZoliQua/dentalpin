@@ -224,6 +224,31 @@ class Settings(BaseSettings):
             warnings.warn(message, stacklevel=2)
         return self
 
+    @model_validator(mode="after")
+    def _validate_public_secret_key(self) -> "Settings":
+        """Require a dedicated public-link key in production (#538).
+
+        Public budget sessions must never be signed with the staff-JWT
+        key, so a production boot without ``BUDGET_PUBLIC_SECRET_KEY``
+        fails here with an actionable message instead of serving the
+        first patient a 500 from the request-time check.
+        """
+        key = self.BUDGET_PUBLIC_SECRET_KEY or ""
+        if self.ENVIRONMENT != "production":
+            return self
+        if not key:
+            raise ValueError(
+                "BUDGET_PUBLIC_SECRET_KEY is required in production: refusing "
+                "to start with public budget sessions bound to the staff-JWT "
+                "SECRET_KEY."
+            )
+        if len(key) < MIN_SECRET_KEY_LENGTH:
+            raise ValueError(
+                f"BUDGET_PUBLIC_SECRET_KEY must be at least {MIN_SECRET_KEY_LENGTH} "
+                "characters (see .env.example: openssl rand -hex 32)."
+            )
+        return self
+
     #: Valid ENVIRONMENT values (#530). Anything else (a typo like
     #: "prod", "staging") fails fast at boot instead of silently
     #: degrading production-only behavior (docs, secure cookies,

@@ -365,10 +365,11 @@ class BudgetAccessLog(Base):
     and lockout policy:
 
     - 5 failed attempts in 15 minutes per token → 429 (transient).
-    - 10 total failed attempts from the same IP hash against the same
-      budget → ``Budget.public_locked_at`` set → token stops verifying;
-      reception clears it via ``unlock-public`` (or reissues when the
-      link itself is burned).
+    - 10 total failed attempts against the same budget, from any IPs →
+      ``Budget.public_locked_at`` set → token stops verifying (the lock
+      is deliberately budget-wide); reception clears it via
+      ``unlock-public``, which also drops the failed-attempt rows (or
+      reissues when the link itself is burned).
 
     A daily cron purges rows older than 90 days (retention policy).
     """

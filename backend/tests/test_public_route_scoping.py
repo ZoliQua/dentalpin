@@ -376,14 +376,15 @@ async def _seed_failures(
 
 
 @pytest.mark.asyncio
-async def test_lockout_partitioned_by_attacker_ip(db_session: AsyncSession, t1_setup: dict) -> None:
-    """Ten failures from one IP lock the link (#531)."""
+async def test_total_lockout_counts_every_ip(db_session: AsyncSession, t1_setup: dict) -> None:
+    """The permanent lockout stays budget-wide: failures from any IPs add up (#531)."""
     from app.modules.budget.workflow import BudgetWorkflowService
 
     budget = t1_setup["budget"]
-    await _seed_failures(db_session, budget.id, "attacker-ip", 9)
+    await _seed_failures(db_session, budget.id, "attacker-ip-a", 5)
+    await _seed_failures(db_session, budget.id, "attacker-ip-b", 4)
     ok, code = await BudgetWorkflowService.verify_public_access(
-        db_session, budget, "phone_last4", "0000", "attacker-ip"
+        db_session, budget, "phone_last4", "0000", "attacker-ip-c"
     )
     assert (ok, code) == (False, "locked")
     assert budget.public_locked_at is not None
@@ -410,22 +411,20 @@ async def test_unlock_clears_failure_counter(db_session: AsyncSession, t1_setup:
 
 
 @pytest.mark.asyncio
-async def test_lockout_ignores_other_ips_failures(db_session: AsyncSession, t1_setup: dict) -> None:
-    """Nine failures from A do not lock out B: B's bad guess is invalid (#531)."""
+async def test_correct_guess_succeeds_despite_old_failures(
+    db_session: AsyncSession, t1_setup: dict
+) -> None:
+    """Old failures never block the legitimate patient: only failures count (#531)."""
     from app.modules.budget.workflow import BudgetWorkflowService
 
     clinic, patient, user = t1_setup["clinic"], t1_setup["patient"], t1_setup["user"]
     budget = await _budget(db_session, clinic.id, patient.id, user.id)
     await _seed_failures(db_session, budget.id, "attacker-ip", 9)
     ok, code = await BudgetWorkflowService.verify_public_access(
-        db_session, budget, "phone_last4", "0000", "patient-ip"
-    )
-    assert (ok, code) == (False, "invalid")
-    assert budget.public_locked_at is None
-    ok, code = await BudgetWorkflowService.verify_public_access(
         db_session, budget, "phone_last4", "1222", "patient-ip"
     )
     assert (ok, code) == (True, None)
+    assert budget.public_locked_at is None
 
 
 def test_public_secret_hard_required_in_production(monkeypatch: pytest.MonkeyPatch) -> None:
