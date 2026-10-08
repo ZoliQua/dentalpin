@@ -11,6 +11,18 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Fixed
+
+- **The help-portal build now fails on a fragment slug collision** and
+  warns about a slug the app can never request (#573, partial). Two
+  screens whose routes collapse to the same slug used to write the same
+  `.html`, last one winning, with nothing to show it had happened — and
+  the obvious fix for the periodontogram route (`{id}` → `[id]`) walks
+  straight into that: it would have silently taken the patient-detail
+  page's help away. The underlying question of how a query-selected
+  sub-view gets its own fragment is still open on #573; this only makes
+  the two failure modes visible.
+
 ## [2.8.0] - 2026-10-07
 
 ### Added
