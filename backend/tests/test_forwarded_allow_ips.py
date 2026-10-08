@@ -16,6 +16,7 @@ fails here rather than in production.
 
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -136,6 +137,38 @@ async def test_wildcard_is_the_bypass_this_guards_against() -> None:
     }
     assert len(keys) == 3, "a fresh bucket per request is the bypass"
     assert await _resolved_client("*", TRUSTED_PEER, "9.9.9.9, 198.51.100.23") == "9.9.9.9"
+
+
+# --- the plumbing the whole fix rests on ---------------------------------
+
+
+def test_uvicorn_reads_the_env_var_when_the_flag_is_absent() -> None:
+    """The Dockerfile deliberately passes no ``--forwarded-allow-ips``, so
+    everything above depends on uvicorn picking the value out of the
+    environment. That is one line in uvicorn's own Config
+    (``os.environ.get("FORWARDED_ALLOW_IPS", "127.0.0.1,::1")``) and
+    nothing in this repo would notice if a future release moved it: the
+    CMD would silently fall back to uvicorn's default, which is safe but
+    collapses every client onto the proxy's IP and makes the login limit
+    global. Pinned here so an upgrade that breaks it fails loudly.
+    """
+    from uvicorn.config import Config
+
+    previous = os.environ.get("FORWARDED_ALLOW_IPS")
+    try:
+        os.environ["FORWARDED_ALLOW_IPS"] = "10.9.8.7,172.16.0.0/12"
+        config = Config("app.main:app", proxy_headers=True)
+        assert config.forwarded_allow_ips == "10.9.8.7,172.16.0.0/12"
+
+        del os.environ["FORWARDED_ALLOW_IPS"]
+        fallback = Config("app.main:app", proxy_headers=True)
+        # Safe, but not what we ship — see the comment above.
+        assert fallback.forwarded_allow_ips == "127.0.0.1,::1"
+        assert "*" not in str(fallback.forwarded_allow_ips)
+    finally:
+        os.environ.pop("FORWARDED_ALLOW_IPS", None)
+        if previous is not None:
+            os.environ["FORWARDED_ALLOW_IPS"] = previous
 
 
 # --- the session audit trail ---------------------------------------------
