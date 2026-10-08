@@ -12,6 +12,13 @@
   `tests/test_event_name_constants.py`, fails on any literal publish
   under `app/`.
 
+- fix: `auto_close_expired_plans` (the daily 03:00 cron) raised
+  `UndefinedColumnError` on its first statement and closed nothing, ever.
+  It selected clinics with `WHERE deleted_at IS NULL` and `clinics` has no
+  such column. Now an ORM query, so a missing column is a test failure
+  rather than a 03:00 log line. Two tests execute the job — the existing
+  scheduler test only asserted its id.
+
 - fix(#590): the professional-membership validation tolerates duplicated
   membership rows (`.limit(1)` existence read, same fix as #598 for
   orthodontics). `clinic_memberships` has no unique `(clinic_id, user_id)`
