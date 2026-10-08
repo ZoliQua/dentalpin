@@ -91,6 +91,20 @@ def test_whitespace_public_key_in_production_raises():
         )
 
 
+@pytest.mark.parametrize(
+    "value",
+    [" " + STRONG_KEY, STRONG_KEY + " ", STRONG_KEY + "\n"],
+)
+def test_padded_public_key_in_production_raises(value: str):
+    """Validation and signing must see the same production key (#538)."""
+    with pytest.raises(ValueError, match="leading or trailing whitespace"):
+        _make_settings(
+            SECRET_KEY=STRONG_KEY,
+            ENVIRONMENT="production",
+            BUDGET_PUBLIC_SECRET_KEY=value,
+        )
+
+
 def test_missing_public_key_outside_production_boots():
     settings = _make_settings(SECRET_KEY=STRONG_KEY, ENVIRONMENT="development")
     assert settings.BUDGET_PUBLIC_SECRET_KEY == ""

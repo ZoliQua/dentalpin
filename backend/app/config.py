@@ -252,6 +252,12 @@ class Settings(BaseSettings):
                 "production: refusing to start with a signing key that has no "
                 "entropy."
             )
+        if key != stripped_key:
+            raise ValueError(
+                "BUDGET_PUBLIC_SECRET_KEY must not have leading or trailing "
+                "whitespace in production: the validator checks the stripped "
+                "value, while signing uses the configured value."
+            )
         if len(stripped_key) < MIN_SECRET_KEY_LENGTH:
             raise ValueError(
                 f"BUDGET_PUBLIC_SECRET_KEY must be at least {MIN_SECRET_KEY_LENGTH} "
