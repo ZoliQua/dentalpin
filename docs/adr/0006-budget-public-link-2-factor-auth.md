@@ -146,19 +146,29 @@ authenticated request.
 
 ## How to verify the rule still holds
 
-- Tests:
-  - `backend/app/modules/budget/tests/test_public_auth.py`
-    exercises the cascade (phone present → phone, no phone → DOB,
-    neither → manual_code required), constant-time comparison of
-    `manual_code`, lockout after threshold, cookie issuance and
-    expiry, expired-token gate, locked-token gate.
-  - `backend/app/modules/budget/tests/test_public_endpoints.py`
-    covers idempotency (double accept → 409), rate limiting,
-    `valid_until` enforcement.
-- The endpoint set requires the `public_session` dependency on every
-  data-bearing route except `/meta` and `/verify`. A grep in CI:
-  `rg -n 'public/budgets/\{token\}' backend/app/modules/budget/router.py`
-  must show that all data-bearing routes use the dependency.
+- Tests: `backend/tests/test_public_route_scoping.py` is the public
+  budget surface's test file (the module has no in-module `tests/`
+  package). It covers the unknown-token 404s, the verify cascade
+  (correct value → cookie, bad value → 401, decided → 409, expired →
+  410, locked → 423), a cookie minted for one budget being rejected on
+  another, the `none` method needing no cookie, the clinic-scoped
+  `/meta` lookup, the budget-wide lockout total, and the accept/reject
+  `BudgetAccessLog` rows.
+- The cascade resolution (`resolve_public_auth_method`) and the
+  constant-time comparisons (`secrets.compare_digest` on the phone
+  last-4 and on the DOB) have **no test coverage today** — no test in
+  `backend/tests/` references `manual_code`. They are verifiable by
+  reading `backend/app/modules/budget/workflow.py` (the resolver and
+  both `compare_digest` call sites). A change to either must add a test
+  to `backend/tests/test_public_route_scoping.py` in the same change;
+  an earlier revision of this section named test files that never
+  existed, which is exactly how a rule silently stops holding.
+- Every data-bearing route except `/meta` and `/verify` is guarded by
+  the `_require_session` dependency in
+  `backend/app/modules/budget/public_router.py`. To re-check the
+  surface, list the routes in that file (the public prefix moved out of
+  `router.py` into `public_router.py`):
+  `rg -n '_require_session' backend/app/modules/budget/public_router.py`
 
 ## References
 
