@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- refactor: the nine `event_bus.publish` call sites that named their event
+  with a string literal now use the matching `EventType` constant
+  (`treatment_plan.created`, `.status_changed`, `.treatment_added`,
+  `.treatment_removed`, `.treatment_completed`,
+  `.budget_sync_requested`). Identical strings, so no behaviour change —
+  but a typo in a literal publishes to nobody and raises nothing, and
+  this module was the only one still publishing that way. A new guard,
+  `tests/test_event_name_constants.py`, fails on any literal publish
+  under `app/`.
+
 - fix: `auto_close_expired_plans` (the daily 03:00 cron) raised
   `UndefinedColumnError` on its first statement and closed nothing, ever.
   It selected clinics with `WHERE deleted_at IS NULL` and `clinics` has no
