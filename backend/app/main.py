@@ -44,15 +44,9 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # (defaults to ``-`` outside a request).
     setup_logging()
 
-    # Security posture (audit SEC-01): public budget sessions fall back to
-    # SECRET_KEY when BUDGET_PUBLIC_SECRET_KEY is unset. Warn once in
-    # production; behavior unchanged (hard-requiring would break existing
-    # deploys that rely on the fallback).
-    if settings.ENVIRONMENT == "production" and not settings.BUDGET_PUBLIC_SECRET_KEY:
-        logger.warning(
-            "BUDGET_PUBLIC_SECRET_KEY is unset: public budget sessions fall "
-            "back to SECRET_KEY. Set a dedicated key in production."
-        )
+    # Security posture (audit SEC-01): a production boot without
+    # BUDGET_PUBLIC_SECRET_KEY already fails in app.config's Settings
+    # validation, so there is nothing left to warn about here.
     # Trusted-proxy posture (#623). uvicorn resolves request.client.host
     # from X-Forwarded-For only for peers in FORWARDED_ALLOW_IPS; "*"
     # trusts every peer and then takes the client-controlled leftmost
