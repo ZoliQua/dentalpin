@@ -162,7 +162,9 @@ they do not issue a fresh cookie.
   410, locked → 423), a cookie minted for one budget being rejected on
   another, the `none` method needing no cookie, the clinic-scoped
   `/meta` lookup, the budget-wide lockout total, and the accept/reject
-  `BudgetAccessLog` rows.
+  `BudgetAccessLog` rows. The production boot rules for
+  `BUDGET_PUBLIC_SECRET_KEY` (required, minimum length, no blank or
+  padded values) are proven in `backend/tests/test_secret_key_strength.py`.
 - What the tests do and do not reach: `phone_last4` (the default method)
   is exercised end to end over HTTP, including a wrong value and the
   locked/decided/expired gates. Creating or cloning any budget executes

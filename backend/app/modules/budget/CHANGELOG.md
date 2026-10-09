@@ -8,8 +8,8 @@
   the failed-attempt rows so the recovery is not one-shot, and writes
   a `BudgetHistory` entry for the unlock itself.
 - fix(#538): `BUDGET_PUBLIC_SECRET_KEY` is hard-required in production
-  (refuses to sign public sessions with the staff-JWT key); dev-only
-  fallback otherwise.
+  (missing, blank, short, or whitespace-padded values refuse to boot;
+  dev-only fallback otherwise).
 - feat(#540): public accept/reject decisions are logged to
   `BudgetAccessLog` with `success=True` (so they do not count towards
   the lockout), like the signed-PDF download.
