@@ -11,6 +11,17 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Tests
+
+- **Every declared scheduled job is now executed by a test** (#629).
+  `test_scheduler_jobs.py` asserted the job *ids* and never called them,
+  which is how the 03:00 auto-close cron shipped querying a column that
+  does not exist and failed silently every night for months (#628).
+  `test_scheduled_jobs_run.py` resolves all 17 declared jobs and runs
+  each against a real (empty) schema — a schema-and-import smoke test,
+  not behaviour coverage, which is what keeps it at ~12s. Confirmed it
+  catches #628's regression when the old query is put back.
+
 ### Security
 
 - **The backend no longer trusts `X-Forwarded-For` from any peer** (#623).
