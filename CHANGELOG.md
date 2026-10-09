@@ -72,6 +72,14 @@ frontend as a Nuxt layer under its own Python package.
   under `TZ=Pacific/Kiritimati` (UTC+14), selecting the files at run time
   so a new test of this shape is covered the day it lands.
 
+- **A typo in a route's permission string now fails CI.** The tool
+  registry already guarded this (`test_every_tool_permission_exists`,
+  "would otherwise silently always-deny"); routes gate on the same
+  strings with no equivalent check, and the consequence is worse — a 403
+  for every user, forever, with nothing logged to say the string was the
+  problem. The tree is clean today (673 literal call sites, 189 distinct,
+  all valid), so `test_route_permissions.py` is purely preventive.
+
 ### Fixed
 
 - **The help-portal build now fails on a fragment slug collision** and
@@ -83,17 +91,6 @@ frontend as a Nuxt layer under its own Python package.
   page's help away. The underlying question of how a query-selected
   sub-view gets its own fragment is still open on #573; this only makes
   the two failure modes visible.
-
-### Tests
-
-- **A typo in a route's permission string now fails CI.** The tool
-  registry already guarded this (`test_every_tool_permission_exists`,
-  "would otherwise silently always-deny"); routes gate on the same
-  strings with no equivalent check, and the consequence is worse — a 403
-  for every user, forever, with nothing logged to say the string was the
-  problem. The tree is clean today (673 literal call sites, 189 distinct,
-  all valid), so `test_route_permissions.py` is purely preventive.
-
 
 ## [2.8.0] - 2026-10-07
 
