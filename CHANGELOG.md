@@ -11,18 +11,15 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
-### Fixed
+### Changed
 
-- **The split-host cookie warning told PaaS operators to set a value
-  browsers reject** (#444). `_shared_parent` built `.onrender.com` from
-  `app.onrender.com` + `api.onrender.com` — two labels, so it passed the
-  existing "a public suffix is not a parent" check — and the guard then
-  advised `COOKIE_DOMAIN=.onrender.com`, which the browser drops. The
-  operator restarted the backend and nothing changed. Known hosting
-  suffixes now resolve to no parent, and the remedy for that case points
-  at `NUXT_API_PROXY=true` (shipped in 2.8.0 for exactly this shape)
-  instead of suggesting they go and buy a domain. A real multi-label
-  domain such as `.example.co.uk` is still suggested as before.
+- **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
+  required. A production boot without it fails fast with an actionable
+  message instead of signing public budget sessions with the staff-JWT
+  `SECRET_KEY`. Blank, whitespace-only, and whitespace-padded values are
+  also refused, so generate a clean value (e.g. `openssl rand -hex 32`)
+  before upgrading; `docker-compose.prod.yml` and
+  `docker-compose.coolify.yml` now both refuse to start without it.
 
 ### Security
 
@@ -75,7 +72,26 @@ frontend as a Nuxt layer under its own Python package.
   under `TZ=Pacific/Kiritimati` (UTC+14), selecting the files at run time
   so a new test of this shape is covered the day it lands.
 
+- **A typo in a route's permission string now fails CI.** The tool
+  registry already guarded this (`test_every_tool_permission_exists`,
+  "would otherwise silently always-deny"); routes gate on the same
+  strings with no equivalent check, and the consequence is worse — a 403
+  for every user, forever, with nothing logged to say the string was the
+  problem. The tree is clean today (673 literal call sites, 189 distinct,
+  all valid), so `test_route_permissions.py` is purely preventive.
+
 ### Fixed
+
+- **The split-host cookie warning told PaaS operators to set a value
+  browsers reject** (#444). `_shared_parent` built `.onrender.com` from
+  `app.onrender.com` + `api.onrender.com` — two labels, so it passed the
+  existing "a public suffix is not a parent" check — and the guard then
+  advised `COOKIE_DOMAIN=.onrender.com`, which the browser drops. The
+  operator restarted the backend and nothing changed. Known hosting
+  suffixes now resolve to no parent, and the remedy for that case points
+  at `NUXT_API_PROXY=true` (shipped in 2.8.0 for exactly this shape)
+  instead of suggesting they go and buy a domain. A real multi-label
+  domain such as `.example.co.uk` is still suggested as before.
 
 - **The help-portal build now fails on a fragment slug collision** and
   warns about a slug the app can never request (#573, partial). Two
