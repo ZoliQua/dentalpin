@@ -54,7 +54,9 @@ services:
       EMAIL_SMTP_PASSWORD: ${EMAIL_SMTP_PASSWORD:-}
       EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-noreply@dentalpin.com}
       EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-DentalPin}
-      BUDGET_PUBLIC_SECRET_KEY: ${BUDGET_PUBLIC_SECRET_KEY:-}
+      # Required in production since #538 (config.py refuses to boot
+      # without it); the agenda key keeps its optional form until #640.
+      BUDGET_PUBLIC_SECRET_KEY: ${BUDGET_PUBLIC_SECRET_KEY:?Set BUDGET_PUBLIC_SECRET_KEY in your .env}
       AGENDA_PUBLIC_SECRET_KEY: ${AGENDA_PUBLIC_SECRET_KEY:-}
       SENTRY_DSN: ${SENTRY_DSN:-}
       ENVIRONMENT: production

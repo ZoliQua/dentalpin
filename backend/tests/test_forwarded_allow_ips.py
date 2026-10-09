@@ -114,13 +114,13 @@ async def test_a_real_proxy_still_delivers_the_real_client(compose: str) -> None
     assert await _resolved_client(trusted, TRUSTED_PEER, "198.51.100.23") == "198.51.100.23"
 
 
-
 @pytest.mark.asyncio
 async def test_coolify_traefik_peer_is_trusted() -> None:
     """Coolify puts its networks in 10.0.x (Traefik reached prod from
     10.0.2.5); untrusted, every client became Traefik's IP."""
     trusted = _shipped_default("docker-compose.coolify.yml")
     assert await _resolved_client(trusted, "10.0.2.5", "198.51.100.23") == "198.51.100.23"
+
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("compose", COMPOSE_FILES)
