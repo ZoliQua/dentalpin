@@ -289,6 +289,34 @@ class Settings(BaseSettings):
             )
         return self
 
+    #: Email providers the boot guard accepts in production (#614).
+    PRODUCTION_EMAIL_PROVIDERS: ClassVar[tuple[str, ...]] = ("smtp",)
+
+    @model_validator(mode="after")
+    def _validate_email_provider_production(self) -> "Settings":
+        """Refuse to boot production on a non-sending email provider (#614).
+
+        The console provider writes the whole patient communication to
+        the application log at INFO and reports it sent, so a production
+        boot with ``EMAIL_PROVIDER=console`` leaks PII into the logs
+        while the UI claims delivery. An unknown provider is no better:
+        the service falls back to console with only a warning. Disabled
+        email (``EMAIL_ENABLED=false``) is the legitimate opt-out and
+        boots fine; the public demo (``DEMO_MODE=true``) keeps console —
+        it carries only seeded fake data and is maintainer-controlled.
+        Dev/test keep the console default silently.
+        """
+        if self.ENVIRONMENT != "production" or not self.EMAIL_ENABLED or self.DEMO_MODE:
+            return self
+        if self.EMAIL_PROVIDER not in self.PRODUCTION_EMAIL_PROVIDERS:
+            raise ValueError(
+                f"EMAIL_PROVIDER={self.EMAIL_PROVIDER!r} is not allowed in "
+                "production: refusing to start a mail-sending instance that "
+                "cannot deliver. Set EMAIL_PROVIDER=smtp (see .env.example), "
+                "or EMAIL_ENABLED=false if this instance sends no mail."
+            )
+        return self
+
     @model_validator(mode="after")
     def _warn_about_unknown_env_keys(self) -> "Settings":
         """Name keys in ``.env`` that look like misspelled app settings.

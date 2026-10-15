@@ -4,7 +4,8 @@
 recipient, name, treatment, amount — to the application log and reports
 `SUCCESS`, so the outbox marks it sent while the patient receives
 nothing. Reaching that state in production is an omission, not a choice,
-so it has to say so.
+so it has to say so — and since the fail-closed boot guard, it cannot
+even start there (see the boot-refusal tests at the bottom of this file).
 """
 
 from __future__ import annotations
@@ -106,3 +107,60 @@ def test_boolean_email_settings_have_a_real_default(compose: str) -> None:
         m = re.search(rf"^\s+{name}: \$\{{{name}:-(.*?)\}}", body, re.M)
         assert m, f"{compose}: {name} not forwarded with a default"
         assert m.group(1) != "", f"{compose}: {name} defaults to empty, which fails bool parsing"
+
+
+def _make_settings(**overrides):
+    from app.config import MIN_SECRET_KEY_LENGTH, Settings
+
+    kwargs = {
+        "DATABASE_URL": "postgresql://user:pass@localhost/db",
+        "SECRET_KEY": "a" * MIN_SECRET_KEY_LENGTH,
+        "BUDGET_PUBLIC_SECRET_KEY": "a" * MIN_SECRET_KEY_LENGTH,
+        "AGENDA_PUBLIC_SECRET_KEY": "a" * MIN_SECRET_KEY_LENGTH,
+        "ENVIRONMENT": "development",
+    }
+    kwargs.update(overrides)
+    return Settings(**kwargs)
+
+
+def test_console_provider_in_production_refuses_to_boot():
+    """Fail-closed: console logs PII while reporting delivery (#614)."""
+    with pytest.raises(ValueError, match="EMAIL_PROVIDER='console' is not allowed"):
+        _make_settings(ENVIRONMENT="production", EMAIL_PROVIDER="console")
+
+
+def test_unknown_provider_in_production_refuses_to_boot():
+    """Unknown falls back to console in the service — same hole, same refusal."""
+    with pytest.raises(ValueError, match="EMAIL_PROVIDER='carrier-pigeon' is not allowed"):
+        _make_settings(ENVIRONMENT="production", EMAIL_PROVIDER="carrier-pigeon")
+
+
+def test_disabled_email_in_production_boots():
+    """EMAIL_ENABLED=false is the legitimate no-mail opt-out."""
+    settings = _make_settings(ENVIRONMENT="production", EMAIL_ENABLED=False)
+    assert settings.EMAIL_ENABLED is False
+
+
+def test_demo_mode_in_production_keeps_console():
+    """The public demo carries only seeded fake data (maintainer-controlled)."""
+    settings = _make_settings(ENVIRONMENT="production", DEMO_MODE=True)
+    assert settings.EMAIL_PROVIDER == "console"
+
+
+def test_smtp_provider_in_production_boots_clean():
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        settings = _make_settings(ENVIRONMENT="production", EMAIL_PROVIDER="smtp")
+    assert settings.EMAIL_PROVIDER == "smtp"
+
+
+def test_console_provider_outside_production_boots_silently():
+    """Console is the documented dev default — no warning noise on every boot."""
+    import warnings
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        settings = _make_settings(ENVIRONMENT="development")
+    assert settings.EMAIL_PROVIDER == "console"

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#614): production refuses to boot with `EMAIL_PROVIDER=console`
+  (or unknown) when email is enabled — the console provider logs the
+  whole patient communication at INFO while reporting it sent. Opt out
+  with `EMAIL_ENABLED=false`; the public demo (`DEMO_MODE=true`) is
+  exempt. `.env.prod.example` documents the SMTP section; per-clinic
+  `console` settings remain a follow-up.
 - feat(#546, ADR 0038): expose a `NotificationsErasureContributor` instead of
   subscribing to `gdpr.erasure.executed`; `gdpr` pulls it inside the
   erasure transaction. Same redaction (recipient, subject, body, template

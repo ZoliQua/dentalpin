@@ -26,6 +26,9 @@ def test_environment_accepts_known_values(value: str) -> None:
         SECRET_KEY="x" * 32,
         BUDGET_PUBLIC_SECRET_KEY="x" * 32,
         AGENDA_PUBLIC_SECRET_KEY="x" * 32,
+        # Console email is refused in production (#614); smtp keeps the
+        # production case about the enum, not the email floor.
+        EMAIL_PROVIDER="smtp",
     )
     assert settings.ENVIRONMENT == value
 

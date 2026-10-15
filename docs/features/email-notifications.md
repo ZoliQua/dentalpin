@@ -568,3 +568,9 @@ EMAIL_SMTP_TLS=true
 EMAIL_FROM_ADDRESS=noreply@example.com
 EMAIL_FROM_NAME=DentalPin
 ```
+
+Production refuses to boot with `EMAIL_PROVIDER=console` (or an unknown
+provider) while email is enabled (#614): console writes the whole patient
+communication to the application log and reports it sent. Either configure
+SMTP or set `EMAIL_ENABLED=false`; the public demo (`DEMO_MODE=true`) is
+exempt.
