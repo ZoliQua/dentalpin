@@ -37,6 +37,14 @@ frontend as a Nuxt layer under its own Python package.
 - Email templates missing in a locale now fall back to the English
   template instead of rendering nothing.
 
+- **Upgrade note (production):** `EMAIL_PROVIDER=console` (the dev
+  default) is now refused at boot when email is enabled (#614). A
+  production instance that never set `EMAIL_PROVIDER` gets `console`
+  from the compose defaults, so the default upgrade path fails fast
+  until the operator edits `.env`: set `EMAIL_PROVIDER=smtp` with
+  real credentials, or `EMAIL_ENABLED=false` if the instance sends
+  no mail. The public demo (`DEMO_MODE=true`) is exempt.
+
 - **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
   required. A production boot without it fails fast with an actionable
   message instead of signing public budget sessions with the staff-JWT
