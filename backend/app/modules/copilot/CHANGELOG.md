@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#332): `COPILOT_MAX_TOKENS` was declared in `Settings` and read
+  nowhere, while `drive_turn` and `resume_turn` each hardcoded
+  `max_tokens=4096`, so the setting an operator could change did
+  nothing. Both call sites now read it, and the setting is documented
+  in `.env.example` and `.env.prod.example` so it can be set at all.
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from
