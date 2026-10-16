@@ -64,7 +64,6 @@ def test_strong_key_in_production_boots_clean():
             ENVIRONMENT="production",
             BUDGET_PUBLIC_SECRET_KEY=STRONG_KEY,
             AGENDA_PUBLIC_SECRET_KEY=STRONG_KEY,
-            EMAIL_PROVIDER="smtp",  # console is refused in production (#614)
         )
     assert settings.SECRET_KEY == STRONG_KEY
 
