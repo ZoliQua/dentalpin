@@ -3,8 +3,9 @@
 `EMAIL_PROVIDER` defaults to `console`, which is reached by omission,
 not choice. In production the console provider is metadata-only and
 reports FAILED (so the UI and the outbox stop claiming delivery), and
-boot logs an ERROR naming the remedy. Per the maintainer decision,
-production boots normally — no refusal.
+resolving the provider logs an ERROR naming the remedy (resolution is
+lazy, so on the first email). Per the maintainer decision, production
+boots normally — no refusal.
 """
 
 from __future__ import annotations
