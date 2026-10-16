@@ -82,9 +82,16 @@ class EmailService:
         else:
             # Fallback to console if unknown provider
             self._provider = ConsoleProvider()
-            logger.warning(
-                f"Unknown email provider '{settings.EMAIL_PROVIDER}', falling back to console"
-            )
+            if settings.ENVIRONMENT == "production":
+                logger.error(
+                    f"Unknown email provider '{settings.EMAIL_PROVIDER}': no email "
+                    "will be delivered. Set EMAIL_PROVIDER=smtp (or "
+                    "EMAIL_ENABLED=false to silence this)."
+                )
+            else:
+                logger.warning(
+                    f"Unknown email provider '{settings.EMAIL_PROVIDER}', falling back to console"
+                )
 
         # Initialize Jinja2 environment for templates
         if TEMPLATES_DIR.exists():

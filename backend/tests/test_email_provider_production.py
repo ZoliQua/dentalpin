@@ -46,6 +46,19 @@ def test_smtp_in_production_does_not_warn(monkeypatch, caplog) -> None:
     assert "Email is not configured" not in text
 
 
+def test_unknown_provider_in_production_logs_an_error(monkeypatch, caplog) -> None:
+    """Unknown falls back to console, so production stays just as loud (#614)."""
+    text = _resolve(monkeypatch, caplog, environment="production", provider="carrier-pigeon")
+    assert "Unknown email provider 'carrier-pigeon'" in text
+    assert any(r.levelno >= logging.ERROR for r in caplog.records)
+
+
+def test_unknown_provider_outside_production_stays_a_warning(monkeypatch, caplog) -> None:
+    text = _resolve(monkeypatch, caplog, environment="development", provider="carrier-pigeon")
+    assert "falling back to console" in text
+    assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
+
+
 def test_env_example_documents_the_setting() -> None:
     """An operator cannot set what the example never mentions."""
     from pathlib import Path
