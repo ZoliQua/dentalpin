@@ -574,4 +574,5 @@ provider) while email is enabled (#614): boot logs an ERROR naming the
 remedy, the console provider writes metadata-only lines (masked
 recipient, no subject/body/names) and reports every send as failed, so
 the UI stops claiming delivery. Either configure SMTP or set
-`EMAIL_ENABLED=false`; the public demo (`DEMO_MODE=true`) is unaffected.
+`EMAIL_ENABLED=false`. A demo instance running `ENVIRONMENT=development`
+is unaffected by the production branch.
