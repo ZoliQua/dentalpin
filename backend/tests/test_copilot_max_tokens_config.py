@@ -34,15 +34,17 @@ def _backend_env_block(compose: str) -> str:
 
 @pytest.mark.parametrize("compose", COMPOSE_FILES)
 def test_compose_forwards_the_token_ceiling(compose: str) -> None:
+    """The compose default must equal the Settings default, not repeat it as a
+    second literal, so the pair is actually checked.
+
+    `${COPILOT_MAX_TOKENS:-}` with no default would resolve to an empty
+    string and fail int parsing at boot, the way EMAIL_ENABLED did.
+    """
     block = _backend_env_block(compose)
     match = re.search(r"^\s+COPILOT_MAX_TOKENS:\s*\$\{COPILOT_MAX_TOKENS:-([^}]*)\}", block, re.M)
     assert match, f"{compose} does not forward COPILOT_MAX_TOKENS to the backend"
-    assert match.group(1).strip() == "4096", "compose default must match the Settings default"
-
-
-def test_compose_default_matches_the_settings_default() -> None:
-    """A drifting pair means the documented default is a lie in one place."""
-    assert Settings.model_fields["COPILOT_MAX_TOKENS"].default == 4096
+    default = str(Settings.model_fields["COPILOT_MAX_TOKENS"].default)
+    assert match.group(1).strip() == default, "compose default must match the Settings default"
 
 
 @pytest.mark.parametrize("template", (".env.example", ".env.prod.example"))
@@ -53,6 +55,5 @@ def test_templates_document_the_setting(template: str) -> None:
 
 
 def test_the_setting_is_an_int() -> None:
-    """`${COPILOT_MAX_TOKENS:-}` with no default would resolve to an empty
-    string and fail bool/int parsing at boot, the way EMAIL_ENABLED did."""
+    """The field parses as an int so the env value cannot be free text."""
     assert Settings.model_fields["COPILOT_MAX_TOKENS"].annotation is int
