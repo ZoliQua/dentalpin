@@ -514,6 +514,72 @@ def test_openrouter_groq_spec_shape() -> None:
         assert isinstance(spec.factory(ProviderConfig(api_key="test-key")), cls)
 
 
+# --- ollama provider --------------------------------------------------------
+
+
+def test_ollama_provider_needs_no_key() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider()
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
+def test_ollama_provider_targets_configured_endpoint() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    assert str(provider._client.base_url) == "http://192.168.1.20:11434/v1/"
+
+
+def test_ollama_provider_strips_trailing_slash() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://ollama:11434/")
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
+def test_ollama_provider_accepts_full_compat_url() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://host.docker.internal:11434/v1")
+    assert str(provider._client.base_url) == "http://host.docker.internal:11434/v1/"
+
+
+def test_ollama_spec_shape() -> None:
+    from app.config import settings
+    from app.core.llm.factory import OLLAMA_SPEC
+    from app.core.llm.ollama_provider import OllamaProvider
+    from app.core.llm.spec import ProviderConfig
+
+    assert OLLAMA_SPEC.name == "ollama"
+    assert OLLAMA_SPEC.tool_dialect == "openai"
+    assert OLLAMA_SPEC.needs_api_key is False
+    assert OLLAMA_SPEC.api_key_setting is None
+    assert OLLAMA_SPEC.base_url_setting == "OLLAMA_BASE_URL"
+    assert OLLAMA_SPEC.default_model == settings.COPILOT_MODEL_CHAT_OLLAMA
+    assert isinstance(OLLAMA_SPEC.factory(ProviderConfig(api_key=None)), OllamaProvider)
+
+
+def test_production_compose_forwards_ollama_base_url() -> None:
+    """A self-hosted endpoint the compose never passes cannot be reached.
+
+    Neither prod compose file declares ``env_file``, so a setting absent
+    from ``environment:`` keeps its default inside the container (#673).
+    """
+    import re
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[2]
+    for compose in ("docker-compose.prod.yml",):
+        body = (repo / compose).read_text(encoding="utf-8")
+        after = body.split("\n  backend:", 1)[1]
+        nxt = re.search(r"^  \S", after, re.M)
+        backend = after[: nxt.start()] if nxt else after
+        assert re.search(r"^\s+OLLAMA_BASE_URL:\s*\$\{OLLAMA_BASE_URL:-[^}]*\}", backend, re.M), (
+            f"{compose} does not forward OLLAMA_BASE_URL"
+        )
+
+
 def test_anthropic_message_mapping_merges_tool_results_into_user_turn() -> None:
     from app.core.llm.anthropic_provider import _to_anthropic_messages
     from app.core.llm.base import ToolUseBlock

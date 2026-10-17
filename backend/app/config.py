@@ -196,12 +196,17 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     OPENROUTER_API_KEY: str = ""
     GROQ_API_KEY: str = ""
+    # Ollama (self-hosted, keyless) - the OpenAI-compatible server root;
+    # the provider appends `/v1`. Defaults to the compose service name, so
+    # a same-host operator who runs Ollama elsewhere sets this one URL.
+    OLLAMA_BASE_URL: str = "http://ollama:11434"
     COPILOT_PROVIDER_DEFAULT: str = "openai"
     COPILOT_MODEL_CHAT_OPENAI: str = "gpt-5.4-mini"
     COPILOT_MODEL_CHAT_ANTHROPIC: str = "claude-sonnet-5"
     COPILOT_MODEL_CHAT_GEMINI: str = "gemini-3.5-flash"
     COPILOT_MODEL_CHAT_OPENROUTER: str = "meta-llama/llama-3.3-70b-instruct"
     COPILOT_MODEL_CHAT_GROQ: str = "llama-3.3-70b-versatile"
+    COPILOT_MODEL_CHAT_OLLAMA: str = "llama3.1:8b"
     COPILOT_MAX_TOKENS: int = 4096
     COPILOT_REDACTION_DEFAULT: bool = True
 
