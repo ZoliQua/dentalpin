@@ -548,7 +548,7 @@ def test_ollama_provider_accepts_full_compat_url() -> None:
 def test_ollama_spec_shape() -> None:
     from app.config import settings
     from app.core.llm.factory import OLLAMA_SPEC
-    from app.core.llm.ollama_provider import OllamaProvider
+    from app.core.llm.ollama_provider import OLLAMA_DEFAULT_BASE_URL, OllamaProvider
     from app.core.llm.spec import ProviderConfig
 
     assert OLLAMA_SPEC.name == "ollama"
@@ -557,14 +557,19 @@ def test_ollama_spec_shape() -> None:
     assert OLLAMA_SPEC.api_key_setting is None
     assert OLLAMA_SPEC.base_url_setting == "OLLAMA_BASE_URL"
     assert OLLAMA_SPEC.default_model == settings.COPILOT_MODEL_CHAT_OLLAMA
+    # The provider's fallback default must track the deployment setting it
+    # mirrors, or a config edit silently diverges from direct construction.
+    assert OLLAMA_DEFAULT_BASE_URL == settings.OLLAMA_BASE_URL
     assert isinstance(OLLAMA_SPEC.factory(ProviderConfig(api_key=None)), OllamaProvider)
 
 
 def test_production_compose_forwards_ollama_base_url() -> None:
     """A self-hosted endpoint the compose never passes cannot be reached.
 
-    Neither prod compose file declares ``env_file``, so a setting absent
-    from ``environment:`` keeps its default inside the container (#673).
+    The backend service lists env key-by-key and declares no ``env_file``,
+    so a setting absent from ``environment:`` keeps its default inside the
+    container (#673). Coolify forwards no copilot provider key at all, so
+    only the main prod compose carries an assertion here.
     """
     import re
     from pathlib import Path

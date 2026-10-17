@@ -27,7 +27,7 @@ OLLAMA_PLACEHOLDER_API_KEY = "ollama"
 
 
 def _openai_compatible_url(base_url: str | None) -> str:
-    """Normalize a server root (or full endpoint) to Ollama's base URL."""
+    """Normalize a server root (with or without a trailing ``/v1``)."""
     root = (base_url or OLLAMA_DEFAULT_BASE_URL).strip().rstrip("/")
     if root.endswith("/v1"):
         return f"{root}/"

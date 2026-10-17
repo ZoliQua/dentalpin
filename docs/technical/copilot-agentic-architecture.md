@@ -9,8 +9,9 @@ Status: **plan / not yet implemented**. This is the technical/architecture plan 
 > `GeminiProvider` have since landed in `backend/app/core/llm/`; the factory
 > now resolves active provider specifications through a process-wide
 > registry. Copilot registers the built-in OpenAI, Anthropic, Gemini,
-> OpenRouter and Groq specifications from `CopilotModule.on_activate()` per
-> ADR 0020. RAG/Ollama remain deferred as stated.
+> OpenRouter, Groq and Ollama specifications from `CopilotModule.on_activate()`
+> per ADR 0020. RAG/pgvector, proactive/scheduled agents and admin dashboards
+> remain deferred as stated.
 
 ---
 
