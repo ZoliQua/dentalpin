@@ -518,10 +518,11 @@ def test_openrouter_groq_spec_shape() -> None:
 
 
 def test_ollama_provider_needs_no_key() -> None:
-    from app.core.llm.ollama_provider import OllamaProvider
+    from app.core.llm.ollama_provider import OLLAMA_PLACEHOLDER_API_KEY, OllamaProvider
 
     provider = OllamaProvider()
     assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+    assert provider._client.api_key == OLLAMA_PLACEHOLDER_API_KEY
 
 
 def test_ollama_provider_targets_configured_endpoint() -> None:
@@ -543,6 +544,13 @@ def test_ollama_provider_accepts_full_compat_url() -> None:
 
     provider = OllamaProvider(base_url="http://host.docker.internal:11434/v1")
     assert str(provider._client.base_url) == "http://host.docker.internal:11434/v1/"
+
+
+def test_ollama_provider_accepts_full_compat_url_with_trailing_slash() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434/v1/")
+    assert str(provider._client.base_url) == "http://192.168.1.20:11434/v1/"
 
 
 def test_ollama_provider_empty_base_url_uses_default() -> None:
@@ -615,14 +623,14 @@ def test_production_compose_forwards_ollama_base_url() -> None:
 
     The backend service lists env key-by-key and declares no ``env_file``,
     so a setting absent from ``environment:`` keeps its default inside the
-    container (#673). Coolify forwards no copilot provider key at all, so
-    only the main prod compose carries an assertion here.
+    container (#673). Both dev and prod must forward it: Ollama is the
+    self-hosted provider, so local development is its primary deployment.
     """
     import re
     from pathlib import Path
 
     repo = Path(__file__).resolve().parents[2]
-    for compose in ("docker-compose.prod.yml",):
+    for compose in ("docker-compose.prod.yml", "docker-compose.yml"):
         body = (repo / compose).read_text(encoding="utf-8")
         after = body.split("\n  backend:", 1)[1]
         nxt = re.search(r"^  \S", after, re.M)

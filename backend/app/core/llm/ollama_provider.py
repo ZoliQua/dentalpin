@@ -12,8 +12,8 @@ placeholder stands in); pointed at a host on the operator's network, every
 prompt stays there. Tool calling only works on pulled models that support
 it; the mandatory PHI redactor still runs upstream (the local-tier
 relaxation from the #332 brief stays deferred). Token-budget accounting
-reads the streamed usage chunks, so a server that omits them disables
-that accounting.
+reads the streamed usage chunks, so a server that omits them leaves
+``monthly_token_limit`` unenforced and ``GET /metrics`` reading zero.
 """
 
 from __future__ import annotations
