@@ -618,19 +618,20 @@ def test_get_provider_ollama_threads_configured_base_url(monkeypatch: pytest.Mon
             llm_provider_registry.register(previous)
 
 
-def test_production_compose_forwards_ollama_base_url() -> None:
+def test_compose_forwards_ollama_base_url() -> None:
     """A self-hosted endpoint the compose never passes cannot be reached.
 
-    The backend service lists env key-by-key and declares no ``env_file``,
-    so a setting absent from ``environment:`` keeps its default inside the
-    container (#673). Both dev and prod must forward it: Ollama is the
-    self-hosted provider, so local development is its primary deployment.
+    Every deployment compose lists the backend env key-by-key and declares
+    no ``env_file``, so a setting absent from ``environment:`` keeps its
+    default inside the container (#673), and a selection pointing at an
+    unreachable host fails only at first chat. Ollama is self-hosted, so
+    local development (``docker-compose.yml``) is its primary deployment.
     """
     import re
     from pathlib import Path
 
     repo = Path(__file__).resolve().parents[2]
-    for compose in ("docker-compose.prod.yml", "docker-compose.yml"):
+    for compose in ("docker-compose.prod.yml", "docker-compose.yml", "docker-compose.coolify.yml"):
         body = (repo / compose).read_text(encoding="utf-8")
         after = body.split("\n  backend:", 1)[1]
         nxt = re.search(r"^  \S", after, re.M)
