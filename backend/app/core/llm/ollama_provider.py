@@ -8,10 +8,10 @@ endpoint. Tool dialect is ``"openai"``; dotted tool names map
 ``.`` <-> ``-`` exactly like the OpenAI provider.
 
 Ollama needs no API key (the ``openai`` SDK refuses an empty one, so a
-placeholder stands in) and keeps every prompt on the operator's network.
-Tool calling only works on pulled models that support it; the mandatory
-PHI redactor still runs upstream (the local-tier relaxation from the #332
-brief stays deferred).
+placeholder stands in); pointed at a host on the operator's network, every
+prompt stays there. Tool calling only works on pulled models that support
+it; the mandatory PHI redactor still runs upstream (the local-tier
+relaxation from the #332 brief stays deferred).
 """
 
 from __future__ import annotations
