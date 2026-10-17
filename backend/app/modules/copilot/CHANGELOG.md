@@ -7,10 +7,13 @@
   `needs_api_key=False`, a nullable `api_key_setting` and a new
   `base_url_setting` (`OLLAMA_BASE_URL`, default `http://ollama:11434`,
   `/v1` appended by the adapter) the factory now threads into
-  `ProviderConfig`. `COPILOT_MODEL_CHAT_OLLAMA` default `llama3.1:8b`;
+  `ProviderConfig`.   `COPILOT_MODEL_CHAT_OLLAMA` default `llama3.1:8b`;
   spec registered from `on_activate`. No bridge, settings or UI change.
   The mandatory PHI redactor still runs upstream (the local-tier
-  redaction relaxation from the #332 brief stays deferred).
+  redaction relaxation from the #332 brief stays deferred), and save-time
+  validation stays key-only: Ollama is not probed for reachability or
+  model tool support (the brief's tool-use-incapable 422 stays deferred
+  too).
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from

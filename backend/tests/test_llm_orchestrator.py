@@ -545,8 +545,15 @@ def test_ollama_provider_accepts_full_compat_url() -> None:
     assert str(provider._client.base_url) == "http://host.docker.internal:11434/v1/"
 
 
+def test_ollama_provider_empty_base_url_uses_default() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="")
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
 def test_ollama_spec_shape() -> None:
-    from app.config import settings
+    from app.config import Settings, settings
     from app.core.llm.factory import OLLAMA_SPEC
     from app.core.llm.ollama_provider import OLLAMA_DEFAULT_BASE_URL, OllamaProvider
     from app.core.llm.spec import ProviderConfig
@@ -557,10 +564,23 @@ def test_ollama_spec_shape() -> None:
     assert OLLAMA_SPEC.api_key_setting is None
     assert OLLAMA_SPEC.base_url_setting == "OLLAMA_BASE_URL"
     assert OLLAMA_SPEC.default_model == settings.COPILOT_MODEL_CHAT_OLLAMA
-    # The provider's fallback default must track the deployment setting it
-    # mirrors, or a config edit silently diverges from direct construction.
-    assert OLLAMA_DEFAULT_BASE_URL == settings.OLLAMA_BASE_URL
+    # The provider's fallback default must track the deployment setting's
+    # default, or a config edit silently diverges from direct construction.
+    # Assert the *field default*, not the ambient value: an operator who
+    # sets OLLAMA_BASE_URL (as the prod compose comment invites) must not
+    # turn this suite red.
+    assert OLLAMA_DEFAULT_BASE_URL == Settings.model_fields["OLLAMA_BASE_URL"].default
     assert isinstance(OLLAMA_SPEC.factory(ProviderConfig(api_key=None)), OllamaProvider)
+
+
+def test_factory_normalizes_blank_base_url_to_none(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import settings
+    from app.core.llm.factory import OLLAMA_SPEC, get_configured_base_url
+
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "")
+    assert get_configured_base_url(OLLAMA_SPEC) is None
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "http://192.168.1.20:11434")
+    assert get_configured_base_url(OLLAMA_SPEC) == "http://192.168.1.20:11434"
 
 
 def test_production_compose_forwards_ollama_base_url() -> None:
@@ -580,7 +600,7 @@ def test_production_compose_forwards_ollama_base_url() -> None:
         after = body.split("\n  backend:", 1)[1]
         nxt = re.search(r"^  \S", after, re.M)
         backend = after[: nxt.start()] if nxt else after
-        assert re.search(r"^\s+OLLAMA_BASE_URL:\s*\$\{OLLAMA_BASE_URL:-[^}]*\}", backend, re.M), (
+        assert re.search(r"^\s+OLLAMA_BASE_URL:\s*\$\{OLLAMA_BASE_URL:-\}", backend, re.M), (
             f"{compose} does not forward OLLAMA_BASE_URL"
         )
 

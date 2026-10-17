@@ -126,11 +126,13 @@ def get_configured_base_url(spec: ProviderSpec) -> str | None:
     """Return the deployment-level base URL configured for ``spec``.
 
     ``None`` for vendors with a fixed endpoint; the self-hosted provider
-    (Ollama) reads its endpoint from ``OLLAMA_BASE_URL``.
+    (Ollama) reads its endpoint from ``OLLAMA_BASE_URL``. An unset *or*
+    empty setting normalizes to ``None`` so the provider's own default
+    applies (Compose forwards an unset var as ``""``, not omitted).
     """
     if spec.base_url_setting is None:
         return None
-    return getattr(settings, spec.base_url_setting)
+    return getattr(settings, spec.base_url_setting) or None
 
 
 def get_provider(name: str, *, api_key: str | None = None) -> Provider:
