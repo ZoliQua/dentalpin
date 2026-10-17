@@ -10,7 +10,8 @@
   `COPILOT_PROVIDER_DEFAULT`, like `docker-compose.prod.yml` already did,
   and `tests/test_copilot_compose_wiring.py` derives the required keys
   from the registered provider specs so the two stacks cannot drift
-  apart again.
+  apart again. `COPILOT_PROVIDER_DEFAULT` and `COPILOT_MAX_TOKENS` are
+  forwarded there too, for the same reason.
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from
