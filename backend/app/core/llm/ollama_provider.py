@@ -11,7 +11,9 @@ Ollama needs no API key (the ``openai`` SDK refuses an empty one, so a
 placeholder stands in); pointed at a host on the operator's network, every
 prompt stays there. Tool calling only works on pulled models that support
 it; the mandatory PHI redactor still runs upstream (the local-tier
-relaxation from the #332 brief stays deferred).
+relaxation from the #332 brief stays deferred). Token-budget accounting
+reads the streamed usage chunks, so a server that omits them disables
+that accounting.
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ OLLAMA_PLACEHOLDER_API_KEY = "ollama"
 
 def _openai_compatible_url(base_url: str | None) -> str:
     """Normalize a server root (with or without a trailing ``/v1``)."""
-    root = (base_url or OLLAMA_DEFAULT_BASE_URL).strip().rstrip("/")
+    root = (base_url or "").strip().rstrip("/") or OLLAMA_DEFAULT_BASE_URL
     if root.endswith("/v1"):
         return f"{root}/"
     return f"{root}/v1/"

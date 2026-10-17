@@ -132,7 +132,7 @@ def get_configured_base_url(spec: ProviderSpec) -> str | None:
     """
     if spec.base_url_setting is None:
         return None
-    return getattr(settings, spec.base_url_setting) or None
+    return (getattr(settings, spec.base_url_setting) or "").strip() or None
 
 
 def get_provider(name: str, *, api_key: str | None = None) -> Provider:

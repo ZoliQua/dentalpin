@@ -552,6 +552,13 @@ def test_ollama_provider_empty_base_url_uses_default() -> None:
     assert str(provider._client.base_url) == "http://ollama:11434/v1/"
 
 
+def test_ollama_provider_whitespace_base_url_uses_default() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="   ")
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
 def test_ollama_spec_shape() -> None:
     from app.config import Settings, settings
     from app.core.llm.factory import OLLAMA_SPEC
@@ -579,8 +586,28 @@ def test_factory_normalizes_blank_base_url_to_none(monkeypatch: pytest.MonkeyPat
 
     monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "")
     assert get_configured_base_url(OLLAMA_SPEC) is None
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "   ")
+    assert get_configured_base_url(OLLAMA_SPEC) is None
     monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "http://192.168.1.20:11434")
     assert get_configured_base_url(OLLAMA_SPEC) == "http://192.168.1.20:11434"
+
+
+def test_get_provider_ollama_threads_configured_base_url(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import settings
+    from app.core.llm.factory import OLLAMA_SPEC, get_provider
+    from app.core.llm.registry import llm_provider_registry
+
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "http://192.168.1.20:11434")
+    previous = llm_provider_registry.get("ollama")
+    llm_provider_registry.register(OLLAMA_SPEC)
+    try:
+        provider = get_provider("ollama")
+        assert str(provider._client.base_url) == "http://192.168.1.20:11434/v1/"
+    finally:
+        if previous is None:
+            llm_provider_registry.unregister("ollama")
+        else:
+            llm_provider_registry.register(previous)
 
 
 def test_production_compose_forwards_ollama_base_url() -> None:
