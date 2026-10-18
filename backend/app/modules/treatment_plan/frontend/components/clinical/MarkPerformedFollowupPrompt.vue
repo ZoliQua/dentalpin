@@ -31,7 +31,9 @@ const markedCount = ref<number | null>(null)
 // dialog — re-fetch the detail so `treatments` is always present.
 onMounted(async () => {
   try {
-    const res = await api.get<ApiResponse<Appointment>>(`/api/v1/appointments/${props.appointment.id}`)
+    const res = await api.get<ApiResponse<Appointment>>(
+      `/api/v1/agenda/appointments/${props.appointment.id}`
+    )
     pendingLinked.value = (res.data.treatments ?? []).filter(
       tr => tr.planned_item_id && tr.plan_id
         && tr.planned_item_status === 'pending' && !tr.completed_in_appointment
