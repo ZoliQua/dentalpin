@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#679): `list_rvg_imports.status` is typed with a new
+  `RvgImportStatus` Literal, so an unrecognized queue status is rejected by
+  name instead of reporting an empty approval queue — which reads as
+  "nothing is waiting".
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 
 - fix: the queue list stays visible when the counts call fails (counts

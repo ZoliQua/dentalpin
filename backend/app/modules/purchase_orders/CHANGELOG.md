@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- fix(#679): `PO_STATUSES` is derived from a new `PurchaseOrderStatus`
+  Literal (one vocabulary, two shapes, no drift), and the agent tools are
+  typed with it: `list_purchase_orders.order_status` rejects an unknown
+  status by name instead of answering an empty page, and
+  `transition_purchase_order.status` advertises the four reachable targets
+  — `received` is excluded, since it is stamped only by a receive batch
+  that fulfils every line.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi purchase-order PDF labels.
 - feat(i18n): Telugu (`te`) locale for the module's frontend layer.
 - feat(i18n): Telugu (`te`) purchase-order PDF labels.
