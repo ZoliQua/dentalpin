@@ -202,6 +202,28 @@ def test_disabled_email_in_production_boots():
     assert settings.EMAIL_ENABLED is False
 
 
+@pytest.mark.asyncio
+async def test_disabled_email_skips_instead_of_failing(monkeypatch, caplog) -> None:
+    """The opt-out silences the send path too: SKIPPED, no ERROR (#614)."""
+    from app.config import settings as app_settings
+    from app.core.email.providers.base import EmailMessage, EmailStatus
+
+    monkeypatch.setattr(app_settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(app_settings, "TESTING", False)
+    monkeypatch.setattr(app_settings, "EMAIL_ENABLED", False)
+    message = EmailMessage(
+        to_email="ana@example.com",
+        subject="Hola",
+        body_html="<p>Hola</p>",
+    )
+    with caplog.at_level(logging.INFO, logger="app.core.email"):
+        result = await EmailService().send(message)
+    assert result.status == EmailStatus.SKIPPED
+    assert not result.is_success
+    assert result.error_message == "Email is disabled (EMAIL_ENABLED=false)"
+    assert "ERROR" not in caplog.text
+
+
 def test_smtp_provider_in_production_boots_clean():
     import warnings
 

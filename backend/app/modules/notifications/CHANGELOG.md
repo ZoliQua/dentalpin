@@ -6,10 +6,12 @@
   boots normally but delivers nothing loudly — resolving the provider
   logs an ERROR, the console provider writes metadata-only lines (masked
   recipient, no subject/body/names) and reports sends as failed so the UI
-  stops claiming delivery. Opt out with `EMAIL_ENABLED=false`. The public
+  stops claiming delivery. `EMAIL_ENABLED=false` is a real opt-out: the
+  send path returns SKIPPED before resolving a provider, and the gateway
+  records SKIPPED as a skip (no retry, no `notification.failed`) instead
+  of collapsing it into a failure. The public
   demo runs production, so it reports those sends as failed too.
-  `.env.prod.example` documents the SMTP section; per-clinic
-  `console` settings remain a follow-up.
+  `.env.prod.example` documents the SMTP section.
 - feat(#546, ADR 0038): expose a `NotificationsErasureContributor` instead of
   subscribing to `gdpr.erasure.executed`; `gdpr` pulls it inside the
   erasure transaction. Same redaction (recipient, subject, body, template

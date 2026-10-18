@@ -575,7 +575,8 @@ ERROR naming the remedy (resolution is lazy, so this happens on the first
 email, not at boot), the console provider writes metadata-only lines
 (masked recipient, no subject/body/names) and reports every send as
 failed, so the UI stops claiming delivery. Either configure SMTP or set
-`EMAIL_ENABLED=false`. The public demo is not exempt: it runs
+`EMAIL_ENABLED=false`, which skips the send (recorded as `skipped`, never
+retried) instead of failing it. The public demo is not exempt: it runs
 `ENVIRONMENT=production`, so it takes this branch too and now reports
 those sends as failed instead of printing the message and reporting it
 sent. A demo running `ENVIRONMENT=development` is unaffected.

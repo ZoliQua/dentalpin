@@ -194,6 +194,18 @@ class EmailService:
         """
         self._initialize()
 
+        from app.config import settings
+
+        if not settings.EMAIL_ENABLED:
+            # Global opt-out: this instance is not meant to deliver mail, so
+            # skip before resolving a provider or touching the network. The
+            # outbox records this as a skip, not a failure.
+            return EmailResult(
+                status=EmailStatus.SKIPPED,
+                provider="disabled",
+                error_message="Email is disabled (EMAIL_ENABLED=false)",
+            )
+
         # Try to get clinic-specific provider
         provider = self.provider  # Default to global
         if db and clinic_id:
@@ -204,8 +216,6 @@ class EmailService:
 
         # Apply default from address if not set
         if not message.from_email:
-            from app.config import settings
-
             message.from_email = settings.EMAIL_FROM_ADDRESS
             message.from_name = message.from_name or settings.EMAIL_FROM_NAME
 

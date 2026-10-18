@@ -44,7 +44,8 @@ frontend as a Nuxt layer under its own Python package.
   writes metadata-only log lines (no bodies, no names), and reports
   sends as failed so the UI stops claiming delivery. Set
   `EMAIL_PROVIDER=smtp` with real credentials, or
-  `EMAIL_ENABLED=false` if the instance sends no mail. The public demo is
+  `EMAIL_ENABLED=false` if the instance sends no mail (sends are then
+  skipped, not retried or reported as failed). The public demo is
   affected too: it runs production, so it now logs metadata and reports
   those sends as failed instead of printing the message and reporting it
   sent.

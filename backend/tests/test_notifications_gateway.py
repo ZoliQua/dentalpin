@@ -158,6 +158,35 @@ async def test_enqueue_then_dispatch_sends_email(db_session, test_patient):
 
 
 @pytest.mark.asyncio
+async def test_skipped_send_is_recorded_not_retried(monkeypatch, db_session, test_patient):
+    """A skipped send (EMAIL_ENABLED=false) is not a failure (#614)."""
+    from app.config import settings as app_settings
+
+    monkeypatch.setattr(app_settings, "EMAIL_ENABLED", False)
+    monkeypatch.setattr(app_settings, "TESTING", False)
+    monkeypatch.setattr(app_settings, "ENVIRONMENT", "production")
+    await _email_template(db_session, test_patient.clinic_id)
+
+    msg = await NotificationGateway.enqueue(
+        db_session,
+        test_patient.clinic_id,
+        "appointment_confirmation",
+        context={},
+        patient_id=test_patient.id,
+        to_address=test_patient.email,
+    )
+    assert msg is not None
+    assert msg.status == "queued"
+
+    attempted = await NotificationGateway.dispatch_outbox(db_session)
+    assert attempted == 1
+    await db_session.refresh(msg)
+    assert msg.status == "skipped"
+    assert msg.next_attempt_at is None
+    assert "EMAIL_ENABLED=false" in (msg.error_message or "")
+
+
+@pytest.mark.asyncio
 async def test_dedup_key_is_idempotent(db_session, test_patient):
     await _email_template(db_session, test_patient.clinic_id)
     key = f"appointment_reminder:{uuid4()}"
