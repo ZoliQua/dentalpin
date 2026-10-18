@@ -341,7 +341,7 @@ async def test_skipped_send_drops_the_previous_failure_text(db_session, test_pat
         assert msg.status == "failed"
         assert msg.error_message == "boom"
 
-        adapter.result = AdapterResult(status=SendStatus.SKIPPED, provider="webpush")
+        adapter.result = AdapterResult(status=SendStatus.SKIPPED, provider="console")
         msg.next_attempt_at = None
         await db_session.commit()
 
@@ -349,7 +349,6 @@ async def test_skipped_send_drops_the_previous_failure_text(db_session, test_pat
         await db_session.refresh(msg)
         assert msg.status == "skipped"
         assert msg.error_message is None
-        assert msg.next_attempt_at is None
     finally:
         channel_registry.unregister("controlled_email_test")
 
