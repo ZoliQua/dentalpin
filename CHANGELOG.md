@@ -24,6 +24,20 @@ frontend as a Nuxt layer under its own Python package.
   `t('…')` key against the merged English set — the locale-parity test
   cannot see this class, because a key absent from *every* locale keeps
   parity perfectly.
+- **Ten UI strings rendered one hardcoded language to every locale**
+  (#697). `actions.change`, `common.optional`, `common.expand`,
+  `common.collapse`, `clinical.diagnosis.openNotes`,
+  `attachments.linkError`, `documents.viewError` and the three
+  `photoGallery.*` upload/fetch messages existed in no locale file, so the
+  default message passed at the call site is what rendered: an English
+  clinic read "Cambiar" / "Opcional" / "Expandir" on the media upload
+  controls and the patient alerts banner (two of them aria-labels), a
+  Spanish one read "Error loading photos" in a toast. All ten are now in
+  the 12 host locales, phrased from the strings each locale already uses
+  for the same kind of message, and the redundant defaults are gone from
+  the call sites. `key-resolution.test.ts` no longer skips a call that
+  passes a default message — the default may stay, the key has to exist —
+  which is the follow-up its own docstring asked for.
 
 ### Added
 

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#697): the diagnosis notes FAB's aria-label
+  (`clinical.diagnosis.openNotes`) existed in no locale file, so screen
+  readers got the hardcoded Spanish "Notas" in every language. Added to
+  all 12 host locales as the action it performs ("Open notes" /
+  "Abrir notas").
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix(#522): `TimelineSlider` compared the last history date against the UTC

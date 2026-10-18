@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Bearbeiten",
+    "change": "Ändern",
     "cancel": "Abbrechen",
     "save": "Speichern",
     "create": "Erstellen",
     "delete": "Löschen",
     "close": "Schließen",
     "remove": "Entfernen"
+  },
+  "attachments": {
+    "linkError": "Fehler beim Verknüpfen des Anhangs"
   },
   "patients": {
     "title": "Patienten",
@@ -760,7 +764,8 @@
       "continuePlan": "Plan \"{name}\" fortsetzen",
       "selectPlan": "Plan auswählen",
       "continue": "Fortsetzen",
-      "odontogramTab": "Zahnschema"
+      "odontogramTab": "Zahnschema",
+      "openNotes": "Notizen öffnen"
     },
     "plans": {
       "title": "Behandlungspläne",
@@ -1366,6 +1371,8 @@
     "retry": "Erneut versuchen",
     "refresh": "Aktualisieren",
     "hide": "Ausblenden",
+    "expand": "Ausklappen",
+    "collapse": "Einklappen",
     "forbidden": "Zugriff verweigert",
     "confirm": "Bestätigen",
     "yes": "Ja",
@@ -1389,6 +1396,7 @@
     "deselectAll": "Keine",
     "all": "Alle",
     "required": "Dieses Feld ist erforderlich",
+    "optional": "Optional",
     "invalidEmail": "Ungültige E-Mail",
     "networkError": "Verbindungsfehler",
     "serverError": "Serverfehler",
@@ -3058,6 +3066,7 @@
     "uploadSuccess": "Dokument erfolgreich hochgeladen",
     "uploadError": "Fehler beim Hochladen des Dokuments",
     "downloadError": "Fehler beim Herunterladen des Dokuments",
+    "viewError": "Fehler beim Laden des Dokuments",
     "deleteSuccess": "Dokument gelöscht",
     "deleteError": "Fehler beim Löschen des Dokuments",
     "updateSuccess": "Dokument aktualisiert",
@@ -3095,6 +3104,9 @@
     "showingOf": "{count} von {total} angezeigt",
     "upload": "Foto hochladen",
     "uploadHelp": "Klassifizieren, damit es in der richtigen Kategorie erscheint",
+    "fetchError": "Fehler beim Laden der Fotos",
+    "uploadError": "Fehler beim Hochladen des Fotos",
+    "uploadSuccess": "Foto erfolgreich hochgeladen",
     "dropHere": "Foto hierher ziehen oder klicken",
     "category": "Typ",
     "subtype": "Ansicht",

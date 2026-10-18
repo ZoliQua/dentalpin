@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Edytuj",
+    "change": "Zmień",
     "cancel": "Anuluj",
     "save": "Zapisz",
     "create": "Utwórz",
     "delete": "Usuń",
     "close": "Zamknij",
     "remove": "Usuń"
+  },
+  "attachments": {
+    "linkError": "Błąd podczas dołączania załącznika"
   },
   "patients": {
     "title": "Pacjenci",
@@ -760,7 +764,8 @@
       "continuePlan": "Kontynuuj plan \"{name}\"",
       "selectPlan": "Wybierz plan",
       "continue": "Kontynuuj",
-      "odontogramTab": "Diagram zębowy"
+      "odontogramTab": "Diagram zębowy",
+      "openNotes": "Otwórz notatki"
     },
     "plans": {
       "title": "Plany leczenia",
@@ -1366,6 +1371,8 @@
     "retry": "Ponów",
     "refresh": "Odśwież",
     "hide": "Ukryj",
+    "expand": "Rozwiń",
+    "collapse": "Zwiń",
     "forbidden": "Brak dostępu",
     "confirm": "Potwierdź",
     "yes": "Tak",
@@ -1389,6 +1396,7 @@
     "deselectAll": "Żadne",
     "all": "Wszystkie",
     "required": "To pole jest wymagane",
+    "optional": "Opcjonalne",
     "invalidEmail": "Nieprawidłowy e-mail",
     "networkError": "Błąd połączenia",
     "serverError": "Błąd serwera",
@@ -3058,6 +3066,7 @@
     "uploadSuccess": "Dokument przesłany pomyślnie",
     "uploadError": "Błąd podczas przesyłania dokumentu",
     "downloadError": "Błąd podczas pobierania dokumentu",
+    "viewError": "Błąd podczas wczytywania dokumentu",
     "deleteSuccess": "Dokument usunięty",
     "deleteError": "Błąd podczas usuwania dokumentu",
     "updateSuccess": "Dokument zaktualizowany",
@@ -3095,6 +3104,9 @@
     "showingOf": "Wyświetlono {count} z {total}",
     "upload": "Prześlij zdjęcie",
     "uploadHelp": "Sklasyfikuj, aby pojawiło się we właściwej kategorii",
+    "fetchError": "Błąd podczas wczytywania zdjęć",
+    "uploadError": "Błąd podczas przesyłania zdjęcia",
+    "uploadSuccess": "Zdjęcie przesłane pomyślnie",
     "dropHere": "Przeciągnij zdjęcie tutaj lub kliknij",
     "category": "Rodzaj",
     "subtype": "Widok",
