@@ -24,11 +24,16 @@ logger = logging.getLogger(__name__)
 
 
 def _mask_address(address: str | None) -> str:
-    """Mask an email local part (a***@example.com); domains are not PII."""
+    """Mask the whole email local part (***@example.com); domains are not PII.
+
+    Keeping the first character (``a***@example.com``) still leaks it: a
+    short local part is often a patient or staff name at a small clinic,
+    so the local part is dropped entirely.
+    """
     if not address or "@" not in address:
         return "unknown"
-    local, _, domain = address.partition("@")
-    return f"{local[:1]}***@{domain}" if local else f"***@{domain}"
+    _, _, domain = address.partition("@")
+    return f"***@{domain}"
 
 
 class ConsoleProvider(EmailProvider):

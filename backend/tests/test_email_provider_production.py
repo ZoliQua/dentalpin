@@ -169,8 +169,9 @@ def test_console_send_in_production_is_metadata_only_and_failed(monkeypatch, cap
     assert "Ana Garcia" not in logged
     assert "Endodoncia" not in logged
     assert "180,00" not in logged
-    assert "a***@example.com" in logged
-    assert _mask_address("ana.garcia@example.com") == "a***@example.com"
+    assert "***@example.com" in logged
+    assert _mask_address("ana.garcia@example.com") == "***@example.com"
+    assert _mask_address("a@example.com") == "***@example.com"
     assert _mask_address(None) == "unknown"
 
 
