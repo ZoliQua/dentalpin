@@ -3,6 +3,7 @@ medical certificates, referral letters and radiology requests."""
 
 from fastapi import APIRouter
 
+from app.core.erasure.types import ErasureContributor
 from app.core.plugins import BaseModule, ModuleContext
 
 from . import lifecycle
@@ -70,3 +71,8 @@ class DocumentsModule(BaseModule):
 
     async def post_upgrade(self, ctx: ModuleContext, from_version: str) -> None:
         await lifecycle.post_upgrade(ctx, from_version)
+
+    def get_erasure_contributors(self) -> list[ErasureContributor]:
+        from .erasure import DocumentsErasureContributor
+
+        return [DocumentsErasureContributor()]

@@ -11,7 +11,8 @@ import logging
 from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.erasure.registry import erasure_registry
@@ -142,21 +143,46 @@ class GdprService:
 
 class ConsentService:
     @staticmethod
+    def normalize_purpose(purpose: str) -> str:
+        """Canonical purpose key: case/whitespace variants ("SMS", "sms ")
+        are one purpose, not three (#562 CONS-05). Purposes stay an open
+        vocabulary (clinics invent processors); only the spelling is
+        canonical, so no legitimate purpose is ever rejected."""
+        return purpose.strip().lower()
+
+    @staticmethod
     async def grant_or_withdraw(
         db: AsyncSession, clinic_id: UUID, payload: ConsentCreate
-    ) -> PatientConsent:
+    ) -> PatientConsent | None:
         """Record a consent grant/withdrawal (Art. 7-8) as an immutable event.
 
         Every call APPENDS a row — grant → withdraw → grant leaves three
         rows, so the withdrawal is never lost. The latest row per
         (patient, purpose) (``created_at`` desc) is the current state;
         ``list_consents`` already orders that way.
+
+        Unknown or other-clinic patient ids return ``None`` (404 upstream,
+        error in the tool) before anything is written: consent rows must
+        never reference a patient the clinic cannot see (#562 CONS-01),
+        and the audit table FK would otherwise surface a raw 500 (#562
+        CONS-03).
         """
+        from app.modules.patients.models import Patient
+
+        patient = (
+            await db.execute(
+                select(Patient).where(
+                    Patient.id == payload.patient_id, Patient.clinic_id == clinic_id
+                )
+            )
+        ).scalar_one_or_none()
+        if patient is None:
+            return None
         now = datetime.now(UTC)
         row = PatientConsent(
             clinic_id=clinic_id,
             patient_id=payload.patient_id,
-            purpose=payload.purpose,
+            purpose=ConsentService.normalize_purpose(payload.purpose),
             granted=payload.granted,
             provided_text=payload.provided_text,
             granted_at=now if payload.granted else None,
@@ -172,7 +198,7 @@ class ConsentService:
                     "clinic_id": str(clinic_id),
                     "consent_id": str(row.id),
                     "patient_id": str(payload.patient_id),
-                    "purpose": payload.purpose,
+                    "purpose": row.purpose,
                 },
                 db=db,
             )
@@ -183,7 +209,7 @@ class ConsentService:
                     "clinic_id": str(clinic_id),
                     "consent_id": str(row.id),
                     "patient_id": str(payload.patient_id),
-                    "purpose": payload.purpose,
+                    "purpose": row.purpose,
                 },
                 db=db,
             )
@@ -202,11 +228,41 @@ class ConsentService:
             stmt = stmt.where(PatientConsent.patient_id == patient_id)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(PatientConsent.created_at.desc())
+            # created_at ties are real (same-second writes, clock granularity):
+            # id DESC breaks them deterministically so "latest" is stable
+            # (#562 CONS-04).
+            stmt.order_by(PatientConsent.created_at.desc(), PatientConsent.id.desc())
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )
         return list((await db.execute(stmt)).scalars()), total
+
+    @staticmethod
+    async def current(
+        db: AsyncSession, clinic_id: UUID, patient_id: UUID, purpose: str
+    ) -> PatientConsent | None:
+        """Latest consent row for one (patient, purpose) — the current state.
+
+        Same ordering as ``list_consents`` (created_at + id tiebreak),
+        so the endpoint and the ledger can never disagree (#562 CONS-04).
+        """
+        return (
+            await db.execute(
+                select(PatientConsent)
+                .where(
+                    PatientConsent.clinic_id == clinic_id,
+                    PatientConsent.patient_id == patient_id,
+                    PatientConsent.purpose == ConsentService.normalize_purpose(purpose),
+                )
+                .order_by(PatientConsent.created_at.desc(), PatientConsent.id.desc())
+                .limit(1)
+            )
+        ).scalar_one_or_none()
+
+
+class RetentionConflictError(ValueError):
+    """A second active policy for one (clinic, category) was committed
+    concurrently. Answered 409 upstream (#562 RET-01, advisory ADV-01)."""
 
 
 class RetentionService:
@@ -226,6 +282,24 @@ class RetentionService:
     async def create(
         db: AsyncSession, clinic_id: UUID, payload: RetentionPolicyCreate
     ) -> RetentionPolicy:
+        """Create a policy, superseding any active same-category policy.
+
+        At most one policy per (clinic, category) is active at a time:
+        creating a new one deactivates its active predecessors in the same
+        transaction (their rows stay as history). Without this,
+        ``erasure_eligible`` would collapse duplicates nondeterministically
+        (#562 RET-01). Changing a policy therefore always means creating a
+        new row; deactivation alone is terminal.
+        """
+        await db.execute(
+            update(RetentionPolicy)
+            .where(
+                RetentionPolicy.clinic_id == clinic_id,
+                RetentionPolicy.data_category == payload.data_category,
+                RetentionPolicy.is_active.is_(True),
+            )
+            .values(is_active=False)
+        )
         row = RetentionPolicy(
             clinic_id=clinic_id,
             data_category=payload.data_category,
@@ -233,7 +307,15 @@ class RetentionService:
             legal_hold_until=payload.legal_hold_until,
         )
         db.add(row)
-        await db.commit()
+        try:
+            await db.commit()
+        except IntegrityError:
+            # True-concurrency twin of the supersede above: the partial
+            # unique index (gdpr_0002) rejected a second active policy.
+            await db.rollback()
+            raise RetentionConflictError(
+                f"an active policy for category {payload.data_category!r} already exists"
+            )
         await db.refresh(row)
         return row
 
@@ -241,7 +323,13 @@ class RetentionService:
     async def update(
         db: AsyncSession, row: RetentionPolicy, payload: RetentionPolicyUpdate
     ) -> RetentionPolicy:
+        # No reactivate path: an inactive row is unreachable via the router
+        # (get_active_by_id 404s), and silently deactivating its siblings
+        # would destroy live config. To change a policy, create a new one:
+        # create() supersedes. (#562 RET-01, advisory ADV-02/03.)
         for field, value in payload.model_dump(exclude_unset=True).items():
+            if field == "is_active" and value is True:
+                continue
             setattr(row, field, value)
         await db.commit()
         await db.refresh(row)
@@ -394,11 +482,6 @@ class ErasureService:
         ]
         for contributor in erasure_registry.contributors():
             coverages.append(await contributor.erase(clinic_id, patient_id, erasable, retained, db))
-        coverages.extend(
-            ErasureService._interim_retained_coverage(
-                erasable, retained, answered={c.scope for c in coverages}
-            )
-        )
         await db.commit()
         await db.refresh(log)
         # Announcement only: contributors already ran above. Published after
@@ -432,49 +515,6 @@ class ErasureService:
         )
 
     @staticmethod
-    def _interim_retained_coverage(
-        erased: list[str], retained: list[str], answered: set[str] | None = None
-    ) -> list[ErasureCoverage]:
-        """Retained-scope rows until their contributor modules land (#546).
-
-        INTERIM, not the contract: these four rows are still hardcoded in
-        ``gdpr`` because their owning modules (patient_timeline, budget,
-        billing, clinical) do not contribute yet. Each row claims only
-        retention under Art. 17(3) — a conservative claim that cannot
-        under-erase — and the follow-up replaces them with contributor
-        answers. The scrubbed scopes (``patient_record`` here,
-        ``notifications``/``recalls`` via the registry) are never hardcoded.
-        """
-        erased_set = set(erased)
-        contact_requested = bool({"email", "phone"} & (erased_set | set(retained)))
-
-        rows = [
-            ErasureCoverage(
-                scope="patient_timeline",
-                status="retained" if contact_requested else "not_applicable",
-                detail="Append-only activity feed keeps communication copies (Art. 17(3)). Interim: contributor lands in follow-up.",
-            ),
-            ErasureCoverage(
-                scope="budget",
-                status="retained" if contact_requested else "not_applicable",
-                detail="Budget estimates/signatures keep the signer's email (Art. 17(3)). Interim: contributor lands in follow-up.",
-            ),
-            ErasureCoverage(
-                scope="billing",
-                status="retained" if contact_requested else "not_applicable",
-                detail="Issued invoices keep a fiscal snapshot (Art. 17(3)). Interim: contributor lands in follow-up.",
-            ),
-            ErasureCoverage(
-                scope="clinical",
-                status="retained",
-                detail="Clinical notes, documents and media are retained as care records. Interim: contributor lands in follow-up.",
-            ),
-        ]
-        # A scope the registry already answered must not be reported twice
-        # once its contributor lands: the contributor's row wins.
-        return [row for row in rows if row.scope not in (answered or set())]
-
-    @staticmethod
     async def list_audit(
         db: AsyncSession, clinic_id: UUID, page: int = 1, page_size: int = 20
     ) -> tuple[list[ErasureAuditLog], int]:
@@ -488,6 +528,12 @@ class ErasureService:
         return list((await db.execute(stmt)).scalars()), total
 
 
+class BreachTransitionError(ValueError):
+    """A breach status move outside the transition table. Answered 422
+    upstream (#562 SEC-03). Narrower than ValueError so the router's
+    handler never relabels a database error as a client error."""
+
+
 class DataBreachService:
     @staticmethod
     async def create(db: AsyncSession, clinic_id: UUID, payload: DataBreachCreate) -> DataBreach:
@@ -497,6 +543,8 @@ class DataBreachService:
             description=payload.description,
             data_involved=payload.data_involved,
             affected_people=payload.affected_people,
+            notified_subjects_at=payload.notified_subjects_at,
+            notified_subjects_count=payload.notified_subjects_count,
         )
         db.add(row)
         await db.commit()
@@ -535,15 +583,53 @@ class DataBreachService:
             stmt = stmt.where(DataBreach.status == status)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(DataBreach.occurred_at.desc())
+            # occurred_at ties are real (same-second breaches), so id DESC
+            # breaks them deterministically and pagination stays stable
+            # (#562 CONS-04).
+            stmt.order_by(DataBreach.occurred_at.desc(), DataBreach.id.desc())
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )
         return list((await db.execute(stmt)).scalars()), total
 
+    #: Allowed breach status transitions. Terminal states accept no
+    #: further moves; going back (e.g. reported → under_review) is never
+    #: valid, while not_reportable → under_review is allowed to retry the
+    #: assessment. A wrong report is superseded by correcting the record
+    #: fields, not by rewinding the lifecycle (#562 SEC-03).
+    #: ``not_reportable`` is the closed state for its branch: an assessed
+    #: non-breach rests there, it never moves to ``resolved`` (which
+    #: closes the reported branch only). ``reported → not_reportable``
+    #: covers the authority ruling the report below the threshold after
+    #: notification: the latches stay set deliberately, because the
+    #: notification did happen and clearing them would rewrite history
+    #: (#562 S2, review round on #664).
+    _BREACH_TRANSITIONS: dict[str, set[str]] = {
+        "under_review": {"reported", "not_reportable"},
+        "reported": {"resolved", "not_reportable"},
+        "not_reportable": {"under_review"},
+        "resolved": set(),
+    }
+
     @staticmethod
     async def update(db: AsyncSession, row: DataBreach, payload: DataBreachUpdate) -> DataBreach:
+        if payload.status is not None and payload.status != row.status:
+            allowed = DataBreachService._BREACH_TRANSITIONS.get(row.status, set())
+            if payload.status not in allowed:
+                raise BreachTransitionError(
+                    f"illegal breach transition {row.status} -> {payload.status}"
+                )
         for field, value in payload.model_dump(exclude_unset=True).items():
+            # `notified_authority_at` is stamped by the reported transition,
+            # never written directly: an explicit timestamp decoupled from
+            # status would let a backdated or forged stamp stand (#562 SEC-04).
+            if field == "notified_authority_at":
+                continue
+            if value is None and field in ("description", "data_involved", "status"):
+                # Non-nullable columns: an explicit null is a no-op, not a
+                # 500 from the NOT NULL constraint (#562 S1-04). (Nullable
+                # affected_people genuinely clears on null.)
+                continue
             setattr(row, field, value)
         if payload.status == "reported" and not row.notified_authority_at:
             row.notified_authority_at = datetime.now(UTC)

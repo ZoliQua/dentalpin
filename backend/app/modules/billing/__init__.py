@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from app.core.erasure.types import ErasureContributor
 from app.core.plugins import BaseModule
 
 from .models import Invoice, InvoiceHistory, InvoiceItem, InvoicePayment, InvoiceSeries
@@ -90,3 +91,8 @@ class BillingModule(BaseModule):
             # Fresh clinic → default FAC/RECT series.
             EventType.CLINIC_CREATED: on_clinic_created,
         }
+
+    def get_erasure_contributors(self) -> list[ErasureContributor]:
+        from .erasure import BillingErasureContributor
+
+        return [BillingErasureContributor()]

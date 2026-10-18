@@ -74,6 +74,13 @@ through `attachment_registry`.
 
 ## Gotchas
 
+- **GDPR erasure retains files and imaging.**
+  `erasure.MediaErasureContributor` owns the `media` coverage scope
+  (ADR 0038, #657) and writes nothing: radiographs, clinical photos and
+  scanned consents are care records (Art. 17(3)(c)/(h)). `title`,
+  `description`, `original_filename` and the stored file itself are all
+  free-form, so all three erasure categories are declared.
+
 - **Storage backend is pluggable** (`STORAGE_BACKEND` env var).
   Currently `local`. The future `media_s3` module extends
   `StorageBackend` without API changes.

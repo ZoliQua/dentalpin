@@ -7,6 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.erasure.types import ErasureContributor
 from app.core.events import EventType
 from app.core.plugins import BaseModule
 
@@ -107,3 +108,8 @@ class MediaModule(BaseModule):
         await DocumentService.unarchive_patient_documents(
             db, UUID(str(clinic_id)), UUID(str(patient_id))
         )
+
+    def get_erasure_contributors(self) -> list[ErasureContributor]:
+        from .erasure import MediaErasureContributor
+
+        return [MediaErasureContributor()]

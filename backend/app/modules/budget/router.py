@@ -7,6 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from fastapi.responses import Response
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.dependencies import ClinicContext, get_clinic_context, require_permission
@@ -541,9 +542,12 @@ async def resend_budget(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[BudgetResponse]:
     """Clone a finished (rejected/expired/cancelled) budget to a
-    fresh draft (version+1) with a brand-new public token. Reception
-    can then edit and send the new draft. The linked plan's
-    ``budget_id`` follows the new version via ``budget.superseded``."""
+    fresh draft with a brand-new public token. Reception can then edit
+    and send the new draft. The new version is the next free one for the
+    budget number (``BudgetService.next_version``), not the cloned row's
+    version + 1 — a terminal version stays resendable after a newer
+    version exists. The linked plan's ``budget_id`` follows the new
+    version via ``budget.superseded``."""
     budget = await BudgetService.get_budget(db, ctx.clinic_id, budget_id, include_items=True)
     if not budget:
         raise HTTPException(status_code=404, detail="Budget not found")
@@ -552,7 +556,18 @@ async def resend_budget(
             status_code=400,
             detail="Only rejected, expired or cancelled budgets can be resent",
         )
-    new_budget = await BudgetWorkflowService.clone_to_new_draft(db, budget, ctx.user_id)
+    try:
+        new_budget = await BudgetWorkflowService.clone_to_new_draft(db, budget, ctx.user_id)
+    except IntegrityError as e:
+        # Backstop for the narrow race the max-version lookup cannot
+        # close: two resends of the same budget number in flight both
+        # read the same max and one loses ``uq_budget_clinic_number_version``.
+        # Honest 409 instead of a 500 carrying the statement text.
+        await db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="Another version of this budget was created concurrently; retry",
+        ) from e
     plan_ref = await BudgetWorkflowService._lookup_plan(db, budget)
     response = ApiResponse(data=BudgetResponse.model_validate(new_budget))
 

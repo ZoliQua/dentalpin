@@ -114,6 +114,18 @@ Nuxt layer at `frontend/` with:
   `registerSettingsPage` (category `billing`).
 - Navigation: sidebar entry gated on `documents.read`, order 75.
 
+## Gotchas
+
+- **GDPR erasure retains generated documents.**
+  `erasure.DocumentsErasureContributor` owns the `documents` coverage
+  scope (ADR 0038, #657) and writes nothing: a prescription or
+  certificate must match the copy handed to the patient or the pharmacy
+  (Art. 17(3)(c)/(h)). `content` is a free-form JSONB snapshot, so all
+  three erasure categories are declared. Because the module is
+  `auto_install: False`, a clinic that never installed it gets no
+  `documents` coverage row at all — the registry only collects from active
+  modules.
+
 ## CHANGELOG
 
 See `./CHANGELOG.md`.

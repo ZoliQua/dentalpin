@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- feat(#657): owns the `documents` GDPR erasure coverage scope
+  (`get_erasure_contributors()`). Issued prescriptions, certificates and
+  referrals are retained as clinical records (Art. 17(3)(c)/(h)). The
+  module is `auto_install: False`, so a clinic that never installed it no
+  longer sees a coverage claim for it at all — previously `gdpr`'s
+  hardcoded `clinical` row covered these documents unconditionally.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi document PDF labels.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

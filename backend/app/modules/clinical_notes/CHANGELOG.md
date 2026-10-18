@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- feat(#657): owns the `clinical_notes` GDPR erasure coverage scope
+  (`get_erasure_contributors()`). Notes are retained as health-care
+  records (Art. 17(3)(c)/(h)) and their prose is never redacted. One of
+  the three scopes that replaced `gdpr`'s hardcoded `clinical` row —
+  there is no `clinical` module to own it.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi demo seed notes.
 - fix: an admin editing a note written by someone else got a 500.
   `NoteService.update` did not eager-load `author`, and

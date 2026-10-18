@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#631): the alerts banner's overflow badge rendered
+  `+2 common.more` — `common.more` exists in no locale file. It now uses
+  one interpolated host key, `common.andMore` (`+{count} more`), so the
+  count and the word stay in the locale's own order instead of being
+  concatenated in the template.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix: the five clinical getters (`get_medical_context`, `get_allergy`,

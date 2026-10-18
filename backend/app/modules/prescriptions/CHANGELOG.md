@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#269 follow-up): the prescriber license caption follows the
+  clinic country when it has its own term (Mexico: "Cédula
+  profesional" instead of the es default "N.º de colegiado"), in the
+  settings page and on the PDF. Country-default map in `hooks.py`
+  (a registered country hook's `label_overrides()` always wins);
+  no new i18n keys. Prescription letterhead logo stays a separate
+  follow-up (no clinic logo surface feeds the Rx PDF today).
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi prescription PDF labels.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

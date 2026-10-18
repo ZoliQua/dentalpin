@@ -145,7 +145,7 @@ const showExpanded = ref(false)
           v-if="!showExpanded && alerts.length > 3"
           class="text-caption text-muted self-center"
         >
-          +{{ alerts.length - 3 }} {{ t('common.more') }}
+          {{ t('common.andMore', { count: alerts.length - 3 }) }}
         </span>
       </div>
     </div>

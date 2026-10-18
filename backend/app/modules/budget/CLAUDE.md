@@ -94,6 +94,31 @@ contract.
 
 ## Gotchas
 
+- **One version allocator: `BudgetService.next_version`.**
+  `uq_budget_clinic_number_version` covers
+  `(clinic_id, budget_number, version)`, so a new version must come from
+  `max(version)` over the budget number — never from the version of the
+  row being cloned. `clone_to_new_draft` (resend) used
+  `budget.version + 1` while `duplicate_budget` used `max + 1`, so
+  resending a terminal version twice, or resending an old terminal
+  version after a newer one existed, hit the constraint and 500'd with
+  the INSERT in the response body. Both paths go through `next_version`
+  now; the resend route also maps a losing concurrent insert to 409.
+  Resending the same terminal version more than once is allowed by
+  product decision (2026-10-16): each resend becomes a new draft version,
+  and the plan link follows the last `budget.superseded`. Don't add a
+  "newer version exists" 409.
+
+- **GDPR erasure retains the signer's email.**
+  `erasure.BudgetErasureContributor` owns the `budget` coverage scope
+  (ADR 0038, #657) and writes nothing: blanking
+  `BudgetSignature.signed_by_email` would cut the signature loose from its
+  `document_hash`, which is what makes the acceptance provable
+  (Art. 17(3)(e)). It declares only the `email` category — there is no
+  phone or national-id column here — so a phone- or identity-only run
+  reports `not_applicable`. Adding a patient contact column to this module
+  means updating that declaration.
+
 - **Budget → treatment_plan is event-driven, never direct.** Don't
   import treatment_plan services or models from here. The reverse
   direction (treatment_plan → budget) is allowed because budget is in

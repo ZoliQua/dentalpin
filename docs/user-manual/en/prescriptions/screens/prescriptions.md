@@ -2,7 +2,7 @@
 module: prescriptions
 screen: prescriptions
 route: /prescriptions
-last_verified_commit: 8ef21830e7947065d2932020e53a4abbee17c0fd
+last_verified_commit: b631b127955584bc7d5350275232ffa9b1abdfa9
 related_endpoints:
   - GET /api/v1/prescriptions/patients/{patient_id}/prescriptions
   - POST /api/v1/prescriptions/patients/{patient_id}/prescriptions
@@ -36,7 +36,8 @@ draft from the patient summary ("New prescription" action).
 - **Issue** and **Cancel** ask for confirmation (both are irreversible).
   Issuing without a saved license shows a warning, not a block.
 - Your **license number** lives in Settings (clinical section,
-  prescriber identity) and prints on the PDF.
+  prescriber identity) and prints on the PDF. The caption follows the
+  clinic country when it has its own term (Mexico: cédula profesional).
 - The header shows the patient name with a link back to the record.
 - The editor requires at least one line, includes a route field, and
   clears `&new=1` from the URL on open.

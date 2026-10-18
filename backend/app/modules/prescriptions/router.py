@@ -191,7 +191,7 @@ async def download_prescription_pdf(
     label_overrides: dict = {}
     hook = None
     try:
-        from .hooks import resolve_hook_for_clinic
+        from .hooks import country_license_label, resolve_hook_for_clinic
 
         hook = await resolve_hook_for_clinic(db, ctx.clinic_id)
         if hook is not None:
@@ -200,6 +200,14 @@ async def download_prescription_pdf(
             # the stored snapshot and let the hook enhance the payload.
             stored = (row.compliance_data or {}).get(hook.country_code)
             hook_data = stored if isinstance(stored, dict) else {}
+        else:
+            # No country module installed: country-default caption from
+            # the hook seam (issue #269 follow-up), locale default else.
+            clinic_settings = ctx.clinic.settings
+            country = clinic_settings.get("country") if isinstance(clinic_settings, dict) else None
+            override = country_license_label(country, row.locale or "es")
+            if override is not None:
+                label_overrides = {"license": override}
     except ImportError:
         pass
     data = build_pdf_data(

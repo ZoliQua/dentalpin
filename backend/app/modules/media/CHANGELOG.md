@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- fix(#631): the document card's view tooltip used `common.view`, which
+  exists in no locale file, so it rendered the key string; it now reuses
+  `common.viewDetails`, matching the button's own `aria-label`. The
+  before/after pairing toast uses the existing `photoGallery.pair.paired`
+  instead of a hardcoded English default, so it is translated.
+- feat(#657): owns the `media` GDPR erasure coverage scope
+  (`get_erasure_contributors()`). Imaging, clinical photos and uploaded
+  patient files are retained as care records (Art. 17(3)(c)/(h)). One of
+  the three scopes that replaced `gdpr`'s hardcoded `clinical` row.
+
 - fix: the download `Content-Disposition` filename is sanitized (quotes,
   backslashes and control characters stripped, `document` fallback) — the
   stored name comes from the uploader and must never reach the header

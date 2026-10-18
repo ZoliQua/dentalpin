@@ -11,8 +11,26 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+### Fixed
+
+- **26 UI strings showed the i18n key instead of a message** (#631).
+  `errors.loadFailed`, `errors.createFailed`, `errors.updateFailed` and
+  `errors.deleteFailed` existed in no locale file, so a clinic saw a toast
+  titled `errors.updateFailed`; `treatment_plan` alone had 21 of the sites.
+  The four keys are now in all 12 host locales, `common.more` became the
+  interpolated `common.andMore` (`+{count} more`), and the one `common.view`
+  tooltip reuses the existing `common.viewDetails`. A new guard,
+  `frontend/tests/i18n/key-resolution.test.ts`, resolves every literal
+  `t('…')` key against the merged English set — the locale-parity test
+  cannot see this class, because a key absent from *every* locale keeps
+  parity perfectly.
+
 ### Added
 
+- **Copilot: OpenRouter + Groq LLM provider adapters** over their
+  OpenAI-compatible endpoints (same subclass shape as Gemini;
+  `OPENROUTER_API_KEY` / `GROQ_API_KEY` + per-clinic selection, specs
+  registered from `on_activate`). No bridge, settings or UI change (#332).
 - **Copilot: Gemini LLM provider adapter** over Google's OpenAI-compatible
   endpoint (same wire format and `openai` tool dialect as the OpenAI
   provider; `GEMINI_API_KEY` + per-clinic selection, spec registered from
@@ -59,6 +77,16 @@ frontend as a Nuxt layer under its own Python package.
   `docker-compose.coolify.yml` now both refuse to start without it.
 
 ### Security
+
+- **A consent could be recorded against another clinic's patient.**
+  `ConsentService.grant_or_withdraw` built the row straight from the
+  payload id with no patient lookup, so any tenant got a 201 against any
+  patient id — and an unknown id surfaced as a `ForeignKeyViolation`,
+  i.e. a 500 for what is a bad request, with the 201/500 split acting as
+  a cross-tenant patient-existence oracle (#562). Both paths now do a
+  clinic-scoped patient lookup first: unknown or foreign ids answer 404
+  on HTTP and `{"error": "patient not found"}` on the agent tool, before
+  anything is written.
 
 - **A budget could be assigned a professional from another clinic.**
   `assigned_professional_id` was a plain FK to `users` with no
@@ -108,6 +136,20 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **GDPR retention policies can no longer disagree with each other**
+  (#562). Two active policies for one (clinic, category) made erasure
+  eligibility pick one at random (unordered dict collapse). Creating a
+  policy now supersedes its active predecessors in the same transaction
+  (rows stay as history, and reactivation is not a path); a partial
+  unique index (`gdpr_0002`, which first reconciles pre-existing
+  duplicates) backstops concurrent creates, answered 409.
+- **The breach register no longer accepts illegal transitions or forged
+  stamps** (#562). `DataBreachService.update` took any status in any
+  order (a `reported` breach could return to `under_review` keeping a
+  stale reported latch) and any explicit `notified_authority_at`.
+  Transitions now follow a fixed table (illegal moves answer 422) and
+  the authority timestamp is stamped only by the `reported` transition.
+  An Art. 33 entry with zero data categories is rejected at the schema.
 - **An admin editing another user's clinical note always returned 500.**
   `NoteService.update` fetched the note without eager-loading `author`,
   and `ClinicalNoteResponse` declares that field, so building the

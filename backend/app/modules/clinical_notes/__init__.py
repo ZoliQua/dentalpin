@@ -24,6 +24,7 @@ from typing import Any
 
 from fastapi import APIRouter
 
+from app.core.erasure.types import ErasureContributor
 from app.core.plugins import BaseModule
 
 from .models import ClinicalNote
@@ -77,3 +78,8 @@ class ClinicalNotesModule(BaseModule):
 
     def get_event_handlers(self) -> dict[str, Any]:
         return {}
+
+    def get_erasure_contributors(self) -> list[ErasureContributor]:
+        from .erasure import ClinicalNotesErasureContributor
+
+        return [ClinicalNotesErasureContributor()]

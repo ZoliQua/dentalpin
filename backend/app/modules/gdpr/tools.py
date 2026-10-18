@@ -9,12 +9,21 @@ from pydantic import BaseModel, Field
 from app.core.agents import AgentContext, Tool, ToolCategory
 
 from .schemas import (
+    BreachStatus,
     ConsentCreate,
+    DataBreachCreate,
     ErasureCategory,
     GdprRequestCreate,
     RetentionPolicyCreate,
 )
-from .service import ConsentService, ErasureService, GdprService, RetentionService
+from .service import (
+    ConsentService,
+    DataBreachService,
+    ErasureService,
+    GdprService,
+    RetentionConflictError,
+    RetentionService,
+)
 
 
 class CreateRequestArgs(BaseModel):
@@ -35,7 +44,9 @@ class RecordConsentArgs(BaseModel):
     patient_id: str = Field(description="UUID of the patient")
     purpose: str = Field(description="e.g. sms, email, third_party_sharing")
     granted: bool = True
-    provided_text: str | None = None
+    provided_text: str | None = Field(
+        default=None, description="the consent text shown to the patient; required when granted"
+    )
 
 
 class ListConsentsArgs(BaseModel):
@@ -58,6 +69,17 @@ class ExecuteErasureArgs(BaseModel):
         description="data categories to erase: email|phone|identity only"
     )
     rationale: str | None = None
+
+
+class ReportBreachArgs(BaseModel):
+    description: str = Field(description="what happened, free text")
+    data_involved: list[str] = Field(description="e.g. ['email', 'national_id']")
+    affected_people: int | None = Field(default=None, ge=0)
+
+
+class ListBreachesArgs(BaseModel):
+    status: BreachStatus | None = None
+    limit: int = Field(default=20, ge=1, le=100)
 
 
 async def _create_request(ctx: AgentContext, params: CreateRequestArgs) -> dict:
@@ -114,6 +136,8 @@ async def _record_consent(ctx: AgentContext, params: RecordConsentArgs) -> dict:
             provided_text=params.provided_text,
         ),
     )
+    if row is None:
+        return {"error": "patient not found"}
     return {
         "id": row.id,
         "patient_id": row.patient_id,
@@ -142,13 +166,16 @@ async def _list_consents(ctx: AgentContext, params: ListConsentsArgs) -> dict:
 
 
 async def _create_policy(ctx: AgentContext, params: CreatePolicyArgs) -> dict:
-    row = await RetentionService.create(
-        ctx.db,
-        ctx.clinic_id,
-        RetentionPolicyCreate(
-            data_category=params.data_category, retention_years=params.retention_years
-        ),
-    )
+    try:
+        row = await RetentionService.create(
+            ctx.db,
+            ctx.clinic_id,
+            RetentionPolicyCreate(
+                data_category=params.data_category, retention_years=params.retention_years
+            ),
+        )
+    except RetentionConflictError as exc:
+        return {"error": str(exc)}
     return {
         "id": row.id,
         "data_category": row.data_category,
@@ -172,6 +199,33 @@ async def _execute_erasure(ctx: AgentContext, params: ExecuteErasureArgs) -> dic
         "erased_categories": result.erased_categories,
         "retained_categories": result.retained_categories,
         "audit_log_id": result.audit_log_id,
+    }
+
+
+async def _report_breach(ctx: AgentContext, params: ReportBreachArgs) -> dict:
+    row = await DataBreachService.create(
+        ctx.db,
+        ctx.clinic_id,
+        DataBreachCreate(
+            description=params.description,
+            data_involved=list(params.data_involved),
+            affected_people=params.affected_people,
+        ),
+    )
+    return {
+        "id": row.id,
+        "status": row.status,
+        "occurred_at": row.occurred_at,
+    }
+
+
+async def _list_breaches(ctx: AgentContext, params: ListBreachesArgs) -> dict:
+    items, total = await DataBreachService.list(
+        ctx.db, ctx.clinic_id, status=params.status, page=1, page_size=params.limit
+    )
+    return {
+        "total": total,
+        "breaches": [{"id": b.id, "status": b.status, "occurred_at": b.occurred_at} for b in items],
     }
 
 
@@ -227,5 +281,21 @@ def get_all_tools() -> list[Tool]:
             permissions=["gdpr.requests.write"],
             handler=_execute_erasure,
             parameters=ExecuteErasureArgs,
+        ),
+        Tool(
+            name="report_breach",
+            description="Record a personal-data breach in the clinic register",
+            category=ToolCategory.WRITE,
+            permissions=["gdpr.breaches.write"],
+            handler=_report_breach,
+            parameters=ReportBreachArgs,
+        ),
+        Tool(
+            name="list_breaches",
+            description="List breach register rows, optionally by status",
+            category=ToolCategory.READ,
+            permissions=["gdpr.breaches.read"],
+            handler=_list_breaches,
+            parameters=ListBreachesArgs,
         ),
     ]

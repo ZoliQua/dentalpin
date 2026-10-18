@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
+  as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
+  `GROQ_API_KEY` + per-provider default models, specs registered from
+  `on_activate`). No bridge, settings or UI change.
 - feat(#332): Gemini LLM provider adapter over Google's OpenAI-compatible
   endpoint (same wire format and `openai` tool dialect as `OpenAIProvider`;
   `GEMINI_API_KEY` + `COPILOT_MODEL_CHAT_GEMINI`, spec registered from

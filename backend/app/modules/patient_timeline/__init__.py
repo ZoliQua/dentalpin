@@ -13,6 +13,7 @@ from typing import Any
 
 from fastapi import APIRouter
 
+from app.core.erasure.types import ErasureContributor
 from app.core.events import EventType
 from app.core.plugins import BaseModule
 
@@ -124,3 +125,8 @@ class PatientTimelineModule(BaseModule):
             EventType.ORTHODONTICS_CASE_STATUS_CHANGED: (events.on_ortho_case_status_changed),
             EventType.ORTHODONTICS_CONTROL_REGISTERED: (events.on_ortho_control_registered),
         }
+
+    def get_erasure_contributors(self) -> list[ErasureContributor]:
+        from .erasure import PatientTimelineErasureContributor
+
+        return [PatientTimelineErasureContributor()]

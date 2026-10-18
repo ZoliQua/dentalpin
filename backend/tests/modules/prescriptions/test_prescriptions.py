@@ -364,3 +364,40 @@ def test_pdf_every_locale_set_is_complete():
         assert set(_get_labels(locale)) == expected, locale
         html = render_html(build_pdf_data(rx, [], "Pat", {"name": "C"}, locale=locale))
         assert f'lang="{locale}"' in html
+
+
+def test_country_license_label_defaults():
+    """Issue #269 follow-up: MX/es defaults to cédula without a country module."""
+    from app.modules.prescriptions.hooks import country_license_label
+
+    assert country_license_label("MX", "es") == "Cédula profesional"
+    assert country_license_label("mx", "es") == "Cédula profesional"
+    assert country_license_label("ES", "es") is None
+    assert country_license_label("MX", "en") is None
+    assert country_license_label(None, "es") is None
+    assert country_license_label("", "es") is None
+
+
+def test_country_default_flows_into_pdf_caption():
+    """The country default travels the same label_overrides merge as a hook."""
+    from types import SimpleNamespace
+
+    from app.modules.prescriptions.pdf import build_pdf_data, render_html
+
+    rx = SimpleNamespace(
+        status="issued",
+        issued_at=None,
+        prescriber_name="Doc",
+        license_number="1234567",
+        notes=None,
+    )
+    data = build_pdf_data(
+        rx,
+        [],
+        "Pac",
+        {"name": "C"},
+        label_overrides={"license": "Cédula profesional"},
+        locale="es",
+    )
+    assert "Cédula profesional" in render_html(data)
+    assert "N.º de colegiado" not in render_html(data)

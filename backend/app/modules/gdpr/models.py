@@ -12,7 +12,7 @@ from datetime import UTC, date, datetime
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, Date, DateTime, ForeignKey, Index, Integer, String, Text, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -93,6 +93,20 @@ class RetentionPolicy(Base, TimestampMixin):
 
     __tablename__ = "retention_policies"
 
+    # At most one ACTIVE policy per (clinic, category): the DB backstop
+    # for the service supersede, so concurrent creates cannot gate
+    # erasure nondeterministically (#562 RET-01, gdpr_0002). Inactive
+    # rows stay as history and never collide.
+    __table_args__ = (
+        Index(
+            "ix_retention_policies_clinic_category_active",
+            "clinic_id",
+            "data_category",
+            unique=True,
+            postgresql_where=text("is_active"),
+        ),
+    )
+
     id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     clinic_id: Mapped[UUID] = mapped_column(ForeignKey("clinics.id"), index=True)
     # Data category the rule applies to. Only the closed erasure
@@ -160,5 +174,11 @@ class DataBreach(Base, TimestampMixin):
         DateTime(timezone=True), nullable=True
     )
     reported: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    # Art. 34 communication to affected people (operator-recorded; no
+    # auto-stamp rule — that scope decision is parked, #562 SEC-02).
+    notified_subjects_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    notified_subjects_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     clinic: Mapped[Clinic] = relationship(foreign_keys=[clinic_id])

@@ -856,7 +856,7 @@ class BudgetWorkflowService:
         cloned_by: UUID,
     ) -> Budget:
         """Clone a finished (rejected/expired/cancelled) budget to a new
-        draft (version+1). Used by reception to "Resend" a budget.
+        draft. Used by reception to "Resend" a budget.
 
         The new draft inherits the line items, valid window and plan
         snapshots; it gets a fresh ``public_token`` and re-resolves the
@@ -872,7 +872,7 @@ class BudgetWorkflowService:
             clinic_id=budget.clinic_id,
             patient_id=budget.patient_id,
             budget_number=budget.budget_number,
-            version=budget.version + 1,
+            version=await BudgetService.next_version(db, budget.clinic_id, budget.budget_number),
             parent_budget_id=budget.id,
             status="draft",
             valid_from=datetime.now(UTC).date(),

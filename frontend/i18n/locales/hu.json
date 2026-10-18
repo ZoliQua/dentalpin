@@ -832,7 +832,11 @@
       "copyLink": "Bejelentkezési link másolása",
       "openTitle": "Klinikai bejelentkezés",
       "success": "Bejelentkezés kész. Kérjük, foglaljon helyet.",
-      "invalid": "Ez a bejelentkezési kód érvénytelen vagy lejárt. Kérjen újat a recepción."
+      "invalid": "Ez a bejelentkezési kód érvénytelen vagy lejárt. Kérjen újat a recepción.",
+      "confirm": "Megérkeztem",
+      "confirmHint": "Nyomja meg a gombot érkezése megerősítéséhez.",
+      "tooEarly": "Még túl korai a bejelentkezéshez. Az időpontja {time}-kor van.",
+      "tooLate": "A bejelentkezés erre az időpontra már lezárult. Kérjen segítséget a recepción."
     },
     "create": "Új időpont",
     "edit": "Időpont szerkesztése",
@@ -1337,7 +1341,14 @@
       "errorGeneric": "Nem sikerült létrehozni a pácienst. Próbálja újra."
     }
   },
+  "errors": {
+    "loadFailed": "Nem sikerült betölteni",
+    "createFailed": "Nem sikerült létrehozni",
+    "updateFailed": "Nem sikerült frissíteni",
+    "deleteFailed": "Nem sikerült törölni"
+  },
   "common": {
+    "andMore": "+{count} további",
     "save": "Mentés",
     "add": "Hozzáadás",
     "cancel": "Mégse",

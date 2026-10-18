@@ -832,7 +832,11 @@
       "copyLink": "चेक-इन लिंक कॉपी करें",
       "openTitle": "क्लिनिक चेक-इन",
       "success": "आपका चेक-इन हो गया है। कृपया बैठ जाएँ।",
-      "invalid": "यह चेक-इन कोड अमान्य है या समाप्त हो चुका है। कृपया रिसेप्शन से नया कोड लें।"
+      "invalid": "यह चेक-इन कोड अमान्य है या समाप्त हो चुका है। कृपया रिसेप्शन से नया कोड लें।",
+      "confirm": "I'm here",
+      "confirmHint": "Press the button to confirm your arrival.",
+      "tooEarly": "It's too early to check in. Your appointment is at {time}.",
+      "tooLate": "Check-in for this appointment is closed. Please ask at reception."
     },
     "create": "नया अपॉइंटमेंट",
     "edit": "अपॉइंटमेंट संपादित करें",
@@ -1347,7 +1351,14 @@
       "errorGeneric": "मरीज़ नहीं बनाया जा सका। फिर कोशिश करें।"
     }
   },
+  "errors": {
+    "loadFailed": "लोड करने में विफल",
+    "createFailed": "बनाने में विफल",
+    "updateFailed": "अपडेट करने में विफल",
+    "deleteFailed": "हटाने में विफल"
+  },
   "common": {
+    "andMore": "+{count} और",
     "save": "सहेजें",
     "add": "जोड़ें",
     "cancel": "रद्द करें",

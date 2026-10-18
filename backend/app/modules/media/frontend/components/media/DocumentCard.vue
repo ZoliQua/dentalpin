@@ -139,7 +139,7 @@ function handleEdit() {
               color="neutral"
               variant="ghost"
               size="xs"
-              :title="t('common.view')"
+              :title="t('common.viewDetails')"
               @click="handleView"
             />
             <UButton

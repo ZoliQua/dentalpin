@@ -10,7 +10,7 @@ The clinic's ``settings["country"]`` selects the hook.
 from __future__ import annotations
 
 from abc import ABC
-from typing import Any
+from typing import Any, Final
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -77,6 +77,29 @@ class PrescriptionHookRegistry:
         if not isinstance(settings, dict):
             return None
         return cls.for_country(settings.get("country"))
+
+
+#: Country-default license captions used when no country module is
+#: installed (issue #269 follow-up: an MX clinic sees "Cédula
+#: profesional" instead of the es-locale default "N.º de colegiado").
+#: Keyed by (COUNTRY, locale); a registered hook's label_overrides()
+#: always wins over these.
+DEFAULT_COUNTRY_LICENSE_LABELS: Final[dict[tuple[str, str], str]] = {
+    ("MX", "es"): "Cédula profesional",
+}
+
+
+def country_license_label(country_code: str | None, locale: str) -> str | None:
+    """Return the country-default license caption, if any.
+
+    Only fires for an explicit (country, locale) pair in
+    ``DEFAULT_COUNTRY_LICENSE_LABELS`` — every other combination falls
+    back to the locale default, so adding a country never changes an
+    unrelated clinic's wording.
+    """
+    if not country_code:
+        return None
+    return DEFAULT_COUNTRY_LICENSE_LABELS.get((country_code.upper(), (locale or "es").lower()))
 
 
 async def resolve_hook_for_clinic(

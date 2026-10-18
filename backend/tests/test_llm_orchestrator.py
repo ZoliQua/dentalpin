@@ -375,7 +375,7 @@ def test_salted_round_trip() -> None:
 
 def test_factory_rejects_unsupported_provider() -> None:
     with pytest.raises(LLMConfigError):
-        get_provider("groq")
+        get_provider("not-a-provider")
 
 
 def test_openai_name_roundtrip() -> None:
@@ -451,6 +451,67 @@ def test_gemini_spec_shape() -> None:
     assert GEMINI_SPEC.default_model == settings.COPILOT_MODEL_CHAT_GEMINI
     provider = GEMINI_SPEC.factory(ProviderConfig(api_key="test-key"))
     assert isinstance(provider, GeminiProvider)
+
+
+# --- openrouter + groq providers -------------------------------------------
+
+
+def test_openrouter_provider_requires_key() -> None:
+    from app.core.llm.openrouter_provider import OpenRouterProvider
+
+    with pytest.raises(LLMConfigError, match="OPENROUTER_API_KEY"):
+        OpenRouterProvider(api_key="")
+
+
+def test_groq_provider_requires_key() -> None:
+    from app.core.llm.groq_provider import GroqProvider
+
+    with pytest.raises(LLMConfigError, match="GROQ_API_KEY"):
+        GroqProvider(api_key="")
+
+
+def test_openrouter_provider_targets_compat_endpoint() -> None:
+    from app.core.llm.openrouter_provider import (
+        OPENROUTER_BASE_URL,
+        OpenRouterProvider,
+    )
+
+    provider = OpenRouterProvider(api_key="test-key")
+    assert str(provider._client.base_url) == OPENROUTER_BASE_URL
+
+
+def test_groq_provider_targets_compat_endpoint() -> None:
+    from app.core.llm.groq_provider import GROQ_OPENAI_COMPAT_BASE_URL, GroqProvider
+
+    provider = GroqProvider(api_key="test-key")
+    assert str(provider._client.base_url) == GROQ_OPENAI_COMPAT_BASE_URL
+
+
+def test_openrouter_groq_spec_shape() -> None:
+    from app.config import settings
+    from app.core.llm.factory import GROQ_SPEC, OPENROUTER_SPEC
+    from app.core.llm.groq_provider import GroqProvider
+    from app.core.llm.openrouter_provider import OpenRouterProvider
+    from app.core.llm.spec import ProviderConfig
+
+    for spec, cls, key, model in (
+        (
+            OPENROUTER_SPEC,
+            OpenRouterProvider,
+            "OPENROUTER_API_KEY",
+            settings.COPILOT_MODEL_CHAT_OPENROUTER,
+        ),
+        (
+            GROQ_SPEC,
+            GroqProvider,
+            "GROQ_API_KEY",
+            settings.COPILOT_MODEL_CHAT_GROQ,
+        ),
+    ):
+        assert spec.tool_dialect == "openai"
+        assert spec.api_key_setting == key
+        assert spec.default_model == model
+        assert isinstance(spec.factory(ProviderConfig(api_key="test-key")), cls)
 
 
 def test_anthropic_message_mapping_merges_tool_results_into_user_turn() -> None:

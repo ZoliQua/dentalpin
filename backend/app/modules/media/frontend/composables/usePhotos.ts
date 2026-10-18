@@ -154,7 +154,7 @@ export function usePhotos() {
         { errorToast: false }
       )
       toast.add({
-        title: t('photoGallery.paired', 'Before/after paired'),
+        title: t('photoGallery.pair.paired'),
         color: 'success'
       })
       return response.data

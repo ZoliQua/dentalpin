@@ -96,6 +96,15 @@ None.
 
 ## Gotchas
 
+- **GDPR erasure retains note text.**
+  `erasure.ClinicalNotesErasureContributor` owns the `clinical_notes`
+  coverage scope (ADR 0038, #657) and writes nothing: a note is health
+  data processed for the provision of care, kept for as long as
+  medical-records law requires (Art. 17(3)(c)/(h)). `body` is free prose,
+  so all three erasure categories are declared. This scope and `documents`
+  / `media` replaced the single `clinical` row `gdpr` used to hardcode —
+  there is no `clinical` module to own it.
+
 - **Treatment notes survive plan churn.** They reference
   ``treatments.id`` directly, so removing a plan item, archiving the
   plan or moving the treatment to another plan all keep the notes

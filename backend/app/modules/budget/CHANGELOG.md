@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- fix: resending a terminal budget twice returned 500. `clone_to_new_draft`
+  took the new version from the row it was cloning (`version + 1`) while
+  `BudgetService.duplicate_budget` took it from `max(version)`, so the
+  second resend landed on a version that already existed and hit
+  `uq_budget_clinic_number_version` — with the INSERT statement in the
+  response body. The same thing happened on a single resend of an older
+  terminal version once a newer one existed. Both paths now share
+  `BudgetService.next_version`, and the resend route maps a losing
+  concurrent insert to 409 instead of 500. Found by a generated-request
+  sweep of the write surface.
+
+- feat(#657): owns the `budget` GDPR erasure coverage scope
+  (`get_erasure_contributors()`). Signed quotes are retained so the
+  signature stays bound to its document hash (Art. 17(3)(e)). The only
+  patient contact copied here is `BudgetSignature.signed_by_email`, so a
+  phone- or identity-only erasure now reports `not_applicable` instead of
+  the blanket `retained` `gdpr` used to hardcode.
+
 - fix: `PUT /budgets/{id}` now returns the linked `treatment_plan`, like
   `GET`. The detail page replaces its budget with the PUT response, so after
   editing a plan-linked quote it dropped the "lines are managed by the plan"

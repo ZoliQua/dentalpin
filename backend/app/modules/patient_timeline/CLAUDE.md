@@ -47,6 +47,15 @@ updates. See `docs/events-catalog.md` for the full list.
 
 ## Gotchas
 
+- **GDPR erasure: the feed is retained, never rewritten.**
+  `erasure.PatientTimelineErasureContributor` is pulled by `gdpr` inside
+  the erasure transaction (ADR 0038, #657) and writes nothing: it owns the
+  `patient_timeline` coverage scope and reports `retained` under
+  Art. 17(3)(b). `title`/`description`/`event_data` are free-form, so all
+  three erasure categories are declared. Don't add a redaction pass here
+  without a decision on the record — the feed's value is that it is
+  append-only.
+
 - **Append-only.** Timeline entries are never edited or deleted, only
   archived. Reactions to delete events log a "removed" entry rather
   than deleting the original.

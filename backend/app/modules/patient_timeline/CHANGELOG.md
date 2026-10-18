@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- feat(#657): owns the `patient_timeline` GDPR erasure coverage scope
+  (`get_erasure_contributors()`). The feed is retained as the clinic's
+  record of events (Art. 17(3)(b)) and nothing is redacted; the row only
+  replaces one `gdpr` used to hardcode, so uninstalling the module now
+  removes the claim with it.
+
 - feat(i18n): the frontend layer's directional spacing, borders, text alignment and inset positioning now resolve against the document direction (physical→logical CSS utilities, Arabic RTL support).
 
 - refactor(#309): the demo seed moved to the host seeds package (`app/seeds/patient_timeline_demo.py`) — the module deliberately declares only `patients`, and the seed's five cross-module imports had it on the isolation allowlist; all five entries drained.

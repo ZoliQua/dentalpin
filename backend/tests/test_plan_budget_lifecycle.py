@@ -350,6 +350,68 @@ async def test_resend_requires_terminal_status(
 
 
 @pytest.mark.asyncio
+async def test_resending_a_terminal_budget_twice_does_not_500(
+    db_session: AsyncSession, client: AsyncClient, auth_headers: dict, setup: dict
+) -> None:
+    """The second resend took `cloned.version + 1`, which was taken.
+
+    `clone_to_new_draft` derived the new version from the row it was
+    cloning, while `BudgetService.duplicate_budget` derived it from
+    `max(version)`. So a terminal budget stayed resendable after its
+    resend had already produced the next version, and the second call hit
+    `uq_budget_clinic_number_version` — a 500 with the INSERT statement in
+    the response body. Both paths now go through
+    `BudgetService.next_version`.
+    """
+    plan_id, _ = await _create_plan_with_items(client, auth_headers, setup, [16])
+    budget_id = await _confirm_plan(client, auth_headers, plan_id)
+    await _sync(db_session)
+    await _send_budget(client, auth_headers, budget_id)
+    await _reject_budget(client, auth_headers, budget_id)
+    await _sync(db_session)
+
+    first = await client.post(f"/api/v1/budget/budgets/{budget_id}/resend", headers=auth_headers)
+    assert first.status_code == 200, first.text
+    assert first.json()["data"]["version"] == 2
+    await _sync(db_session)
+
+    # The original is still rejected, so the route still accepts it. It
+    # must allocate the next *free* version rather than collide on 2.
+    second = await client.post(f"/api/v1/budget/budgets/{budget_id}/resend", headers=auth_headers)
+    assert second.status_code == 200, second.text
+    assert second.json()["data"]["version"] == 3
+    assert second.json()["data"]["parent_budget_id"] == budget_id
+
+    versions = await client.get(
+        f"/api/v1/budget/budgets/{budget_id}/versions", headers=auth_headers
+    )
+    assert versions.status_code == 200, versions.text
+    chain = versions.json()["data"]
+    assert sorted(v["version"] for v in chain["versions"]) == [1, 2, 3]
+    # `current_version` is the version of the row that was asked about
+    # (v1 here), not the newest in the chain — unchanged by this fix.
+    assert chain["current_version"] == 1
+
+
+@pytest.mark.asyncio
+async def test_next_version_reads_the_whole_chain(
+    db_session: AsyncSession, client: AsyncClient, auth_headers: dict, setup: dict
+) -> None:
+    """`next_version` is max+1 over the budget number, not per-row."""
+    from app.modules.budget.service import BudgetService
+
+    plan_id, _ = await _create_plan_with_items(client, auth_headers, setup, [16])
+    budget_id = await _confirm_plan(client, auth_headers, plan_id)
+    await _sync(db_session)
+    row = await db_session.get(Budget, UUID(budget_id))
+    assert row is not None
+
+    assert await BudgetService.next_version(db_session, row.clinic_id, row.budget_number) == 2
+    # An unrelated budget number starts at 1, so the lookup is scoped.
+    assert await BudgetService.next_version(db_session, row.clinic_id, "PRES-NOPE-0000") == 1
+
+
+@pytest.mark.asyncio
 async def test_on_budget_superseded_idempotent(
     db_session: AsyncSession, client: AsyncClient, auth_headers: dict, setup: dict
 ) -> None:

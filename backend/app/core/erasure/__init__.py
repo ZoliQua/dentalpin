@@ -5,12 +5,14 @@ from app.core.erasure.registry import (
     SubjectErasureRegistry,
     erasure_registry,
 )
+from app.core.erasure.retention import RetainedScopeContributor
 from app.core.erasure.types import ErasureContributor, ErasureCoverage
 
 __all__ = [
     "ErasureContributor",
     "ErasureCoverage",
     "ErasureRegistryError",
+    "RetainedScopeContributor",
     "SubjectErasureRegistry",
     "erasure_registry",
 ]

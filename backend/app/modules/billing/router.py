@@ -6,6 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.dependencies import ClinicContext, get_clinic_context, require_permission
@@ -103,6 +104,16 @@ async def create_series(
         return ApiResponse(data=InvoiceSeriesResponse.model_validate(series))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        # ``uq_invoice_series_clinic_prefix`` is the table's only unique
+        # constraint, so this is always the prefix collision. Caught rather
+        # than pre-checked: a SELECT-then-INSERT leaves a window where two
+        # concurrent creates both pass the check.
+        await db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail=f"A series with prefix '{data.prefix}' already exists in this clinic",
+        ) from e
 
 
 @router.put("/series/{series_id}", response_model=ApiResponse[InvoiceSeriesResponse])
@@ -137,6 +148,16 @@ async def update_series(
         return ApiResponse(data=InvoiceSeriesResponse.model_validate(series))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        await db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                f"A series with prefix '{data.prefix}' already exists in this clinic"
+                if data.prefix
+                else "Another series in this clinic already uses that prefix"
+            ),
+        ) from e
 
 
 @router.post("/series/{series_id}/reset", response_model=ApiResponse[InvoiceSeriesResponse])

@@ -26,6 +26,18 @@ def _create_gemini(config: ProviderConfig) -> Provider:
     return GeminiProvider(api_key=config.api_key or "")
 
 
+def _create_openrouter(config: ProviderConfig) -> Provider:
+    from app.core.llm.openrouter_provider import OpenRouterProvider
+
+    return OpenRouterProvider(api_key=config.api_key or "")
+
+
+def _create_groq(config: ProviderConfig) -> Provider:
+    from app.core.llm.groq_provider import GroqProvider
+
+    return GroqProvider(api_key=config.api_key or "")
+
+
 OPENAI_SPEC = ProviderSpec(
     name="openai",
     label="OpenAI",
@@ -54,6 +66,26 @@ GEMINI_SPEC = ProviderSpec(
     needs_api_key=True,
     api_key_setting="GEMINI_API_KEY",
     factory=_create_gemini,
+)
+
+OPENROUTER_SPEC = ProviderSpec(
+    name="openrouter",
+    label="OpenRouter",
+    default_model=settings.COPILOT_MODEL_CHAT_OPENROUTER,
+    tool_dialect="openai",
+    needs_api_key=True,
+    api_key_setting="OPENROUTER_API_KEY",
+    factory=_create_openrouter,
+)
+
+GROQ_SPEC = ProviderSpec(
+    name="groq",
+    label="Groq",
+    default_model=settings.COPILOT_MODEL_CHAT_GROQ,
+    tool_dialect="openai",
+    needs_api_key=True,
+    api_key_setting="GROQ_API_KEY",
+    factory=_create_groq,
 )
 
 
