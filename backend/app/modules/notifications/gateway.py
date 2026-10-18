@@ -356,11 +356,12 @@ class NotificationGateway:
             await NotificationGateway._publish(msg, EventType.NOTIFICATION_SENT)
         elif result.status == SendStatus.SKIPPED:
             # The adapter resolved but had nothing to do (email globally
-            # disabled, patient has no push subscription). That is an expected
+            # disabled, or a push with an empty body). That is an expected
             # outcome: record it without retrying or publishing a failure.
             msg.status = "skipped"
             msg.provider = result.provider
-            msg.error_message = result.error_message
+            if result.error_message:
+                msg.error_message = result.error_message[:2000]
             msg.next_attempt_at = None
             await db.commit()
         else:

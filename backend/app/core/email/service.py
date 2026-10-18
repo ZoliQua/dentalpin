@@ -176,6 +176,15 @@ class EmailService:
         # Fallback to global
         return None
 
+    @staticmethod
+    def _disabled_result() -> EmailResult:
+        """Result for a globally disabled instance: nothing sent, nothing failed."""
+        return EmailResult(
+            status=EmailStatus.SKIPPED,
+            provider="disabled",
+            error_message="Email is disabled (EMAIL_ENABLED=false)",
+        )
+
     async def send(
         self,
         message: EmailMessage,
@@ -200,11 +209,7 @@ class EmailService:
             # Global opt-out: this instance is not meant to deliver mail, so
             # skip before resolving a provider or touching the network. The
             # outbox records this as a skip, not a failure.
-            return EmailResult(
-                status=EmailStatus.SKIPPED,
-                provider="disabled",
-                error_message="Email is disabled (EMAIL_ENABLED=false)",
-            )
+            return self._disabled_result()
 
         # Try to get clinic-specific provider
         provider = self.provider  # Default to global
@@ -265,6 +270,13 @@ class EmailService:
             EmailResult with the status of the operation.
         """
         self._initialize()
+
+        from app.config import settings
+
+        if not settings.EMAIL_ENABLED:
+            # Guarded here too: a disabled instance must not render (and then
+            # fail on) a template it is never going to deliver.
+            return self._disabled_result()
 
         # Render HTML template
         body_html = self._render_template(

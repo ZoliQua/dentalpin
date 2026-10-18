@@ -224,6 +224,26 @@ async def test_disabled_email_skips_instead_of_failing(monkeypatch, caplog) -> N
     assert "ERROR" not in caplog.text
 
 
+@pytest.mark.asyncio
+async def test_disabled_email_skips_templated_sends_too(monkeypatch, caplog) -> None:
+    """The opt-out covers send_templated: an unknown template is not an error (#614)."""
+    from app.config import settings as app_settings
+    from app.core.email.providers.base import EmailStatus
+
+    monkeypatch.setattr(app_settings, "ENVIRONMENT", "production")
+    monkeypatch.setattr(app_settings, "TESTING", False)
+    monkeypatch.setattr(app_settings, "EMAIL_ENABLED", False)
+    with caplog.at_level(logging.ERROR, logger="app.core.email"):
+        result = await EmailService().send_templated(
+            to_email="ana@example.com",
+            template_key="not_a_real_template_key",
+            context={},
+            subject="Hola",
+        )
+    assert result.status == EmailStatus.SKIPPED
+    assert "ERROR" not in caplog.text
+
+
 def test_smtp_provider_in_production_boots_clean():
     import warnings
 

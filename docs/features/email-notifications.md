@@ -348,7 +348,7 @@ class EmailLog:
     template_key: str
     subject: str
     status: str              # "pending" | "sent" | "failed" | "skipped"
-    provider: str            # "smtp" | "console"
+    provider: str            # "smtp" | "console" | "disabled"
     provider_message_id: str
     error_message: str | None
     triggered_by_event: str
@@ -568,6 +568,10 @@ EMAIL_SMTP_TLS=true
 EMAIL_FROM_ADDRESS=noreply@example.com
 EMAIL_FROM_NAME=DentalPin
 ```
+
+`EMAIL_ENABLED=false` is the instance-wide master switch: it disables the
+global provider *and* any per-clinic SMTP configuration, and the attempt is
+recorded as `skipped` instead of being retried.
 
 Production boots normally with `EMAIL_PROVIDER=console` (or an unknown
 provider) while email is enabled (#614): resolving the provider logs an
