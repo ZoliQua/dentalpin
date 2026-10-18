@@ -207,8 +207,8 @@ class EmailService:
 
         if not settings.EMAIL_ENABLED:
             # Global opt-out: this instance is not meant to deliver mail, so
-            # skip before resolving a provider or touching the network. The
-            # outbox records this as a skip, not a failure.
+            # skip without resolving the per-clinic provider or touching the
+            # network. The outbox records this as a skip, not a failure.
             return self._disabled_result()
 
         # Try to get clinic-specific provider

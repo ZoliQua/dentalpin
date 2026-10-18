@@ -360,8 +360,7 @@ class NotificationGateway:
             # outcome: record it without retrying or publishing a failure.
             msg.status = "skipped"
             msg.provider = result.provider
-            if result.error_message:
-                msg.error_message = result.error_message[:2000]
+            msg.error_message = result.error_message[:2000] if result.error_message else None
             msg.next_attempt_at = None
             await db.commit()
         else:

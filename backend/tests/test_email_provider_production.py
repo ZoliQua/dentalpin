@@ -244,19 +244,25 @@ async def test_disabled_email_skips_templated_sends_too(monkeypatch, caplog) -> 
     assert "ERROR" not in caplog.text
 
 
-def test_smtp_provider_in_production_boots_clean():
+def test_smtp_provider_in_production_boots_clean(monkeypatch):
     import warnings
 
+    # The unknown-key warning is about the operator's root .env, not about
+    # the email settings under test.
+    monkeypatch.setattr("app.config.warn_unknown_env_keys", lambda *a, **k: None)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         settings = _make_settings(ENVIRONMENT="production", EMAIL_PROVIDER="smtp")
     assert settings.EMAIL_PROVIDER == "smtp"
 
 
-def test_console_provider_outside_production_boots_silently():
+def test_console_provider_outside_production_boots_silently(monkeypatch):
     """Console is the documented dev default — no warning noise on every boot."""
     import warnings
 
+    # The unknown-key warning is about the operator's root .env, not about
+    # the email settings under test.
+    monkeypatch.setattr("app.config.warn_unknown_env_keys", lambda *a, **k: None)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         settings = _make_settings(ENVIRONMENT="development")

@@ -306,6 +306,54 @@ async def test_failed_send_schedules_backoff(db_session, test_patient, failing_e
     assert attempted == 0
 
 
+@pytest.mark.asyncio
+async def test_skipped_send_drops_the_previous_failure_text(db_session, test_patient):
+    """A row that failed once, then skipped, must not keep the stale error (#614)."""
+
+    class ControlledEmail:
+        channel = Channel.EMAIL
+        adapter_name = "controlled_email_test"
+        result = AdapterResult(
+            status=SendStatus.FAILED, provider="controlled", error_message="boom"
+        )
+
+        async def supports(self, db, clinic_id):  # noqa: ARG002
+            return True
+
+        async def send(self, db, msg):  # noqa: ARG002
+            return self.result
+
+    adapter = ControlledEmail()
+    channel_registry.register(adapter)
+    try:
+        await _email_template(db_session, test_patient.clinic_id)
+        msg = await NotificationGateway.enqueue(
+            db_session,
+            test_patient.clinic_id,
+            "appointment_confirmation",
+            context={},
+            patient_id=test_patient.id,
+            to_address=test_patient.email,
+        )
+
+        await NotificationGateway.dispatch_outbox(db_session)
+        await db_session.refresh(msg)
+        assert msg.status == "failed"
+        assert msg.error_message == "boom"
+
+        adapter.result = AdapterResult(status=SendStatus.SKIPPED, provider="webpush")
+        msg.next_attempt_at = None
+        await db_session.commit()
+
+        await NotificationGateway.dispatch_outbox(db_session)
+        await db_session.refresh(msg)
+        assert msg.status == "skipped"
+        assert msg.error_message is None
+        assert msg.next_attempt_at is None
+    finally:
+        channel_registry.unregister("controlled_email_test")
+
+
 # --------------------------------------------------------------------------- #
 # Agent tool wrapper
 # --------------------------------------------------------------------------- #
