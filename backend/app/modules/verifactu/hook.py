@@ -45,7 +45,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 from zoneinfo import ZoneInfo
@@ -137,9 +137,22 @@ async def _load_emisor(db: AsyncSession, clinic_id) -> tuple[str, str]:
 
 
 def _format_amount(d: Decimal | float) -> Decimal:
-    if isinstance(d, Decimal):
-        return d.quantize(Decimal("0.01"))
-    return Decimal(str(d)).quantize(Decimal("0.01"))
+    """Round to the cent the way the invoice row itself was rounded.
+
+    ``ROUND_HALF_UP`` (half away from zero) is what PostgreSQL applies
+    when it stores a ``NUMERIC(_, 2)`` column, so a half-cent lands on
+    the same cent here as it did in ``invoices.total``. The ``Decimal``
+    default, ``ROUND_HALF_EVEN``, rounds 9.085 down to 9.08 where the
+    stored total is 9.09 — a one-cent gap between the libro fiscal and
+    the invoice, inside a hash chain that cannot be rewritten once AEAT
+    accepts it. It is also the mode every other fiscal builder in the
+    tree already passes explicitly (``sdi_it``, ``nav_online``,
+    ``sistema_ts``, ``india_gst``).
+    """
+
+    if not isinstance(d, Decimal):
+        d = Decimal(str(d))
+    return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
 def _build_desglose(

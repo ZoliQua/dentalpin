@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import hashlib
 from datetime import date, datetime
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 
 def _normalize_nif(nif: str) -> str:
@@ -27,7 +27,17 @@ def _normalize_nif(nif: str) -> str:
 
 
 def _format_amount(amount: Decimal) -> str:
-    return f"{amount:.2f}"
+    """Two decimals, rounded the way the invoice row was rounded.
+
+    Callers pass amounts already quantized by ``hook._format_amount``,
+    so this is normally a straight format. Quantizing explicitly keeps
+    the canonical string on the same cent as ``invoices.total`` even if
+    a caller hands over an unrounded value: ``f"{d:.2f}"`` alone would
+    apply the ``Decimal`` default (``ROUND_HALF_EVEN``), and the huella
+    would then be computed over an amount the invoice does not hold.
+    """
+
+    return f"{amount.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP):.2f}"
 
 
 def _format_fecha_expedicion(fecha: date) -> str:
