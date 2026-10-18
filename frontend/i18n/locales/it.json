@@ -874,14 +874,6 @@
       "cancelled": "Annullato",
       "no_show": "Assente"
     },
-    "scheduled": "Programmato",
-    "confirmed": "Confermato",
-    "inProgress": "In corso",
-    "in_progress": "In corso",
-    "completed": "Completato",
-    "cancelled": "Annullato",
-    "noShow": "Assente",
-    "no_show": "Assente",
     "transitions": {
       "confirmed": "Segna come confermato",
       "checked_in": "Registra l'arrivo",
@@ -2624,6 +2616,8 @@
         "bank_transfer": "Bonifico",
         "direct_debit": "Addebito diretto",
         "insurance": "Assicurazione",
+        "upi": "UPI",
+        "netbanking": "Internet banking",
         "other": "Altro"
       }
     },

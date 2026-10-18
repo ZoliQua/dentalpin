@@ -873,14 +873,6 @@
       "cancelled": "रद्द",
       "no_show": "नहीं आए"
     },
-    "scheduled": "निर्धारित",
-    "confirmed": "पुष्ट",
-    "inProgress": "प्रगति पर",
-    "in_progress": "प्रगति पर",
-    "completed": "पूर्ण",
-    "cancelled": "रद्द",
-    "noShow": "नहीं आए",
-    "no_show": "नहीं आए",
     "transitions": {
       "confirmed": "पुष्ट चिह्नित करें",
       "checked_in": "आगमन दर्ज करें",
@@ -2634,6 +2626,8 @@
         "bank_transfer": "बैंक ट्रांसफ़र",
         "direct_debit": "डायरेक्ट डेबिट",
         "insurance": "बीमा",
+        "upi": "UPI",
+        "netbanking": "नेट बैंकिंग",
         "other": "अन्य"
       }
     },

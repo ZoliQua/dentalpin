@@ -873,14 +873,6 @@
       "cancelled": "Cancelled",
       "no_show": "No show"
     },
-    "scheduled": "Scheduled",
-    "confirmed": "Confirmed",
-    "inProgress": "In progress",
-    "in_progress": "In progress",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "noShow": "No show",
-    "no_show": "No show",
     "transitions": {
       "confirmed": "Mark as confirmed",
       "checked_in": "Mark arrival",
@@ -2624,6 +2616,8 @@
         "bank_transfer": "Bank transfer",
         "direct_debit": "Direct debit",
         "insurance": "Insurance",
+        "upi": "UPI",
+        "netbanking": "Net banking",
         "other": "Other"
       }
     },

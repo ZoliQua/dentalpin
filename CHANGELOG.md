@@ -13,6 +13,21 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **Two backend vocabularies reached the UI with no label** (#695). The
+  patient file's appointment list rendered `appointments.checked_in` /
+  `appointments.in_treatment` in the status badge, because it read a stale
+  flat `appointments.<status>` namespace instead of the canonical
+  `appointments.status.*`; the duplicate is deleted and the component now
+  calls `useAppointmentStatus().statusLabel`. And `invoice.payments.methods`
+  was missing `upi` / `netbanking` (#365) in all 12 host locales, so
+  invoices, the financial by-method report and the dashboard tile labelled
+  India's payment methods with their raw value — the labels the payments
+  layer already ships were copied in. A new guard,
+  `backend/tests/test_i18n_vocabulary_labels.py`, pins 20 (i18n namespace →
+  closed backend vocabulary) pairs: neither locale parity (a key missing
+  everywhere keeps parity) nor the literal-key resolver (#631, dynamic keys
+  are out of its scope) can see this class.
+
 - **26 UI strings showed the i18n key instead of a message** (#631).
   `errors.loadFailed`, `errors.createFailed`, `errors.updateFailed` and
   `errors.deleteFailed` existed in no locale file, so a clinic saw a toast
