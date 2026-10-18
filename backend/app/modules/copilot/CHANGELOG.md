@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- fix(#687): the redaction boundary stops leaking names and contact details
+  under keys its denylist did not list. `professional_name` and
+  `created_by_name` (staff are data subjects too — the same columns are
+  tokenized when returned as `first_name`/`last_name`), `recipient_email`,
+  `billing_email`, `filename` / `original_filename` (an RVG is filed as
+  `Surname_Firstname_date.dcm`, which is the identity the module's own
+  matcher scores on) and `suggested_patient_id` are now covered. A value the
+  symbol table already holds is tokenized under *any* key, so one payload
+  can no longer send the same address as a token under `email` and verbatim
+  under `recipient_email`. Guarded by
+  `tests/test_redaction_key_coverage.py`, which walks every module's tool
+  results rather than a restated list.
+
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from

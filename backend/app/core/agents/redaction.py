@@ -41,15 +41,38 @@ from app.core.llm.base import (
 )
 
 # key (lower-cased) -> token kind
-_NAME_KEYS = {"first_name", "last_name", "full_name", "name", "patient_name"}
+# Key names are matched case-insensitively against these sets. They are a
+# denylist, so a PHI value under a key nobody listed here used to reach the
+# provider verbatim (#687) — ``tests/test_redaction_key_coverage.py`` walks
+# every module's tool results and fails on a new name/email/phone key that
+# is neither covered here nor classified as non-personal.
+#
+# Staff are data subjects too: ``professional_name`` and ``created_by_name``
+# carry a real employee's name, assembled from the same columns that are
+# tokenized when a tool returns them as ``first_name``/``last_name``.
+_NAME_KEYS = {
+    "first_name",
+    "last_name",
+    "full_name",
+    "name",
+    "patient_name",
+    "professional_name",
+    "created_by_name",
+}
 _PHONE_KEYS = {"phone", "mobile", "telephone", "phone_number"}
-_EMAIL_KEYS = {"email", "email_address"}
+_EMAIL_KEYS = {"email", "email_address", "recipient_email", "billing_email"}
 _NATIONAL_ID_KEYS = {"dni", "nif", "tax_id", "national_id"}
 _DOB_KEYS = {"date_of_birth", "dob", "birth_date"}
+# Scanned files are routinely filed under the patient's name
+# (``Surname_Firstname_date.dcm`` is what the RVG matcher scores on), so the
+# file name is an identifier even though the column is not. The token
+# rehydrates on the way back out, so the user still reads the real name.
+_FILE_KEYS = {"filename", "original_filename"}
 # UUID-valued reference keys -> kind
 _ID_KIND = {
     "id": "REF",
     "patient_id": "PATIENT",
+    "suggested_patient_id": "PATIENT",
     "appointment_id": "APPT",
 }
 
@@ -64,6 +87,8 @@ for _k in _NATIONAL_ID_KEYS:
     _KIND_FOR_KEY[_k] = "NATID"
 for _k in _DOB_KEYS:
     _KIND_FOR_KEY[_k] = "DOB"
+for _k in _FILE_KEYS:
+    _KIND_FOR_KEY[_k] = "FILE"
 
 _UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE
@@ -110,6 +135,16 @@ class SymbolTable:
             if token in text:
                 text = text.replace(token, self._to_real[token])
         return text
+
+    def token_if_known(self, value: str) -> str | None:
+        """The token for ``value`` when the table already holds it, else None.
+
+        Whole-value only, deliberately: the substring form
+        (:meth:`replace_known`) can land a token mid-word, which is a
+        tolerable trade for user free text but not for a structured value
+        the model has to reason about.
+        """
+        return self._to_token.get(value)
 
     def replace_known(self, text: str) -> str:
         """Tokenize occurrences of already-known real values in free text."""
@@ -192,7 +227,11 @@ class Redactor:
             return self.table.tokenize(value, kind)
         if lkey in _ID_KIND and _UUID_RE.match(value):
             return self.table.tokenize(value, _ID_KIND[lkey])
-        return value
+        # The key is not one we know, but the value may be: the same address
+        # appeared under ``email`` earlier in this conversation and was
+        # tokenized then. Emitting it verbatim now would undo that (#687).
+        known = self.table.token_if_known(value)
+        return known if known is not None else value
 
     # --- incoming (provider -> server / display) -----------------------
 
