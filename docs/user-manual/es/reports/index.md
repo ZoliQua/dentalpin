@@ -1,17 +1,19 @@
 ---
 module: reports
-last_verified_commit: b1b82f5
+last_verified_commit: 27442250
 ---
 
 # Informes
 
 Hub de informes de la clínica. `reports` es un módulo **solo de
 lectura** que agrega datos de los módulos de negocio (facturación,
-presupuestos, agenda) y los presenta en cuadros de mando. Otros
-módulos pueden añadir sus propios informes en el dashboard a través
-del slot `reports.categories` — por ejemplo, `payments` añade el
-informe de cobros (ver
-[informes de cobros](../payments/screens/reports_payments.md)).
+presupuestos, agenda) y los presenta en cuadros de mando. El
+dashboard muestra un acceso directo por cada familia de informes que
+puede alcanzar, incluido el informe de cobros que pertenece al módulo
+`payments` (ver
+[informes de cobros](../payments/screens/reports_payments.md)); cada
+acceso aparece sólo para quien tiene el permiso de lectura de esa
+familia.
 
 ## Pantallas
 
@@ -54,7 +56,7 @@ informe de cobros (ver
 
 - **Facturación, presupuestos, agenda** — fuentes de los informes
   agregados.
-- **Cobros (`payments`)** — añade el cuadro de cobros vía el slot
-  `reports.categories`.
+- **Cobros (`payments`)** — es el dueño del informe de cobros al que
+  enlaza el dashboard.
 - **Catálogo, pacientes** — referencias y enriquecimientos en filas
   agregadas (categoría del tratamiento, paciente, profesional).

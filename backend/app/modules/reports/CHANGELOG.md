@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs: the reports user manual (en + es) described the dashboard as extended through the `reports.categories` slot, which the page stopped rendering when it moved to native drill-down chips. Rewritten to describe what the page does, and `last_verified_commit` bumped in both locales.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix(#611): report CSVs run every cell through `csv_cell`. Professional
