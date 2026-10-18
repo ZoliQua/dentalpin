@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#701): `Category{Create,Update}.icon` is capped at the column
+  length (`VARCHAR(50)`) instead of 500-ing on the INSERT.
+
 - feat(i18n): Hindi (`hi`) locale: Hindi names for the default VAT types and the seeded catalog (categories, treatments, sessions).
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

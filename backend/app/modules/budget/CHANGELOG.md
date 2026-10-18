@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#701): `SignatureCreate.signed_by_email` is capped at the column
+  length (`VARCHAR(255)`) instead of 500-ing on the INSERT.
+
 - fix: resending a terminal budget twice returned 500. `clone_to_new_draft`
   took the new version from the row it was cloning (`version + 1`) while
   `BudgetService.duplicate_budget` took it from `max(version)`, so the

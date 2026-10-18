@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#701): `ToothInput.role` (20) and `TreatmentCreate.clinical_type`
+  / `source_module` (30) are capped at their column lengths instead of
+  500-ing on the INSERT.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix(#522): `TimelineSlider` compared the last history date against the UTC

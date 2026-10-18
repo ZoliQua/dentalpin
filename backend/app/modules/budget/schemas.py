@@ -207,7 +207,7 @@ class SignatureCreate(BaseModel):
     """Schema for creating a signature."""
 
     signed_by_name: str = Field(min_length=1, max_length=200)
-    signed_by_email: str | None = None
+    signed_by_email: str | None = Field(default=None, max_length=255)
     relationship_to_patient: RelationshipToPatient = "patient"
 
     # Signature data (for drawn signatures)

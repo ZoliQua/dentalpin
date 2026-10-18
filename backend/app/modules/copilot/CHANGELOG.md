@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#701): `SettingsUpdate.model` (100) and `provider` (20) are capped
+  at their column lengths. `provider` was already rejected by the
+  provider registry with a 400; `model` is free text and a long one hit
+  the INSERT as a 500.
+
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from

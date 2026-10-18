@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#701): `AppointmentUpdate.status` is capped at the column length
+  (`VARCHAR(20)`); an over-long value was a 500 from the INSERT instead
+  of a 422. The status vocabulary itself is still `str` — that is #679.
+
 - feat(#480, ADR 0037): `source` claim on check-in tokens. Counter QRs
   (`source=counter`, the staff mint default) auto-submit; mailed reminder
   links (`source=reminder`, minted by the notification sweep with a
