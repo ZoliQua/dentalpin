@@ -14,7 +14,13 @@
   validation stays key-only: Ollama is not probed for reachability or
   model tool support (the brief's tool-use-incapable 422 stays deferred
   too). The endpoint is deployment-level (`OLLAMA_BASE_URL`), not
-  per-clinic (the brief's per-clinic `base_url` stays deferred).
+  per-clinic (the brief's per-clinic `base_url` stays deferred). Since the
+  endpoint is the only one that can be dropped rather than unkeyed, the
+  adapter wraps its stream and re-raises a connection failure as an
+  `LLMConfigError` naming `OLLAMA_BASE_URL` (the setting) and the dialed
+  URL, reporting a stall (`APITimeoutError`, the subclass) as a timeout
+  rather than an unreachable host, instead of the SDK's bare
+  `Connection error.`
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from

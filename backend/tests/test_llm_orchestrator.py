@@ -567,6 +567,107 @@ def test_ollama_provider_whitespace_base_url_uses_default() -> None:
     assert str(provider._client.base_url) == "http://ollama:11434/v1/"
 
 
+@pytest.mark.asyncio
+async def test_ollama_provider_names_base_url_when_unreachable() -> None:
+    """A down self-hosted host must name OLLAMA_BASE_URL, not the SDK default."""
+    from types import SimpleNamespace
+
+    import httpx
+    from openai import APIConnectionError
+
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    request = httpx.Request("POST", "http://192.168.1.20:11434/v1/chat/completions")
+
+    class _Completions:
+        async def create(self, **kwargs):
+            raise APIConnectionError(request=request)
+
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=_Completions()))
+
+    with pytest.raises(LLMConfigError, match="OLLAMA_BASE_URL") as excinfo:
+        async for _ in provider.complete(
+            system="", messages=[], tools=[], model="llama3.1:8b", max_tokens=64
+        ):
+            pass
+    assert "192.168.1.20:11434" in str(excinfo.value)
+
+
+@pytest.mark.asyncio
+async def test_ollama_provider_wraps_connection_error_from_any_iteration_point() -> None:
+    """Pin the wrapper, not the SDK: its ``except`` spans the whole iteration.
+
+    The SDK itself raises ``APIConnectionError`` only before the first chunk;
+    this fixture pins the wrapper's defensive branch so a future narrowing
+    cannot silently drop a prefix of the stream.
+    """
+    from types import SimpleNamespace
+
+    import httpx
+    from openai import APIConnectionError
+
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    request = httpx.Request("POST", "http://192.168.1.20:11434/v1/chat/completions")
+    chunk = SimpleNamespace(
+        usage=None,
+        choices=[
+            SimpleNamespace(
+                delta=SimpleNamespace(content="Hola", tool_calls=None),
+                finish_reason=None,
+            )
+        ],
+    )
+
+    async def _stream():
+        yield chunk
+        raise APIConnectionError(request=request)
+
+    class _Completions:
+        async def create(self, **kwargs):
+            return _stream()
+
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=_Completions()))
+
+    received: list[ProviderEvent] = []
+    with pytest.raises(LLMConfigError, match="OLLAMA_BASE_URL"):
+        async for event in provider.complete(
+            system="", messages=[], tools=[], model="llama3.1:8b", max_tokens=64
+        ):
+            received.append(event)
+    # The wrapper must stream through unchanged, not swallow the first chunk.
+    assert received == [TextDelta(text="Hola")]
+
+
+@pytest.mark.asyncio
+async def test_ollama_provider_reports_timeout_apart_from_unreachable() -> None:
+    """A stalled server is a timeout, not an unreachable host; both name the setting."""
+    from types import SimpleNamespace
+
+    import httpx
+    from openai import APITimeoutError
+
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    request = httpx.Request("POST", "http://192.168.1.20:11434/v1/chat/completions")
+
+    class _Completions:
+        async def create(self, **kwargs):
+            raise APITimeoutError(request=request)
+
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=_Completions()))
+
+    with pytest.raises(LLMConfigError, match="timed out") as excinfo:
+        async for _ in provider.complete(
+            system="", messages=[], tools=[], model="llama3.1:8b", max_tokens=64
+        ):
+            pass
+    assert "OLLAMA_BASE_URL" in str(excinfo.value)
+
+
 def test_ollama_spec_shape() -> None:
     from app.config import Settings, settings
     from app.core.llm.factory import OLLAMA_SPEC
