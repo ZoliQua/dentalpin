@@ -129,10 +129,13 @@ export function useClinicalNotes() {
     }
   }
 
+  // media owns the attachment rows: this module exposes only the read
+  // (`GET /clinical_notes/attachments`, note-aware), while linking and
+  // unlinking go to media's own endpoints.
   async function linkAttachment(input: NoteAttachmentCreate): Promise<NoteAttachment | null> {
     try {
       const response = await api.post<ApiResponse<NoteAttachment>>(
-        '/api/v1/clinical_notes/attachments',
+        '/api/v1/media/attachments',
         input
       )
       return response.data
@@ -144,7 +147,7 @@ export function useClinicalNotes() {
 
   async function unlinkAttachment(attachmentId: string): Promise<boolean> {
     try {
-      await api.del(`/api/v1/clinical_notes/attachments/${attachmentId}`)
+      await api.del(`/api/v1/media/attachments/${attachmentId}`)
       return true
     } catch (error) {
       console.error('Error unlinking attachment:', error)

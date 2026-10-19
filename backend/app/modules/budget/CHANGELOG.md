@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#699): the budgets list could not label a pre-selected professional
+  filter — `professionalResolver` read `GET /api/v1/auth/users/{id}`,
+  which does not exist (the users router has PUT/DELETE for an id, and
+  GET only as a list). It now resolves the name from
+  `GET /api/v1/auth/professionals`, the endpoint the same page already
+  reads under the same permission.
 - fix: the `budget.get_budget` agent tool failed on every budget that has
   a line item. It read `BudgetItem.description`, a column that does not
   exist — the line's name lives on its catalog item — so the copilot got
