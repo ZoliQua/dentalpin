@@ -240,6 +240,7 @@
       "subtitle": "Immutable history of records submitted to AEAT.",
       "filterState": "State",
       "filterTipo": "Type",
+      "all": "All",
       "columns": {
         "createdAt": "Date",
         "tipoFactura": "Type",

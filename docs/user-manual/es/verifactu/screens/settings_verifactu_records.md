@@ -35,21 +35,48 @@ related_paths:
 last_verified_commit: 0000000
 ---
 
-# /settings/verifactu/records
+# Libro fiscal
 
-> _Esqueleto generado automáticamente — reemplazar con documentación real cuando se toque este módulo._
+El historial inmutable de los registros enviados a la AEAT. Cada fila es
+un registro encadenado: modificar o borrar un registro aceptado rompería
+la cadena de hashes, por lo que esta página es de solo lectura.
 
-_Pantalla `/settings/verifactu/records` del módulo `verifactu`._
+## Cómo se usa
+
+1. Abre **Ajustes > Verifactu > Libro fiscal**.
+2. Acota la lista con los dos filtros:
+   - **Estado**: todos, aceptado, aceptado con errores, rechazado o
+     pendiente.
+   - **Tipo**: todos, F1, F2 o R1.
+   Al cambiar cualquiera de los dos, la lista vuelve a la primera página.
+3. Cambia de página con las flechas de abajo (50 registros por página).
+   Al lado se muestra el total.
+
+## Qué significa cada columna
+
+| Columna | Significado |
+|---------|-------------|
+| Fecha | Cuándo se creó el registro. |
+| Tipo | `F1` factura completa, `F2` factura simplificada, `R1` rectificativa. |
+| Número | Serie y número de la factura a la que pertenece el registro. |
+| Importe | Importe total enviado a la AEAT. |
+| Estado | `accepted`, `accepted_with_errors`, `rejected` o `pending`. |
+| CSV AEAT | El código CSV que devuelve la AEAT cuando acepta el registro. |
 
 ## Permisos
 
-- `verifactu.settings.read`
-- `verifactu.settings.configure`
-- `verifactu.records.read`
-- `verifactu.queue.manage`
-- `verifactu.environment.promote`
+| Qué puedes ver / hacer | Permiso |
+|------------------------|---------|
+| Ver el libro fiscal y usar los filtros | `verifactu.records.read` |
 
-## Para qué sirve
+## Problemas frecuentes
 
-_Pendiente de documentar._
-
+- **El libro está vacío.** El módulo solo escribe un registro cuando se
+  emite una factura con Verifactu activo. Revisa **Ajustes > Verifactu**
+  para la configuración del productor y el entorno activo.
+- **Un filtro no devuelve filas.** Los registros solo pasan a aceptado
+  cuando la AEAT los confirma; usa **Estado: todos** para ver también los
+  pendientes y los rechazados.
+- **No aparece la entrada del menú.** El módulo es opcional: un
+  administrador debe instalarlo desde la administración de módulos y
+  conceder `verifactu.records.read`.

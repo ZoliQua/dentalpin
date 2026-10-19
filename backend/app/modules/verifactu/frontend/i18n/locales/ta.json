@@ -249,6 +249,7 @@
       "subtitle": "AEAT-க்கு சமர்ப்பிக்கப்பட்ட பதிவுகளின் மாற்ற முடியாத வரலாறு.",
       "filterState": "நிலை",
       "filterTipo": "வகை",
+      "all": "அனைத்தும்",
       "columns": {
         "createdAt": "தேதி",
         "tipoFactura": "வகை",

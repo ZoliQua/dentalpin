@@ -240,6 +240,7 @@
       "subtitle": "Az AEAT felé beküldött rekordok megváltoztathatatlan előzményei.",
       "filterState": "Állapot",
       "filterTipo": "Típus",
+      "all": "Összes",
       "columns": {
         "createdAt": "Dátum",
         "tipoFactura": "Típus",

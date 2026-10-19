@@ -240,6 +240,7 @@
       "subtitle": "Histórico imutável dos registos enviados à AEAT.",
       "filterState": "Estado",
       "filterTipo": "Tipo",
+      "all": "Todos",
       "columns": {
         "createdAt": "Data",
         "tipoFactura": "Tipo",
