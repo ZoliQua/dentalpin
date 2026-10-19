@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- fix(#677): the `generate_reorder_orders` tool parameter `item_ids` is
+  typed `list[UUID]` instead of `list[str]`.
+  The tool schema now advertises `format: uuid`, and a malformed id is
+  rejected by `tool_registry.call`'s validation step naming the parameter,
+  rather than reaching the handler and raising `badly formed hexadecimal
+  UUID string`, which named nothing.
+
 ### Added
 
 - Rebuilt fresh off current `main` (roadmap #227-4): sourcing excludes

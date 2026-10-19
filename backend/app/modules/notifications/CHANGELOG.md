@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- fix(#614): production with `EMAIL_PROVIDER=console` (or unknown)
+  boots normally but delivers nothing loudly - resolving the provider
+  logs an ERROR, the console provider writes metadata-only lines (masked
+  recipient, no subject/body/names) and reports sends as failed so the UI
+  stops claiming delivery. `EMAIL_ENABLED=false` is a real opt-out: the
+  send path returns SKIPPED without resolving the per-clinic provider or
+  touching the network, and the gateway records SKIPPED as a skip (no
+  retry, no `notification.failed`) instead of collapsing it into a
+  failure. The public demo runs production, so it reports those sends as
+  failed too.
+  `.env.prod.example` documents the SMTP section.
 - feat(#480, ADR 0037): the appointment reminder sweep mints a
   `source=reminder` check-in token (valid until the end of the
   appointment's clinic-local day) and passes `checkin_url` into the

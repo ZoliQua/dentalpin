@@ -27,7 +27,9 @@ original confirmation stands, so it skips draft/pending and keeps
 
 ## Public API
 
-Routes mounted at `/api/v1/treatment-plans/`.
+Routes mounted at `/api/v1/treatment_plan/` (the loader mounts every
+module under `/api/v1/<module name>`; the paths below are relative to
+it, so the detail endpoint is `/api/v1/treatment_plan/treatment-plans/{id}`).
 
 - `GET   /treatment-plans`              — list; `treatment_plan.plans.read`
 - `POST  /treatment-plans`              — create; `treatment_plan.plans.write`

@@ -13,6 +13,21 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **Two backend vocabularies reached the UI with no label** (#695). The
+  patient file's appointment list rendered `appointments.checked_in` /
+  `appointments.in_treatment` in the status badge, because it read a stale
+  flat `appointments.<status>` namespace instead of the canonical
+  `appointments.status.*`; the duplicate is deleted and the component now
+  calls `useAppointmentStatus().statusLabel`. And `invoice.payments.methods`
+  was missing `upi` / `netbanking` (#365) in all 12 host locales, so
+  invoices, the financial by-method report and the dashboard tile labelled
+  India's payment methods with their raw value — the labels the payments
+  layer already ships were copied in. A new guard,
+  `backend/tests/test_i18n_vocabulary_labels.py`, pins 20 (i18n namespace →
+  closed backend vocabulary) pairs: neither locale parity (a key missing
+  everywhere keeps parity) nor the literal-key resolver (#631, dynamic keys
+  are out of its scope) can see this class.
+
 - **26 UI strings showed the i18n key instead of a message** (#631).
   `errors.loadFailed`, `errors.createFailed`, `errors.updateFailed` and
   `errors.deleteFailed` existed in no locale file, so a clinic saw a toast
@@ -24,6 +39,20 @@ frontend as a Nuxt layer under its own Python package.
   `t('…')` key against the merged English set — the locale-parity test
   cannot see this class, because a key absent from *every* locale keeps
   parity perfectly.
+- **Ten UI strings rendered one hardcoded language to every locale**
+  (#697). `actions.change`, `common.optional`, `common.expand`,
+  `common.collapse`, `clinical.diagnosis.openNotes`,
+  `attachments.linkError`, `documents.viewError` and the three
+  `photoGallery.*` upload/fetch messages existed in no locale file, so the
+  default message passed at the call site is what rendered: an English
+  clinic read "Cambiar" / "Opcional" / "Expandir" on the media upload
+  controls and the patient alerts banner (two of them aria-labels), a
+  Spanish one read "Error loading photos" in a toast. All ten are now in
+  the 12 host locales, phrased from the strings each locale already uses
+  for the same kind of message, and the redundant defaults are gone from
+  the call sites. `key-resolution.test.ts` no longer skips a call that
+  passes a default message — the default may stay, the key has to exist —
+  which is the follow-up its own docstring asked for.
 
 ### Added
 
@@ -54,6 +83,19 @@ frontend as a Nuxt layer under its own Python package.
 
 - Email templates missing in a locale now fall back to the English
   template instead of rendering nothing.
+
+- **Heads-up (production email):** `EMAIL_PROVIDER=console` (the dev
+  default) delivers nothing (#614). A production instance that never
+  set `EMAIL_PROVIDER` boots normally but logs an ERROR when it first
+  resolves the provider (on the first email, since resolution is lazy),
+  writes metadata-only log lines (no bodies, no names), and reports
+  sends as failed so the UI stops claiming delivery. Set
+  `EMAIL_PROVIDER=smtp` with real credentials, or
+  `EMAIL_ENABLED=false` if the instance sends no mail (sends are then
+  skipped, not retried or reported as failed). The public demo is
+  affected too: it runs production, so it now logs metadata and reports
+  those sends as failed instead of printing the message and reporting it
+  sent.
 
 - **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
   required. A production boot without it fails fast with an actionable

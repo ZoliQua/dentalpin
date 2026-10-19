@@ -22,6 +22,7 @@ defeat the purpose; CI rejects them.
 from __future__ import annotations
 
 import importlib.util
+import re
 import sys
 from pathlib import Path
 
@@ -71,6 +72,41 @@ def test_every_module_has_doc(discovered_module_names: list[str], doc_name: str)
     assert not too_short, (
         f"Modules with sparse {doc_name} (<{threshold} non-blank lines): "
         f"{too_short}. Flesh out the doc — empty stubs defeat the purpose."
+    )
+
+
+# ---------------------------------------------------------------------------
+# The mount prefix a CLAUDE.md claims (#707)
+# ---------------------------------------------------------------------------
+
+
+def test_claude_md_states_the_real_mount_prefix(discovered_module_names: list[str]) -> None:
+    """``Routes mounted at `/api/v1/<name>/``` has to be the real prefix.
+
+    ``core/plugins/loader.py`` mounts every module router under
+    ``/api/v1/<module name>`` — the Python name, underscores and all.
+    Three CLAUDE.md files claimed a hyphenated prefix that no router
+    answers (``/api/v1/treatment-plans``, ``/api/v1/patient-timeline``,
+    ``/api/v1/patients-clinical``). These files are the brief an agent
+    reads before writing a call, and a wrong path there produces exactly
+    the silent 404 fixed in #699.
+    """
+
+    wrong: list[str] = []
+    checked = 0
+    for module_name in discovered_module_names:
+        text = (MODULES_ROOT / module_name / "CLAUDE.md").read_text()
+        match = re.search(r"[Rr]outes mounted at\s*`([^`]+)`", text)
+        if match is None:
+            continue  # not every module exposes routes
+        checked += 1
+        claimed = match.group(1).strip().rstrip("/")
+        if claimed != f"/api/v1/{module_name}":
+            wrong.append(f"  {module_name}: claims {claimed!r}, mounts at '/api/v1/{module_name}'")
+
+    assert checked > 20, f"CLAUDE.md prefix sweep looks wrong: {checked} claims"
+    assert not wrong, "\n".join(
+        ["these CLAUDE.md files state a mount prefix no router answers:", *wrong]
     )
 
 
@@ -150,3 +186,46 @@ def test_normalise_strips_example_query_strings(docs_coverage) -> None:
         docs_coverage._normalise_endpoint("GET", "/api/v1/payroll/reports/annual?year=")
         == "GET /api/v1/payroll/reports/annual"
     )
+
+
+# ---------------------------------------------------------------------------
+# Every event a module publishes is in its events.md
+# ---------------------------------------------------------------------------
+
+
+def test_published_events_are_in_the_module_events_doc() -> None:
+    """``docs/technical/<module>/events.md`` lists what the module publishes.
+
+    CLAUDE.md asks for a row there for every event published or consumed,
+    and three files said *"This module does not publish any events."*
+    while publishing 3 (billing), 7 (media) and 4 (recalls) events that
+    other modules subscribe to. The publishers come from
+    ``docs/events-catalog.md``, which ``generate_catalogs.py`` derives from
+    the ``event_bus.publish`` call sites and CI keeps current — so this
+    reuses a list that is already checked rather than grepping again.
+    """
+    import re
+
+    docs_root = MODULES_ROOT.parents[2] / "docs"
+    catalog = (docs_root / "events-catalog.md").read_text(encoding="utf-8")
+    summary = catalog.split("## Summary", 1)[1].split("\n## ", 1)[0]
+
+    rows = 0
+    missing: list[str] = []
+    for line in summary.splitlines():
+        match = re.match(r"^\|\s*`([^`]+)`\s*\|\s*`[^`]*`\s*\|(.*?)\|(.*?)\|\s*$", line)
+        if match is None:
+            continue
+        rows += 1
+        event = match.group(1)
+        for module in re.findall(r"`([a-z_]+)`", match.group(2)):
+            doc = docs_root / "technical" / module / "events.md"
+            if not doc.exists():
+                missing.append(f"  {module}: no events.md for {event}")
+            elif f"`{event}`" not in doc.read_text(encoding="utf-8"):
+                missing.append(
+                    f"  {module}: `{event}` missing from docs/technical/{module}/events.md"
+                )
+
+    assert rows > 100, f"events catalog parse looks wrong: {rows} rows"
+    assert not missing, "\n".join(["published events no events.md documents:", *missing])

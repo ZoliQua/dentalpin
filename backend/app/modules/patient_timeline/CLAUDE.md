@@ -5,7 +5,7 @@ to ~22 events across the system to build a single chronological feed.
 
 ## Public API
 
-Routes mounted at `/api/v1/patient-timeline/`.
+Routes mounted at `/api/v1/patient_timeline/`.
 
 ## Dependencies
 

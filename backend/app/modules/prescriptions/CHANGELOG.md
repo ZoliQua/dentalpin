@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#705): the printed prescription date rendered `issued_at` (a
+  `timestamptz`, so UTC) without converting, so a prescription issued
+  after midnight clinic-local carried the previous day's date; the
+  fallback used the server's naive clock. Both now use the clinic
+  timezone, which the router passes into the PDF data.
+
 - fix(#269 follow-up): the prescriber license caption follows the
   clinic country when it has its own term (Mexico: "Cédula
   profesional" instead of the es default "N.º de colegiado"), in the

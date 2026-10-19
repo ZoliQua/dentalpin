@@ -348,7 +348,7 @@ class EmailLog:
     template_key: str
     subject: str
     status: str              # "pending" | "sent" | "failed" | "skipped"
-    provider: str            # "smtp" | "console"
+    provider: str            # "smtp" | "console" | "disabled"
     provider_message_id: str
     error_message: str | None
     triggered_by_event: str
@@ -568,3 +568,19 @@ EMAIL_SMTP_TLS=true
 EMAIL_FROM_ADDRESS=noreply@example.com
 EMAIL_FROM_NAME=DentalPin
 ```
+
+`EMAIL_ENABLED=false` is the instance-wide master switch: it disables the
+global provider *and* any per-clinic SMTP configuration, and the attempt is
+recorded as `skipped` instead of being retried.
+
+Production boots normally with `EMAIL_PROVIDER=console` (or an unknown
+provider) while email is enabled (#614): resolving the provider logs an
+ERROR naming the remedy (resolution is lazy, so this happens on the first
+email, not at boot), the console provider writes metadata-only lines
+(masked recipient, no subject/body/names) and reports every send as
+failed, so the UI stops claiming delivery. Either configure SMTP or set
+`EMAIL_ENABLED=false`, which skips the send (recorded as `skipped`, never
+retried) instead of failing it. The public demo is not exempt: it runs
+`ENVIRONMENT=production`, so it takes this branch too and now reports
+those sends as failed instead of printing the message and reporting it
+sent. A demo running `ENVIRONMENT=development` is unaffected.
