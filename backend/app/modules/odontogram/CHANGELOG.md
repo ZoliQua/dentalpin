@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: the chart showed at most 50 treatments per patient. `fetchTreatments`
+  sent no `page_size`, so the list endpoint's default (50, newest first)
+  applied and a long-standing patient's oldest rows — the initial charting —
+  dropped off the teeth. It now walks every page at the endpoint's cap (100).
 - fix(#701): `ToothInput.role` (20) and `TreatmentCreate.clinical_type`
   / `source_module` (30) are capped at their column lengths instead of
   500-ing on the INSERT.
