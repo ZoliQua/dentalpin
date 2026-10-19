@@ -7,6 +7,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.models import Clinic
+from app.core.utils.dates import clinic_today
 from app.modules.contacts.models import Contact
 from app.modules.lab_orders.schemas import LabOrderCreate, LabOrderUpdate
 from app.modules.lab_orders.service import LabOrderService
@@ -45,7 +46,7 @@ async def test_create_list_and_receive_lab_order(
     # transitions to ``received`` without an explicit date — capture the
     # expected day before the call instead of hardcoding one (a hardcoded
     # date made this test fail everywhere but on its authoring day).
-    expected_receipt = date.today()
+    expected_receipt = clinic_today(test_clinic.timezone)
     updated = await LabOrderService.update_order(
         db_session, test_clinic.id, order.id, LabOrderUpdate(status="received")
     )
