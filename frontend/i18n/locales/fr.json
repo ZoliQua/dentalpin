@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Modifier",
+    "change": "Changer",
     "cancel": "Annuler",
     "save": "Enregistrer",
     "create": "Créer",
     "delete": "Supprimer",
     "close": "Fermer",
     "remove": "Retirer"
+  },
+  "attachments": {
+    "linkError": "Erreur lors de la liaison de la pièce jointe"
   },
   "patients": {
     "title": "Patients",
@@ -760,7 +764,8 @@
       "continuePlan": "Continuer le plan « {name} »",
       "selectPlan": "Sélectionner un plan",
       "continue": "Continuer",
-      "odontogramTab": "Odontogramme"
+      "odontogramTab": "Odontogramme",
+      "openNotes": "Ouvrir les notes"
     },
     "plans": {
       "title": "Plans de traitement",
@@ -1358,6 +1363,8 @@
     "retry": "Réessayer",
     "refresh": "Actualiser",
     "hide": "Masquer",
+    "expand": "Développer",
+    "collapse": "Réduire",
     "forbidden": "Accès refusé",
     "confirm": "Confirmer",
     "yes": "Oui",
@@ -1381,6 +1388,7 @@
     "deselectAll": "Aucun",
     "all": "Tout",
     "required": "Ce champ est obligatoire",
+    "optional": "Facultatif",
     "invalidEmail": "Email invalide",
     "networkError": "Erreur de connexion",
     "serverError": "Erreur serveur",
@@ -3052,6 +3060,7 @@
     "uploadSuccess": "Document téléchargé avec succès",
     "uploadError": "Erreur lors du téléchargement du document",
     "downloadError": "Erreur lors du téléchargement du document",
+    "viewError": "Erreur lors du chargement du document",
     "deleteSuccess": "Document supprimé",
     "deleteError": "Erreur lors de la suppression du document",
     "updateSuccess": "Document mis à jour",
@@ -3089,6 +3098,9 @@
     "showingOf": "{count} sur {total} photos",
     "upload": "Envoyer une photo",
     "uploadHelp": "Classez pour qu'elle apparaisse dans la bonne catégorie",
+    "fetchError": "Erreur lors du chargement des photos",
+    "uploadError": "Erreur lors de l'envoi de la photo",
+    "uploadSuccess": "Photo envoyée avec succès",
     "dropHere": "Glissez une photo ici ou cliquez",
     "category": "Type",
     "subtype": "Vue",

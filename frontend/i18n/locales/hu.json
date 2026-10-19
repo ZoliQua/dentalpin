@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Szerkesztés",
+    "change": "Csere",
     "cancel": "Mégse",
     "save": "Mentés",
     "create": "Létrehozás",
     "delete": "Törlés",
     "close": "Bezárás",
     "remove": "Eltávolítás"
+  },
+  "attachments": {
+    "linkError": "Hiba a csatolmány csatolásakor"
   },
   "patients": {
     "title": "Páciensek",
@@ -760,7 +764,8 @@
       "continuePlan": "\"{name}\" terv folytatása",
       "selectPlan": "Terv kiválasztása",
       "continue": "Folytatás",
-      "odontogramTab": "Fogtérkép"
+      "odontogramTab": "Fogtérkép",
+      "openNotes": "Megjegyzések megnyitása"
     },
     "plans": {
       "title": "Kezelési tervek",
@@ -1358,6 +1363,8 @@
     "retry": "Újra",
     "refresh": "Frissítés",
     "hide": "Elrejtés",
+    "expand": "Kibontás",
+    "collapse": "Összecsukás",
     "forbidden": "Hozzáférés megtagadva",
     "confirm": "Megerősítés",
     "yes": "Igen",
@@ -1381,6 +1388,7 @@
     "deselectAll": "Egyik sem",
     "all": "Összes",
     "required": "Ez a mező kötelező",
+    "optional": "Nem kötelező",
     "invalidEmail": "Érvénytelen e-mail",
     "networkError": "Kapcsolódási hiba",
     "serverError": "Szerverhiba",
@@ -3052,6 +3060,7 @@
     "uploadSuccess": "Dokumentum sikeresen feltöltve",
     "uploadError": "Hiba a dokumentum feltöltésekor",
     "downloadError": "Hiba a dokumentum letöltésekor",
+    "viewError": "Hiba a dokumentum betöltésekor",
     "deleteSuccess": "Dokumentum törölve",
     "deleteError": "Hiba a dokumentum törlésekor",
     "updateSuccess": "Dokumentum frissítve",
@@ -3089,6 +3098,9 @@
     "showingOf": "{count} / {total} megjelenítve",
     "upload": "Fotó feltöltése",
     "uploadHelp": "Sorolja be, hogy a megfelelő kategóriában jelenjen meg",
+    "fetchError": "Hiba a fotók betöltésekor",
+    "uploadError": "Hiba a fotó feltöltésekor",
+    "uploadSuccess": "Fotó sikeresen feltöltve",
     "dropHere": "Húzzon ide egy fotót, vagy kattintson",
     "category": "Típus",
     "subtype": "Nézet",

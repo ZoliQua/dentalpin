@@ -256,7 +256,7 @@ async function submit() {
           size="sm"
           @click="pickFile"
         >
-          {{ t('actions.change', 'Cambiar') }}
+          {{ t('actions.change') }}
         </UButton>
         <UButton
           variant="ghost"
