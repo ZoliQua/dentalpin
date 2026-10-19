@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#718): `valid_from` on a plan-generated quote and the auto-close cron's
+  threshold use each clinic's calendar date instead of the server's (UTC).
 - docs(#711): `treatment_plan.items_reordered` was missing from the
   Published table.
 - docs(#707): CLAUDE.md claimed the routes mount at

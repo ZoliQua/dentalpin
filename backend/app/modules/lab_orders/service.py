@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import date
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -12,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.events import event_bus
 from app.core.events.types import EventType
+from app.core.utils.dates import clinic_today_for
 from app.modules.contacts.models import Contact
 from app.modules.patients.models import Patient
 
@@ -190,7 +190,7 @@ class LabOrderService:
             and "received_date" not in data
             and old_status != "received"
         ):
-            data["received_date"] = date.today()
+            data["received_date"] = await clinic_today_for(db, clinic_id)
         for field, value in data.items():
             setattr(order, field, value)
         await db.flush()
