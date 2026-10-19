@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix: issuing without an explicit date stamped the **server's** date (UTC)
+  on the invoice — tomorrow's date for a UTC-6 clinic from 18:00 local,
+  yesterday's for a UTC+2 clinic until 02:00. The issue route now passes the
+  clinic's calendar date (`app.core.utils.dates.clinic_today`), and the
+  workflow uses it for both the default `issue_date` and the year in the
+  number, so the two always agree. `InvoiceIssueRequest.issue_date` is now
+  optional (`None` = the clinic's today).
 - docs(#711): `docs/technical/billing/events.md` said the module publishes
   no events; it publishes `invoice.issued`, `invoice.paid` (read by
   verifactu) and `invoice.sent`. The Published table now lists all three

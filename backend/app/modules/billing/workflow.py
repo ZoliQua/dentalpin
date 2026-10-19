@@ -76,6 +76,7 @@ class InvoiceWorkflowService:
         issued_by: UUID,
         issue_date: date | None = None,
         hook_callback=None,
+        today: date | None = None,
     ) -> Invoice:
         """Issue an invoice or credit note (transition from draft to issued).
 
@@ -93,9 +94,12 @@ class InvoiceWorkflowService:
             db: Database session
             invoice: Invoice or credit note to issue
             issued_by: User ID issuing the invoice
-            issue_date: Issue date (defaults to today)
+            issue_date: Issue date (defaults to ``today``)
             hook_callback: Optional compliance hook callback for regular invoices.
                           For credit notes, use on_credit_note_issued hook instead.
+            today: The clinic's calendar date (``clinic_today``). Used for the
+                default issue date and the year in the number, so the two
+                always agree. Defaults to the server's date.
 
         Returns:
             Updated invoice with "issued" status
@@ -169,7 +173,7 @@ class InvoiceWorkflowService:
 
             # Generate number
             invoice_number, sequential_number = await InvoiceNumberService.generate_number(
-                db, invoice.clinic_id, series_id
+                db, invoice.clinic_id, series_id, today=today
             )
             invoice.invoice_number = invoice_number
             invoice.sequential_number = sequential_number
@@ -177,7 +181,7 @@ class InvoiceWorkflowService:
 
         previous_status = invoice.status
         invoice.status = "issued"
-        invoice.issue_date = issue_date or date.today()
+        invoice.issue_date = issue_date or today or date.today()
         invoice.issued_by = issued_by
 
         # Calculate due date if not set

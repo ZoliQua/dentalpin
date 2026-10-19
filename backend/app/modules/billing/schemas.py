@@ -542,7 +542,8 @@ class InvoiceListResponse(BaseModel):
 class InvoiceIssueRequest(BaseModel):
     """Schema for issuing an invoice."""
 
-    issue_date: date = Field(default_factory=date.today)
+    # None = the clinic's today, resolved by the route (``clinic_today``).
+    issue_date: date | None = None
 
 
 class CreditNoteItemSelect(BaseModel):
