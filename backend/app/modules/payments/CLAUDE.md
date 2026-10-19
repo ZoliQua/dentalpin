@@ -110,7 +110,7 @@ nothing. Country gating is the gateway's `condition` (same as
 | Slot | Component | Permission |
 |---|---|---|
 | `budget.detail.sidebar` | `BudgetPaymentsCard` (cobrado / pendiente / allocations + "Cobrar" CTA) | `payments.record.read` |
-| `reports.categories` | `PaymentsReportEntry` (card on `/reports` linking to `/reports/payments`) | `payments.reports.read` |
+| `reports.categories` | `PaymentsReportEntry` — **dormant**: the `/reports` dashboard stopped rendering this slot when it moved to native drill-down chips, and hardcodes the "Cobros" chip instead (`payments` is in its `manifest.depends`). The registration stays for backwards compatibility; see reports/CLAUDE.md. New entry points should target `reports.dashboard.widgets`. | `payments.reports.read` |
 | `patient.detail.administracion.payments` | `PatientPaymentsPanel` (patient ledger inside the Administración tab — KPIs + timeline + row menu with refund / "Asignar a presupuesto…" (`PaymentReallocateModal` → `/reallocate`) + "Pendiente de cobrar" card) | `payments.record.read` |
 
 Registered in `frontend/plugins/slots.client.ts`. Cards receive `ctx`

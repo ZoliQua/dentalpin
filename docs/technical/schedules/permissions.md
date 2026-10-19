@@ -1,6 +1,6 @@
 ---
 module: schedules
-last_verified_commit: 0e9a0ac
+last_verified_commit: 27442250
 ---
 
 # Schedules — permissions
@@ -21,17 +21,24 @@ permission registry namespaces them as `schedules.<name>`).
 
 ## Role assignment
 
-Default role mappings (in `backend/app/core/auth/permissions.py`):
+Default role mappings live in this module's `manifest.role_permissions`
+(`backend/app/modules/schedules/__init__.py`), merged at runtime by
+`get_role_permissions()` — `core/auth/permissions.py` holds only the core
+grants:
 
 | Role | Schedules access |
 |------|------------------|
 | `admin` | All (via `*`). |
-| `dentist` | `professional.own.{read,write}`, `availability.read`. Reads but does not write clinic-wide hours. |
-| `hygienist` | `professional.own.{read,write}`, `availability.read`. **No analytics.** |
-| `assistant` | `professional.own.{read,write}`, `availability.read`. |
-| `receptionist` | All read; no `professional.write`; **analytics.read** for occupancy reports. |
+| `dentist` | `clinic_hours.read`, `professional.own.{read,write}`, `availability.read`, `analytics.read`. Reads but does not write clinic-wide hours. |
+| `hygienist` | `clinic_hours.read`, `professional.own.{read,write}`, `availability.read`. **No analytics.** |
+| `assistant` | `clinic_hours.read`, `professional.read`, `availability.read`. |
+| `receptionist` | `clinic_hours.read`, `professional.read`, `availability.read`, `analytics.read`. |
 
 Receptionists read analytics; hygienists do not. Don't widen this.
+
+Note on `assistant`: the manifest grants `professional.read` (any
+professional's hours), not `professional.own.*`. The table above records
+what the code does.
 
 ## Adding a new permission
 

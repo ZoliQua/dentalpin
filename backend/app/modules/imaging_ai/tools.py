@@ -12,9 +12,9 @@ from .service import AiJobService
 
 
 class QueueAiJobArgs(BaseModel):
-    patient_id: str = Field(description="UUID of the patient")
-    document_id: str = Field(description="UUID of the media document holding DICOM bytes")
-    series_document_ids: list[str] = Field(
+    patient_id: UUID = Field(description="Id of the patient")
+    document_id: UUID = Field(description="Id of the media document holding DICOM bytes")
+    series_document_ids: list[UUID] = Field(
         default_factory=list,
         description="Rest of the series for volumetric backends (nnunet needs 2+ slices)",
     )
@@ -22,15 +22,15 @@ class QueueAiJobArgs(BaseModel):
 
 
 class ConfirmAiJobArgs(BaseModel):
-    job_id: str = Field(description="UUID of the AI job to confirm")
+    job_id: UUID = Field(description="Id of the AI job to confirm")
 
 
 class GetAiJobArgs(BaseModel):
-    job_id: str = Field(description="UUID of the AI job")
+    job_id: UUID = Field(description="Id of the AI job")
 
 
 class ListAiJobsArgs(BaseModel):
-    patient_id: str = Field(description="UUID of the patient")
+    patient_id: UUID = Field(description="Id of the patient")
     limit: int = Field(default=20, ge=1, le=100)
 
 
@@ -60,10 +60,10 @@ async def _queue_ai_job(ctx: AgentContext, params: QueueAiJobArgs) -> dict:
         job = await AiJobService.queue_job(
             ctx.db,
             ctx.clinic_id,
-            UUID(params.patient_id),
+            params.patient_id,
             ctx.supervisor_id,
-            UUID(params.document_id),
-            series_document_ids=[UUID(i) for i in params.series_document_ids],
+            params.document_id,
+            series_document_ids=params.series_document_ids,
             backend=params.backend,
         )
     except LookupError:
@@ -74,7 +74,7 @@ async def _queue_ai_job(ctx: AgentContext, params: QueueAiJobArgs) -> dict:
 
 
 async def _confirm_ai_job(ctx: AgentContext, params: ConfirmAiJobArgs) -> dict:
-    job = await AiJobService.get_job(ctx.db, ctx.clinic_id, UUID(params.job_id))
+    job = await AiJobService.get_job(ctx.db, ctx.clinic_id, params.job_id)
     if job is None:
         return {"error": "Job not found"}
     if ctx.supervisor_id is None:
@@ -89,7 +89,7 @@ async def _confirm_ai_job(ctx: AgentContext, params: ConfirmAiJobArgs) -> dict:
 
 
 async def _get_ai_job(ctx: AgentContext, params: GetAiJobArgs) -> dict:
-    job = await AiJobService.get_job(ctx.db, ctx.clinic_id, UUID(params.job_id))
+    job = await AiJobService.get_job(ctx.db, ctx.clinic_id, params.job_id)
     if not job:
         return {"error": "Job not found"}
     return _job_summary(job)
@@ -97,7 +97,7 @@ async def _get_ai_job(ctx: AgentContext, params: GetAiJobArgs) -> dict:
 
 async def _list_ai_jobs(ctx: AgentContext, params: ListAiJobsArgs) -> dict:
     items, total = await AiJobService.list_jobs(
-        ctx.db, ctx.clinic_id, UUID(params.patient_id), page=1, page_size=params.limit
+        ctx.db, ctx.clinic_id, params.patient_id, page=1, page_size=params.limit
     )
     return {"total": total, "jobs": [_job_summary(j) for j in items]}
 

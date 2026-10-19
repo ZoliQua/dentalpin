@@ -3,9 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
+
+# Closed queue vocabulary (see RvgImport in models.py). Declared as a Literal
+# so a caller that takes a status as a parameter can be typed with it: an
+# unknown value is then rejected by name instead of filtering the queue down
+# to nothing.
+RvgImportStatus = Literal["pending", "approved", "rejected", "failed"]
 
 
 class StudyIndexRequest(BaseModel):

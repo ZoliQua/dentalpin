@@ -2,9 +2,11 @@
 
 Mirrors expenses/patient_relationships: install -> uninstall -> reinstall
 must drop ONLY the medication catalog table and leave every other module
-untouched. The module owns a single revision (mc_0001), so the
-branch-scoped downgrade target is ``medication_catalog@-1``. Marked
-``alembic_roundtrip`` and excluded from the default pytest run.
+untouched. The branch-scoped downgrade walks
+``medication_catalog@-1`` until the table is gone — never ``@base``,
+which resolves to the whole-graph base in the merged multi-head graph
+(same reasoning as the verifactu test). Marked ``alembic_roundtrip``
+and excluded from the default pytest run.
 """
 
 from __future__ import annotations
@@ -63,11 +65,13 @@ def test_medication_catalog_uninstall_roundtrip_is_branch_scoped() -> None:
     )
     baseline_other = before - CATALOG_TABLES
 
-    _alembic("downgrade", "medication_catalog@-1")
-    after_down = _list_tables()
-    assert CATALOG_TABLES.isdisjoint(after_down), (
-        f"catalog table survived downgrade: {CATALOG_TABLES & after_down}"
-    )
+    for _ in range(10):
+        _alembic("downgrade", "medication_catalog@-1")
+        after_down = _list_tables()
+        if CATALOG_TABLES.isdisjoint(after_down):
+            break
+    else:
+        raise AssertionError(f"catalog table survived downgrade: {CATALOG_TABLES & _list_tables()}")
     assert baseline_other <= after_down, (
         f"downgrade leaked into other modules; missing: {baseline_other - after_down}"
     )

@@ -14,7 +14,7 @@ related_permissions:
 related_paths:
   - backend/app/modules/patients/router.py
   - backend/app/modules/patients/frontend/pages/patients/[id].vue
-last_verified_commit: 838a6767
+last_verified_commit: 27442250
 ---
 
 # Ficha del paciente
@@ -98,9 +98,10 @@ tarjeta de **Pendiente de cobrar** al principio.
   facturas ni presupuestos; el modal lo indica.
 - Tras el cobro, la tarjeta desaparece o reduce su importe según
   cuánto se cobró.
-- En el menú de cada cobro del historial: **Ver detalle**, **Asignar
-  a presupuesto…** (mueve un anticipo a cuenta al presupuesto elegido
-  y, si tiene facturas emitidas, las imputa) y **Reembolsar**.
+- En el menú de cada cobro del historial: **Asignar a presupuesto…**
+  (mueve un anticipo a cuenta al presupuesto elegido y, si tiene
+  facturas emitidas, las imputa) y **Reembolsar**. El menú muestra
+  solo las acciones que tu rol permite.
 
 ## Pestaña Presupuestos
 

@@ -9,6 +9,17 @@
   workflow uses it for both the default `issue_date` and the year in the
   number, so the two always agree. `InvoiceIssueRequest.issue_date` is now
   optional (`None` = the clinic's today).
+- docs(#711): `docs/technical/billing/events.md` said the module publishes
+  no events; it publishes `invoice.issued`, `invoice.paid` (read by
+  verifactu) and `invoice.sent`. The Published table now lists all three
+  with trigger, payload and subscribers.
+- fix(#701): `InvoiceItemCreate.internal_code` (50),
+  `InvoiceItem{Create,Update}.vat_exempt_reason` (200) and
+  `InvoiceSeries{Create,Update}.description` (200) now carry the
+  `max_length` their columns have. A longer value reached the INSERT and
+  came back as a 500 (`StringDataRightTruncation`) instead of a 422 — the
+  exemption reason and the pasted internal code are the realistic ones.
+
 - fix: a duplicate invoice-series prefix is a 409 instead of a 500.
   Neither `POST /series` nor `PUT /series/{id}` caught the
   `uq_invoice_series_clinic_prefix` violation, so creating a series twice

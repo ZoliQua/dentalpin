@@ -11,6 +11,11 @@ const props = defineProps<{
 }>()
 
 const { t, locale } = useI18n()
+// Status labels come from the canonical composable, never from a local
+// copy of the vocabulary: the flat `appointments.<status>` keys this
+// component used to read were a stale duplicate that never grew
+// `checked_in` / `in_treatment`.
+const { statusLabel } = useAppointmentStatus()
 const api = useApi()
 const router = useRouter()
 
@@ -172,7 +177,7 @@ function goToAppointment(appointment: Appointment) {
             :color="getStatusColor(appointment.status)"
             variant="subtle"
           >
-            {{ t(`appointments.${appointment.status}`) }}
+            {{ statusLabel(appointment.status) }}
           </UBadge>
         </li>
       </ul>

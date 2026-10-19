@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "تعديل",
+    "change": "تغيير",
     "cancel": "إلغاء",
     "save": "حفظ",
     "create": "إنشاء",
     "delete": "حذف",
     "close": "إغلاق",
     "remove": "إزالة"
+  },
+  "attachments": {
+    "linkError": "خطأ في ربط المرفق"
   },
   "patients": {
     "title": "المرضى",
@@ -760,7 +764,8 @@
       "continuePlan": "متابعة الخطة \"{name}\"",
       "selectPlan": "اختر الخطة",
       "continue": "متابعة",
-      "odontogramTab": "مخطط الأسنان"
+      "odontogramTab": "مخطط الأسنان",
+      "openNotes": "فتح الملاحظات"
     },
     "plans": {
       "title": "خطط العلاج",
@@ -873,14 +878,6 @@
       "cancelled": "ملغى",
       "no_show": "لم يحضر"
     },
-    "scheduled": "مجدول",
-    "confirmed": "مؤكد",
-    "inProgress": "جارٍ",
-    "in_progress": "جارٍ",
-    "completed": "منجز",
-    "cancelled": "ملغى",
-    "noShow": "لم يحضر",
-    "no_show": "لم يحضر",
     "actionsMenu": "إجراءات الموعد",
     "transitions": {
       "confirmed": "تحديد كمؤكد",
@@ -1366,6 +1363,8 @@
     "retry": "إعادة المحاولة",
     "refresh": "تحديث",
     "hide": "إخفاء",
+    "expand": "توسيع",
+    "collapse": "طي",
     "forbidden": "الوصول مرفوض",
     "confirm": "تأكيد",
     "yes": "نعم",
@@ -1389,6 +1388,7 @@
     "deselectAll": "ولا واحد",
     "all": "الكل",
     "required": "هذا الحقل مطلوب",
+    "optional": "اختياري",
     "invalidEmail": "بريد إلكتروني غير صالح",
     "networkError": "خطأ في الاتصال",
     "serverError": "خطأ في الخادم",
@@ -2624,6 +2624,8 @@
         "bank_transfer": "حوالة بنكية",
         "direct_debit": "خصم مباشر",
         "insurance": "تأمين",
+        "upi": "UPI",
+        "netbanking": "تحويل إلكتروني",
         "other": "أخرى"
       }
     },
@@ -3058,6 +3060,7 @@
     "uploadSuccess": "رُفع المستند بنجاح",
     "uploadError": "خطأ في رفع المستند",
     "downloadError": "خطأ في تنزيل المستند",
+    "viewError": "خطأ في تحميل المستند",
     "deleteSuccess": "حُذف المستند",
     "deleteError": "خطأ في حذف المستند",
     "updateSuccess": "حُدث المستند",
@@ -3095,6 +3098,9 @@
     "showingOf": "عرض {count} من {total}",
     "upload": "رفع صورة",
     "uploadHelp": "صنّفها لتظهر في الفئة الصحيحة",
+    "fetchError": "خطأ في تحميل الصور",
+    "uploadError": "خطأ في رفع الصورة",
+    "uploadSuccess": "رُفعت الصورة بنجاح",
     "dropHere": "اسحب صورة إلى هنا أو انقر",
     "category": "النوع",
     "subtype": "المنظر",

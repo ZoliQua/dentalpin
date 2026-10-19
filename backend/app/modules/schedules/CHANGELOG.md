@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- docs(#707): the permissions doc's role table missed `analytics.read`
+  for `dentist` and described `assistant` as `professional.own.{read,write}`
+  while the manifest grants `professional.read` (any professional's
+  hours). Both tables also pointed at `core/auth/permissions.py`, while
+  module grants live in `manifest.role_permissions`.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

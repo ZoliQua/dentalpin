@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- docs(#711): the events doc said the module publishes nothing; it
+  publishes `recall.created` (read by activity_journal and
+  recall_reminders), `snoozed`, `cancelled` and `completed`.
+
 - feat(#546, ADR 0038): expose a `RecallsErasureContributor` instead of
   subscribing to `gdpr.erasure.executed`; `gdpr` pulls it inside the
   erasure transaction. Same per-channel note clearing (recall and
