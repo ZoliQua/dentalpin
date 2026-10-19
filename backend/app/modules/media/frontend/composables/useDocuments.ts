@@ -169,7 +169,7 @@ export function useDocuments() {
       console.error('Error fetching document blob:', error)
       toast.add({
         title: t('common.error'),
-        description: t('documents.viewError', 'Error loading document'),
+        description: t('documents.viewError'),
         color: 'error'
       })
       return null

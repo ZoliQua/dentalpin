@@ -197,9 +197,9 @@ class MappingDecisionPatch(BaseModel):
     ``ignored`` (drop this Gesdén row from the import).
     """
 
-    operator_action: str
+    operator_action: str = Field(max_length=20)
     operator_target_id: UUID | None = None
-    operator_target_category_key: str | None = None
+    operator_target_category_key: str | None = Field(default=None, max_length=50)
     operator_notes: str | None = None
 
 

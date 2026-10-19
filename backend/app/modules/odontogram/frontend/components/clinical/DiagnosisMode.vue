@@ -235,7 +235,7 @@ async function handleTreatmentsChanged() {
       icon="i-lucide-notebook-pen"
       color="primary"
       size="lg"
-      :aria-label="t('clinical.diagnosis.openNotes', 'Notas')"
+      :aria-label="t('clinical.diagnosis.openNotes')"
       @click="sidebarOpen = true"
     />
     <USlideover

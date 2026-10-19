@@ -240,7 +240,7 @@ async function submit() {
           size="sm"
           @click="pickFile"
         >
-          {{ t('actions.change', 'Cambiar') }}
+          {{ t('actions.change') }}
         </UButton>
         <UButton
           variant="ghost"
@@ -323,7 +323,7 @@ async function submit() {
     <UFormField
       :label="t('documents.fields.description', 'Notas')"
       size="sm"
-      :hint="t('common.optional', 'Opcional')"
+      :hint="t('common.optional')"
     >
       <UTextarea
         v-model="description"

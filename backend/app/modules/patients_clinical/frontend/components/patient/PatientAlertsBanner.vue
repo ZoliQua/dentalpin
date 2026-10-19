@@ -102,7 +102,7 @@ const showExpanded = ref(false)
           color="neutral"
           size="xs"
           :icon="showExpanded ? 'i-lucide-chevron-up' : 'i-lucide-chevron-down'"
-          :aria-label="showExpanded ? t('common.collapse', 'Contraer') : t('common.expand', 'Expandir')"
+          :aria-label="showExpanded ? t('common.collapse') : t('common.expand')"
           @click="showExpanded = !showExpanded"
         />
       </div>
