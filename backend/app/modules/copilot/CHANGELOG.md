@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#701): `SettingsUpdate.model` (100) and `provider` (20) are capped
+  at their column lengths. `provider` was already rejected by the
+  provider registry with a 400; `model` is free text and a long one hit
+  the INSERT as a 500.
+
 - fix(#687): the redaction boundary stops leaking names and contact details
   under keys its denylist did not list. `professional_name` and
   `created_by_name` (staff are data subjects too — the same columns are

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#701): `AppointmentUpdate.status` is capped at the column length
+  (`VARCHAR(20)`); an over-long value was a 500 from the INSERT instead
+  of a 422. The status vocabulary itself is still `str` — that is #679.
 - fix(#695): the appointment badge in the patient file's **Citas** list
   showed `appointments.checked_in` / `appointments.in_treatment` instead
   of a label. `AppointmentsMode.vue` read the flat `appointments.<status>`

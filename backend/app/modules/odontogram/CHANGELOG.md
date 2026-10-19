@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#701): `ToothInput.role` (20) and `TreatmentCreate.clinical_type`
+  / `source_module` (30) are capped at their column lengths instead of
+  500-ing on the INSERT.
 - fix(#697): the diagnosis notes FAB's aria-label
   (`clinical.diagnosis.openNotes`) existed in no locale file, so screen
   readers got the hardcoded Spanish "Notas" in every language. Added to

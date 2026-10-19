@@ -47,7 +47,7 @@ class PatientUpdate(BaseModel):
     email: EmailStr | None = None
     date_of_birth: date | None = None
     notes: str | None = None
-    status: str | None = None
+    status: str | None = Field(default=None, max_length=20)
     do_not_contact: bool | None = None
     billing_name: str | None = Field(default=None, max_length=200)
     billing_tax_id: str | None = Field(default=None, max_length=50)

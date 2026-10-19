@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#701): `SignatureCreate.signed_by_email` is capped at the column
+  length (`VARCHAR(255)`) instead of 500-ing on the INSERT.
 - fix(#699): the budgets list could not label a pre-selected professional
   filter — `professionalResolver` read `GET /api/v1/auth/users/{id}`,
   which does not exist (the users router has PUT/DELETE for an id, and
