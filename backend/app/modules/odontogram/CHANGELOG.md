@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: the chart showed at most 50 treatments per patient. `fetchTreatments`
+  sent no `page_size`, so the list endpoint's default (50, newest first)
+  applied and a long-standing patient's oldest rows — the initial charting —
+  dropped off the teeth. It now walks every page at the endpoint's cap (100).
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix(#522): `TimelineSlider` compared the last history date against the UTC
