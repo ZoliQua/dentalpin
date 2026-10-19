@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#679): `PO_STATUSES` is derived from a new `PurchaseOrderStatus`
+  Literal (one vocabulary, two shapes, no drift), and the agent tools are
+  typed with it: `list_purchase_orders.order_status` rejects an unknown
+  status by name instead of answering an empty page, and
+  `transition_purchase_order.status` advertises the four reachable targets
+  — `received` is excluded, since it is stamped only by a receive batch
+  that fulfils every line.
 - fix(#677): the tool parameters `order_id`, `supplier_id`, `line_item_ids`
   and `line_ids` are typed `UUID`, and `expected_date` is typed `date`,
   instead of `str`.

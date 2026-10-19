@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- fix(#679): the `list_gdpr_requests` agent tool types `status` and
+  `request_type` with the module's own `RequestStatus` / `RequestType`
+  aliases — the ones `GET /requests` has always used — so an unrecognized
+  value is rejected by name instead of filtering the register down to
+  `{"total": 0}`. Both parameters also gained the description they were
+  missing: the agent was being shown a bare string with no vocabulary at
+  all. `create_gdpr_request.request_type` is typed the same way, moving its
+  failure from the service to the chokepoint.
 - fix(#677): the tool parameter `patient_id` is typed `UUID` instead of
   `str` on all four tools that take it.
   The tool schema now advertises `format: uuid`, and a malformed id is

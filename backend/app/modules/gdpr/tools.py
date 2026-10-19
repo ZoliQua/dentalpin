@@ -14,6 +14,8 @@ from .schemas import (
     DataBreachCreate,
     ErasureCategory,
     GdprRequestCreate,
+    RequestStatus,
+    RequestType,
     RetentionPolicyCreate,
 )
 from .service import (
@@ -29,14 +31,16 @@ from .service import (
 class CreateRequestArgs(BaseModel):
     requester_name: str
     requester_email: str
-    request_type: str = Field(description="access|rectification|erasure|portability|restrict")
+    request_type: RequestType = Field(description="Kind of right the requester is exercising")
     patient_id: UUID | None = None
     notes: str | None = None
 
 
 class ListRequestsArgs(BaseModel):
-    status: str | None = None
-    request_type: str | None = None
+    status: RequestStatus | None = Field(default=None, description="Only requests in this state")
+    request_type: RequestType | None = Field(
+        default=None, description="Only requests exercising this right"
+    )
     limit: int = Field(default=20, ge=1, le=100)
 
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#679): `list_rvg_imports.status` is typed with a new
+  `RvgImportStatus` Literal, so an unrecognized queue status is rejected by
+  name instead of reporting an empty approval queue — which reads as
+  "nothing is waiting".
 - fix(#677): the tool parameters `patient_id`, `document_id` and `study_id`
   are typed `UUID` instead of `str`.
   The tool schema now advertises `format: uuid`, and a malformed id is

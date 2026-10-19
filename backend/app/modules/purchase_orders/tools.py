@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from app.core.agents import AgentContext, Tool, ToolCategory
 
+from .models import PurchaseOrderStatus, PurchaseOrderTransitionTarget
 from .schemas import (
     PurchaseOrderCreate,
     PurchaseOrderLineCreate,
@@ -20,7 +21,9 @@ from .service import PurchaseOrderService
 
 
 class ListPurchaseOrdersArgs(BaseModel):
-    order_status: str | None = Field(default=None, description="PO status to filter by")
+    order_status: PurchaseOrderStatus | None = Field(
+        default=None, description="Only orders in this status"
+    )
     supplier_id: UUID | None = Field(default=None, description="Id of the supplier to filter by")
     limit: int = Field(default=20, ge=1, le=100)
 
@@ -41,7 +44,7 @@ class CreatePurchaseOrderArgs(BaseModel):
 
 class TransitionPurchaseOrderArgs(BaseModel):
     order_id: UUID = Field(description="Id of the purchase order")
-    status: str = Field(description="Target status: draft, sent, confirmed or cancelled")
+    status: PurchaseOrderTransitionTarget = Field(description="Status to move the order to")
 
 
 class ReceivePurchaseOrderArgs(BaseModel):

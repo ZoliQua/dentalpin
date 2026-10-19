@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from app.core.agents import AgentContext, Tool, ToolCategory
 
+from .schemas import RvgImportStatus
 from .service import AnnotationService, ImagingStudyService, RvgService
 
 
@@ -28,8 +29,8 @@ class IndexStudyArgs(BaseModel):
 
 
 class ListRvgImportsArgs(BaseModel):
-    status: str | None = Field(
-        default=None, description="Filter by queue status: pending, approved, rejected, failed"
+    status: RvgImportStatus | None = Field(
+        default=None, description="Only imports in this queue status"
     )
     limit: int = Field(default=20, ge=1, le=100)
 
