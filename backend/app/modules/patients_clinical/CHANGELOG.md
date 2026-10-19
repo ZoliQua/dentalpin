@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs(#707): CLAUDE.md claimed `/api/v1/patients-clinical/`; the real
+  prefix is `/api/v1/patients_clinical/`.
 - fix(#697): the alerts banner's expand/collapse aria-label
   (`common.expand` / `common.collapse`) existed in no locale file, so
   screen readers got the hardcoded Spanish "Expandir" / "Contraer" in

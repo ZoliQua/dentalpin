@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- docs(#707): CLAUDE.md claimed the routes mount at
+  `/api/v1/treatment-plans/`, which answers nothing — the prefix is
+  `/api/v1/treatment_plan/` and the paths listed under it are relative,
+  so the detail endpoint is `/api/v1/treatment_plan/treatment-plans/{id}`.
+  That reading is what produced the broken call fixed in #699.
 - fix(#699): the post-visit "mark the leftover linked treatments
   performed" prompt (#207) listed nothing, ever. It fetched the
   appointment detail from `/api/v1/appointments/{id}`; agenda mounts that

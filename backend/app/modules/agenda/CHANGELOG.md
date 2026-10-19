@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- docs(#707): the router docstring still said cabinets gate on
+  `admin.clinic.write` "until Etapa B.2 chunk 3" — they have gated on
+  `agenda.cabinets.{read,write}` since that chunk landed. The permissions
+  doc gets the five cabinet endpoints, and the one route that gates
+  outside this namespace on purpose (`PATCH /appointment-treatments/{id}`
+  → `clinical_notes.notes.write`, issue #60) is now written down.
 - fix(#701): `AppointmentUpdate.status` is capped at the column length
   (`VARCHAR(20)`); an over-long value was a 500 from the INSERT instead
   of a 422. The status vocabulary itself is still `str` — that is #679.
