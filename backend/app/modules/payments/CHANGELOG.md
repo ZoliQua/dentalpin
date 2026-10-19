@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix: the patient ledger's row menu offered **View detail**, a link to
+  `/payments/{id}` — a page no layer has, so it opened the 404 screen. The
+  item and its `rowMenu.detail` key are gone; the trigger's aria-label is
+  now `common.actions`, and a row whose role can neither reassign nor
+  refund no longer shows an empty menu.
 - docs: the `reports.categories` row in CLAUDE.md said the card renders on `/reports`; it has not since the dashboard moved to native drill-down chips (reports/CHANGELOG.md). Marked dormant, with the successor slot named. No code change — the chip itself is hardcoded by `reports` and still appears.
 
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
