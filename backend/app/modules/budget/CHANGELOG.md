@@ -4,6 +4,20 @@
 
 - fix(#701): `SignatureCreate.signed_by_email` is capped at the column
   length (`VARCHAR(255)`) instead of 500-ing on the INSERT.
+- fix(#699): the budgets list could not label a pre-selected professional
+  filter — `professionalResolver` read `GET /api/v1/auth/users/{id}`,
+  which does not exist (the users router has PUT/DELETE for an id, and
+  GET only as a list). It now resolves the name from
+  `GET /api/v1/auth/professionals`, the endpoint the same page already
+  reads under the same permission.
+- fix: the `budget.get_budget` agent tool failed on every budget that has
+  a line item. It read `BudgetItem.description`, a column that does not
+  exist — the line's name lives on its catalog item — so the copilot got
+  `ok=False` with a raw `AttributeError` string instead of the quote. The
+  existing tool test used an empty draft budget, which is the one case
+  that never reaches the serialisation branch. Now resolved through the
+  shared `catalog_name()` helper, like the PDF does, and the test carries
+  a real line.
 
 - fix: resending a terminal budget twice returned 500. `clone_to_new_draft`
   took the new version from the row it was cloning (`version + 1`) while

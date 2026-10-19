@@ -16,8 +16,8 @@ class ListReorderSuggestionsArgs(BaseModel):
 
 
 class GenerateReorderOrdersArgs(BaseModel):
-    item_ids: list[str] = Field(
-        description="UUIDs of the inventory items whose suggestions become POs"
+    item_ids: list[UUID] = Field(
+        description="Ids of the inventory items whose suggestions become POs"
     )
 
 
@@ -54,7 +54,7 @@ async def _generate_reorder_orders(ctx: AgentContext, params: GenerateReorderOrd
         return {"error": "item_ids must not be empty"}
     # AgentContext carries no acting user (agent_id/session_id only).
     orders = await ReorderService.generate_orders(
-        ctx.db, ctx.clinic_id, [UUID(i) for i in params.item_ids], created_by=None
+        ctx.db, ctx.clinic_id, params.item_ids, created_by=None
     )
     return {"total": len(orders), "purchase_orders": orders}
 
