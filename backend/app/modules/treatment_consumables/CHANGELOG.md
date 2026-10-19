@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#703): `tc_0002` makes `created_at` / `updated_at` NOT NULL, the
+  same `tc_0001` omission as `mc_0002` fixes for medication_catalog.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 
 - feat(i18n): Telugu (`te`) locale for the module's frontend layer.
