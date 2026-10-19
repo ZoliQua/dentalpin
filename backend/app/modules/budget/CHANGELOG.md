@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- fix(#705): the quote PDF footer printed `00:00` on every document —
+  `date.today().strftime("%d/%m/%Y %H:%M")`, the same line #204 fixed in
+  `billing/pdf.py` — and the signed-quote audit line rendered
+  `BudgetSignature.signed_at` (a `timestamptz`, so UTC) directly, so a
+  patient who signed at 01:15 in Madrid read "23:15" next to their
+  signature. Both, plus the quote date, now go through
+  `ZoneInfo(clinic.timezone)` like billing does.
+
 - fix: resending a terminal budget twice returned 500. `clone_to_new_draft`
   took the new version from the row it was cloning (`version + 1`) while
   `BudgetService.duplicate_budget` took it from `max(version)`, so the

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#705): the order PDF footer stamped the server's clock
+  (`datetime.now()`); it now uses the clinic timezone like billing's.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi purchase-order PDF labels.
 - feat(i18n): Telugu (`te`) locale for the module's frontend layer.
 - feat(i18n): Telugu (`te`) purchase-order PDF labels.
