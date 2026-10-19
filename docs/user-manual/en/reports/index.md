@@ -1,16 +1,17 @@
 ---
 module: reports
-last_verified_commit: b1b82f5
+last_verified_commit: 27442250
 ---
 
 # Reports
 
 The clinic's reporting hub. `reports` is a **read-only** module
 that aggregates data from the business modules (billing, budgets,
-agenda) into dashboards. Other modules can add their own reports to
-the dashboard through the `reports.categories` slot — for example,
-`payments` contributes the payments report (see
-[payment reports](../payments/screens/reports_payments.md)).
+agenda) into dashboards. The dashboard shows a drill-down chip for
+each report family it can reach, including the payments report owned by
+the `payments` module (see
+[payment reports](../payments/screens/reports_payments.md)); each chip
+appears only for users who hold that family's read permission.
 
 ## Screens
 
@@ -52,7 +53,6 @@ the dashboard through the `reports.categories` slot — for example,
 ## Related modules
 
 - **Billing, budgets, agenda** — sources of the aggregated reports.
-- **Payments** — contributes the payments card via the
-  `reports.categories` slot.
+- **Payments** — owns the payments report the dashboard links to.
 - **Catalog, patients** — references and enrichments in aggregated
   rows (treatment category, patient, professional).

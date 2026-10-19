@@ -27,7 +27,7 @@ class CreateTaskArgs(BaseModel):
 
 
 class UpdateTaskStatusArgs(BaseModel):
-    task_id: str = Field(min_length=1)
+    task_id: UUID
     status: TaskStatus
 
 
@@ -69,7 +69,7 @@ async def _update_status(ctx: AgentContext, params: UpdateTaskStatusArgs) -> dic
     task = await StaffTaskService.update_task(
         ctx.db,
         ctx.clinic_id,
-        UUID(params.task_id),
+        params.task_id,
         StaffTaskUpdate(status=params.status),
         None,
     )

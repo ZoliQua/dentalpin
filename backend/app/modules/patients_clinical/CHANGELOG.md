@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#697): the alerts banner's expand/collapse aria-label
+  (`common.expand` / `common.collapse`) existed in no locale file, so
+  screen readers got the hardcoded Spanish "Expandir" / "Contraer" in
+  every language. Both keys added to all 12 host locales.
+
 - fix(#631): the alerts banner's overflow badge rendered
   `+2 common.more` — `common.more` exists in no locale file. It now uses
   one interpolated host key, `common.andMore` (`+{count} more`), so the

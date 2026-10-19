@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from decimal import Decimal
+from typing import Literal, get_args
 from uuid import UUID, uuid4
 
 from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String, Text, UniqueConstraint, func
@@ -14,7 +15,20 @@ from app.database import Base
 
 # PO lifecycle: draft -> sent -> confirmed -> (received|cancelled).
 # ``received`` is stamped implicitly when every line fulfils.
-PO_STATUSES = frozenset({"draft", "sent", "confirmed", "received", "cancelled"})
+#
+# Declared as a Literal so callers that take a status as a parameter can be
+# typed with it: that is what puts the vocabulary in an OpenAPI/JSON schema
+# and lets validation reject an unknown value instead of filtering on it.
+# ``PO_STATUSES`` stays the membership-test shape, derived so the two
+# cannot drift.
+PurchaseOrderStatus = Literal["draft", "sent", "confirmed", "received", "cancelled"]
+PO_STATUSES = frozenset(get_args(PurchaseOrderStatus))
+
+# Statuses reachable through an explicit transition. ``received`` is absent
+# on purpose: it is stamped only by a receive batch that fulfils every line
+# (see ALLOWED_TRANSITIONS in service.py, which this must stay in step
+# with).
+PurchaseOrderTransitionTarget = Literal["draft", "sent", "confirmed", "cancelled"]
 
 
 class PurchaseOrder(Base):
