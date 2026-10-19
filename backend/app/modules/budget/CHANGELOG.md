@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - fix(#705): the quote PDF footer printed `00:00` on every document —
   `date.today().strftime("%d/%m/%Y %H:%M")`, the same line #204 fixed in
   `billing/pdf.py` — and the signed-quote audit line rendered

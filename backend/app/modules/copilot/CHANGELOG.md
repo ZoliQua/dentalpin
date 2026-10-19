@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - fix(#701): `SettingsUpdate.model` (100) and `provider` (20) are capped
   at their column lengths. `provider` was already rejected by the
   provider registry with a 400; `model` is free text and a long one hit

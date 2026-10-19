@@ -766,7 +766,7 @@ class InvoiceService:
                 joinedload(Invoice.patient),
                 joinedload(Invoice.creator),
             )
-            .order_by(parse_sort(sort, _INVOICE_SORT_ALLOW, _INVOICE_SORT_DEFAULT))
+            .order_by(parse_sort(sort, _INVOICE_SORT_ALLOW, _INVOICE_SORT_DEFAULT), Invoice.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

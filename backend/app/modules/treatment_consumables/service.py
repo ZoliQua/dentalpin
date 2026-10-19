@@ -52,7 +52,7 @@ class TreatmentConsumablesService:
         total = (await db.execute(count_stmt)).scalar_one()
 
         stmt = (
-            stmt.order_by(TreatmentConsumable.created_at.desc())
+            stmt.order_by(TreatmentConsumable.created_at.desc(), TreatmentConsumable.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - fix: issuing without an explicit date stamped the **server's** date (UTC)
   on the invoice — tomorrow's date for a UTC-6 clinic from 18:00 local,
   yesterday's for a UTC+2 clinic until 02:00. The issue route now passes the

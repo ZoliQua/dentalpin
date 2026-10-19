@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - docs(#711): `treatment_plan.items_reordered` was missing from the
   Published table.
 - docs(#707): CLAUDE.md claimed the routes mount at

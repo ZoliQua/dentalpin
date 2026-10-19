@@ -128,6 +128,7 @@ class PaymentService:
             .order_by(
                 parse_sort(sort, _PAYMENT_SORT_ALLOW, _PAYMENT_SORT_DEFAULT),
                 desc(Payment.created_at),
+                Payment.id,
             )
             .offset(offset)
             .limit(page_size)

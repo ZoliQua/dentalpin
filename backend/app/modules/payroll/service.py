@@ -144,7 +144,7 @@ class ProfileService:
         stmt = select(PayrollProfile).where(PayrollProfile.clinic_id == clinic_id)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(PayrollProfile.created_at.desc())
+            stmt.order_by(PayrollProfile.created_at.desc(), PayrollProfile.id)
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )
@@ -218,7 +218,7 @@ class PeriodService:
         stmt = select(PayrollPeriod).where(PayrollPeriod.clinic_id == clinic_id)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(PayrollPeriod.month.desc())
+            stmt.order_by(PayrollPeriod.month.desc(), PayrollPeriod.id)
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )
@@ -383,7 +383,7 @@ class EntryService:
         )
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(PayrollEntry.created_at.desc())
+            stmt.order_by(PayrollEntry.created_at.desc(), PayrollEntry.id)
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )

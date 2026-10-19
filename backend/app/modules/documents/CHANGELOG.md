@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - feat(#657): owns the `documents` GDPR erasure coverage scope
   (`get_erasure_contributors()`). Issued prescriptions, certificates and
   referrals are retained as clinical records (Art. 17(3)(c)/(h)). The

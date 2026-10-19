@@ -51,7 +51,11 @@ class ContactService:
         count_stmt = select(func.count()).select_from(stmt.subquery())
         total = (await db.execute(count_stmt)).scalar_one()
 
-        stmt = stmt.order_by(Contact.name.asc()).offset((page - 1) * page_size).limit(page_size)
+        stmt = (
+            stmt.order_by(Contact.name.asc(), Contact.id)
+            .offset((page - 1) * page_size)
+            .limit(page_size)
+        )
         rows = (await db.execute(stmt)).scalars().all()
         return list(rows), total
 

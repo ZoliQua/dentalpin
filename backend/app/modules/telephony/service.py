@@ -252,7 +252,7 @@ class TelephonyService:
         rows = (
             (
                 await db.execute(
-                    stmt.order_by(CallLog.created_at.desc())
+                    stmt.order_by(CallLog.created_at.desc(), CallLog.id)
                     .offset((page - 1) * page_size)
                     .limit(page_size)
                 )

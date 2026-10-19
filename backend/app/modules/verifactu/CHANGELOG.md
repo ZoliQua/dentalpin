@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - fix: fiscal amounts round half **away from zero**, the way PostgreSQL rounds the `NUMERIC(_, 2)` columns they come from. `hook._format_amount` and `hash_chain._format_amount` were using the `Decimal` default (`ROUND_HALF_EVEN`), which turns 9.085 into 9.08 where `invoices.total` holds 9.09 — a one-cent gap between the libro fiscal and the invoice, inside a hash chain that cannot be rewritten once AEAT accepts it. The live issue path reloads the invoice in a fresh session, so the values reaching the hook were already rounded and nothing was mis-declared; the new `tests/modules/verifactu/test_amount_rounding.py` pins the rounding itself so that stays true regardless of call order. Same mode the other fiscal builders (`sdi_it`, `nav_online`, `sistema_ts`, `india_gst`) already pass explicitly.
 
 - test(#552): branch-scoped uninstall round-trip test (heads, branch downgrade, reinstall).

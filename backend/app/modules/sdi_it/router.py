@@ -157,7 +157,7 @@ async def list_records(
     rows = (
         (
             await db.execute(
-                base.order_by(SdiItRecord.created_at.desc())
+                base.order_by(SdiItRecord.created_at.desc(), SdiItRecord.id)
                 .offset((page - 1) * page_size)
                 .limit(page_size)
             )

@@ -164,7 +164,7 @@ class SupplierRatingsService:
                 Contact.contact_type == "supplier",
                 Contact.is_active.is_(True),
             )
-            .order_by(Contact.name.asc())
+            .order_by(Contact.name.asc(), Contact.id)
         )
         total_stmt = select(func.count()).select_from(base.subquery())
         total = (await db.execute(total_stmt)).scalar_one()
