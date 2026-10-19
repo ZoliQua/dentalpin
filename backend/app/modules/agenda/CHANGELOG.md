@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- docs(#707): the router docstring still said cabinets gate on
+  `admin.clinic.write` "until Etapa B.2 chunk 3" — they have gated on
+  `agenda.cabinets.{read,write}` since that chunk landed. The permissions
+  doc gets the five cabinet endpoints, and the one route that gates
+  outside this namespace on purpose (`PATCH /appointment-treatments/{id}`
+  → `clinical_notes.notes.write`, issue #60) is now written down.
+
 - feat(#480, ADR 0037): `source` claim on check-in tokens. Counter QRs
   (`source=counter`, the staff mint default) auto-submit; mailed reminder
   links (`source=reminder`, minted by the notification sweep with a

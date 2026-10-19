@@ -6,7 +6,7 @@ gated by clinical roles.
 
 ## Public API
 
-Routes mounted at `/api/v1/patients-clinical/`.
+Routes mounted at `/api/v1/patients_clinical/`.
 
 ## Dependencies
 

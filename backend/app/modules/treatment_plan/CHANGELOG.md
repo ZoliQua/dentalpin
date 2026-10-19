@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- docs(#707): CLAUDE.md claimed the routes mount at
+  `/api/v1/treatment-plans/`, which answers nothing — the prefix is
+  `/api/v1/treatment_plan/` and the paths listed under it are relative,
+  so the detail endpoint is `/api/v1/treatment_plan/treatment-plans/{id}`.
+  That reading is what produced the broken call fixed in #699.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - refactor: the nine `event_bus.publish` call sites that named their event

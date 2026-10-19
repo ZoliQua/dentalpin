@@ -1,9 +1,13 @@
 """Agenda HTTP surface: appointments + cabinets.
 
 Mounts at ``/api/v1/agenda/*``. Appointments use the
-``agenda.appointments.*`` namespace; cabinets still gate on
-``admin.clinic.write`` until Etapa B.2 chunk 3 normalizes cabinets
-into their own table + permission namespace.
+``agenda.appointments.*`` namespace and cabinets ``agenda.cabinets.*``
+(Etapa B.2 chunk 3 gave them their own table and namespace; they no
+longer gate on ``admin.clinic.write``).
+
+One route gates outside this module's namespace on purpose: the
+visit-note PATCH on ``/appointment-treatments/{id}`` requires
+``clinical_notes.notes.write`` — see its docstring and issue #60.
 """
 
 from datetime import date as date_type

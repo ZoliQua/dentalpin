@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- docs(#707): CLAUDE.md claimed `/api/v1/patients-clinical/`; the real
+  prefix is `/api/v1/patients_clinical/`.
+
 - fix(#631): the alerts banner's overflow badge rendered
   `+2 common.more` — `common.more` exists in no locale file. It now uses
   one interpolated host key, `common.andMore` (`+{count} more`), so the
