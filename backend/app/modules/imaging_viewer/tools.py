@@ -13,17 +13,17 @@ from .service import AnnotationService, ImagingStudyService, RvgService
 
 
 class ListStudiesArgs(BaseModel):
-    patient_id: str = Field(description="UUID of the patient")
+    patient_id: UUID = Field(description="Id of the patient")
     limit: int = Field(default=20, ge=1, le=100)
 
 
 class GetStudyArgs(BaseModel):
-    study_id: str = Field(description="UUID of the imaging study")
+    study_id: UUID = Field(description="Id of the imaging study")
 
 
 class IndexStudyArgs(BaseModel):
-    patient_id: str = Field(description="UUID of the patient")
-    document_id: str = Field(description="UUID of the media document holding the DICOM bytes")
+    patient_id: UUID = Field(description="Id of the patient")
+    document_id: UUID = Field(description="Id of the media document holding the DICOM bytes")
     study_uid: str | None = None
     modality: str | None = None
 
@@ -36,7 +36,7 @@ class ListRvgImportsArgs(BaseModel):
 
 
 class ListAnnotationsArgs(BaseModel):
-    study_id: str = Field(description="UUID of the imaging study")
+    study_id: UUID = Field(description="Id of the imaging study")
 
 
 def _study_summary(study) -> dict:
@@ -71,7 +71,7 @@ async def _list_studies(ctx: AgentContext, params: ListStudiesArgs) -> dict:
     items, total = await ImagingStudyService.list_studies(
         ctx.db,
         ctx.clinic_id,
-        UUID(params.patient_id),
+        params.patient_id,
         page=1,
         page_size=params.limit,
     )
@@ -79,7 +79,7 @@ async def _list_studies(ctx: AgentContext, params: ListStudiesArgs) -> dict:
 
 
 async def _get_study(ctx: AgentContext, params: GetStudyArgs) -> dict:
-    study = await ImagingStudyService.get_study(ctx.db, ctx.clinic_id, UUID(params.study_id))
+    study = await ImagingStudyService.get_study(ctx.db, ctx.clinic_id, params.study_id)
     if not study:
         return {"error": "Study not found"}
     return _study_summary(study)
@@ -90,8 +90,8 @@ async def _index_study(ctx: AgentContext, params: IndexStudyArgs) -> dict:
         study, _created = await ImagingStudyService.index_study(
             ctx.db,
             ctx.clinic_id,
-            UUID(params.patient_id),
-            UUID(params.document_id),
+            params.patient_id,
+            params.document_id,
             study_uid=params.study_uid,
             modality=params.modality,
         )
@@ -113,7 +113,7 @@ async def _list_rvg_imports(ctx: AgentContext, params: ListRvgImportsArgs) -> di
 
 async def _list_annotations(ctx: AgentContext, params: ListAnnotationsArgs) -> dict:
     try:
-        rows = await AnnotationService.list(ctx.db, ctx.clinic_id, UUID(params.study_id))
+        rows = await AnnotationService.list(ctx.db, ctx.clinic_id, params.study_id)
     except LookupError:
         return {"error": "Study not found"}
     return {

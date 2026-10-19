@@ -32,7 +32,7 @@ class CreateRequestArgs(BaseModel):
     requester_name: str
     requester_email: str
     request_type: RequestType = Field(description="Kind of right the requester is exercising")
-    patient_id: str | None = None
+    patient_id: UUID | None = None
     notes: str | None = None
 
 
@@ -45,7 +45,7 @@ class ListRequestsArgs(BaseModel):
 
 
 class RecordConsentArgs(BaseModel):
-    patient_id: str = Field(description="UUID of the patient")
+    patient_id: UUID = Field(description="Id of the patient")
     purpose: str = Field(description="e.g. sms, email, third_party_sharing")
     granted: bool = True
     provided_text: str | None = Field(
@@ -54,7 +54,7 @@ class RecordConsentArgs(BaseModel):
 
 
 class ListConsentsArgs(BaseModel):
-    patient_id: str | None = None
+    patient_id: UUID | None = None
     limit: int = Field(default=20, ge=1, le=100)
 
 
@@ -68,7 +68,7 @@ class CreatePolicyArgs(BaseModel):
 
 
 class ExecuteErasureArgs(BaseModel):
-    patient_id: str = Field(description="UUID of the patient")
+    patient_id: UUID = Field(description="Id of the patient")
     categories: list[ErasureCategory] = Field(
         description="data categories to erase: email|phone|identity only"
     )
@@ -156,7 +156,7 @@ async def _list_consents(ctx: AgentContext, params: ListConsentsArgs) -> dict:
     items, total = await ConsentService.list_consents(
         ctx.db,
         ctx.clinic_id,
-        patient_id=UUID(params.patient_id) if params.patient_id else None,
+        patient_id=params.patient_id,
         page=1,
         page_size=params.limit,
     )
@@ -191,7 +191,7 @@ async def _execute_erasure(ctx: AgentContext, params: ExecuteErasureArgs) -> dic
     result = await ErasureService.execute(
         ctx.db,
         ctx.clinic_id,
-        patient_id=UUID(params.patient_id),
+        patient_id=params.patient_id,
         categories=list(params.categories),
         rationale=params.rationale,
         executed_by=ctx.agent_id,

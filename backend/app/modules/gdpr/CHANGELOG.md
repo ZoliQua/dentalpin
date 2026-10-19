@@ -10,6 +10,12 @@
   missing: the agent was being shown a bare string with no vocabulary at
   all. `create_gdpr_request.request_type` is typed the same way, moving its
   failure from the service to the chokepoint.
+- fix(#677): the tool parameter `patient_id` is typed `UUID` instead of
+  `str` on all four tools that take it.
+  The tool schema now advertises `format: uuid`, and a malformed id is
+  rejected by `tool_registry.call`'s validation step naming the parameter,
+  rather than reaching the handler and raising `badly formed hexadecimal
+  UUID string`, which named nothing.
 
 - fix(#562 S2): the consent ledger answers "what is the state now", the
   breach register carries the Art. 34 record, and the filters stop
