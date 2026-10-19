@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from html import escape
 from io import BytesIO
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 from app.core.pdf_locales import LOCALE_BY_LANG as _LOCALE_BY_LANG
 from app.core.utils.currency import format_currency as _fmt_currency
@@ -323,6 +324,12 @@ class PurchaseOrderPDFService:
         # Arabic mirrors the document; every other host locale is LTR (#485).
         rtl_attr = ' dir="rtl"' if locale == "ar" else ""
         status_label = labels["status_label"].get(response["status"], response["status"])
+        # The footer is a printed "generated at": the clinic's zone, not
+        # the server's (#204).
+        try:
+            clinic_tz = ZoneInfo(clinic.timezone or "UTC") if clinic else UTC
+        except (KeyError, ValueError):
+            clinic_tz = UTC
         currency = clinic.currency if clinic else "EUR"
         # One map for every PDF (#441): a German order printed 1,234.56
         # while its invoice printed 1.234,56 (#485).
@@ -481,7 +488,7 @@ class PurchaseOrderPDFService:
 
             <div style="clear: both; padding-top: 30px;"></div>
             <div style="font-size: 8pt; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 10px;">
-                {labels["generated_by"]} DentalPin | {datetime.now().strftime("%d/%m/%Y %H:%M")}
+                {labels["generated_by"]} DentalPin | {datetime.now(clinic_tz).strftime("%d/%m/%Y %H:%M")}
             </div>
         </body>
         </html>"""

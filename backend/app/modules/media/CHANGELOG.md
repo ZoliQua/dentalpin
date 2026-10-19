@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- fix(#697): the upload controls' "Change" button and the "Optional"
+  field hint, and the photo/document/attachment toasts, existed in no
+  locale file — the hardcoded default message rendered for every
+  language (`Cambiar`, `Opcional`, "Error loading photos"). The keys
+  (`actions.change`, `common.optional`, `documents.viewError`,
+  `attachments.linkError`, `photoGallery.{fetchError,uploadError,uploadSuccess}`)
+  are now in all 12 host locales and the defaults are dropped.
+
 - fix(#631): the document card's view tooltip used `common.view`, which
   exists in no locale file, so it rendered the key string; it now reuses
   `common.viewDetails`, matching the button's own `aria-label`. The

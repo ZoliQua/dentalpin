@@ -256,7 +256,7 @@ class ToothInput(BaseModel):
     """Input for one tooth of a Treatment on creation."""
 
     tooth_number: int
-    role: str | None = None
+    role: str | None = Field(default=None, max_length=20)
     surfaces: list[str] | None = None
 
     @field_validator("tooth_number")
@@ -287,7 +287,7 @@ class TreatmentCreate(BaseModel):
     """
 
     catalog_item_id: UUID | None = None
-    clinical_type: str | None = None
+    clinical_type: str | None = Field(default=None, max_length=30)
     scope: Literal["tooth", "multi_tooth", "global_mouth", "global_arch"] | None = None
     """Relation to teeth. If omitted, derived from tooth count: 0→error (globals must
     be explicit), 1→tooth, 2+→multi_tooth. Globals MUST be set explicitly."""
@@ -300,7 +300,7 @@ class TreatmentCreate(BaseModel):
     status: Literal["planned", "performed"] = "planned"
     notes: str | None = None
     budget_item_id: UUID | None = None
-    source_module: str = "odontogram"
+    source_module: str = Field(default="odontogram", max_length=30)
 
     @field_validator("tooth_numbers")
     @classmethod

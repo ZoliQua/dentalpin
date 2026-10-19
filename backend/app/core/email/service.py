@@ -56,16 +56,13 @@ class EmailService:
         elif settings.EMAIL_PROVIDER == "console":
             self._provider = ConsoleProvider()
             if settings.ENVIRONMENT == "production":
-                # The console provider prints the whole message — recipient,
-                # name, treatment, amount — at INFO, and reports SUCCESS, so
-                # the outbox marks it sent while the patient receives nothing
-                # (#614). EMAIL_PROVIDER is in no compose file and not in
-                # .env.example, so this is reached by omission, not choice.
+                # Misconfiguration, reached by omission: the console
+                # provider is metadata-only here and reports FAILED, so
+                # nothing is delivered and nothing claims it was (#614).
                 logger.error(
-                    "EMAIL_PROVIDER=console in production: messages are written to "
-                    "the log instead of being delivered, and patient details end up "
-                    "in it. Set EMAIL_PROVIDER=smtp (see .env.example), or "
-                    "EMAIL_ENABLED=false if this instance is not meant to send mail."
+                    "Email is not configured: no email will be delivered. "
+                    "Set EMAIL_PROVIDER=smtp (or EMAIL_ENABLED=false to "
+                    "silence this)."
                 )
             else:
                 logger.info("Email service using console provider")
@@ -85,9 +82,16 @@ class EmailService:
         else:
             # Fallback to console if unknown provider
             self._provider = ConsoleProvider()
-            logger.warning(
-                f"Unknown email provider '{settings.EMAIL_PROVIDER}', falling back to console"
-            )
+            if settings.ENVIRONMENT == "production":
+                logger.error(
+                    f"Unknown email provider '{settings.EMAIL_PROVIDER}': no email "
+                    "will be delivered. Set EMAIL_PROVIDER=smtp (or "
+                    "EMAIL_ENABLED=false to silence this)."
+                )
+            else:
+                logger.warning(
+                    f"Unknown email provider '{settings.EMAIL_PROVIDER}', falling back to console"
+                )
 
         # Initialize Jinja2 environment for templates
         if TEMPLATES_DIR.exists():
@@ -172,6 +176,15 @@ class EmailService:
         # Fallback to global
         return None
 
+    @staticmethod
+    def _disabled_result() -> EmailResult:
+        """Result for a globally disabled instance: nothing sent, nothing failed."""
+        return EmailResult(
+            status=EmailStatus.SKIPPED,
+            provider="disabled",
+            error_message="Email is disabled (EMAIL_ENABLED=false)",
+        )
+
     async def send(
         self,
         message: EmailMessage,
@@ -190,6 +203,14 @@ class EmailService:
         """
         self._initialize()
 
+        from app.config import settings
+
+        if not settings.EMAIL_ENABLED:
+            # Global opt-out: this instance is not meant to deliver mail, so
+            # skip without resolving the per-clinic provider or touching the
+            # network. The outbox records this as a skip, not a failure.
+            return self._disabled_result()
+
         # Try to get clinic-specific provider
         provider = self.provider  # Default to global
         if db and clinic_id:
@@ -200,8 +221,6 @@ class EmailService:
 
         # Apply default from address if not set
         if not message.from_email:
-            from app.config import settings
-
             message.from_email = settings.EMAIL_FROM_ADDRESS
             message.from_name = message.from_name or settings.EMAIL_FROM_NAME
 
@@ -251,6 +270,13 @@ class EmailService:
             EmailResult with the status of the operation.
         """
         self._initialize()
+
+        from app.config import settings
+
+        if not settings.EMAIL_ENABLED:
+            # Guarded here too: a disabled instance must not render (and then
+            # fail on) a template it is never going to deliver.
+            return self._disabled_result()
 
         # Render HTML template
         body_html = self._render_template(

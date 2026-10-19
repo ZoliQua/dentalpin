@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+- docs(#707): the router docstring still said cabinets gate on
+  `admin.clinic.write` "until Etapa B.2 chunk 3" — they have gated on
+  `agenda.cabinets.{read,write}` since that chunk landed. The permissions
+  doc gets the five cabinet endpoints, and the one route that gates
+  outside this namespace on purpose (`PATCH /appointment-treatments/{id}`
+  → `clinical_notes.notes.write`, issue #60) is now written down.
+- fix(#701): `AppointmentUpdate.status` is capped at the column length
+  (`VARCHAR(20)`); an over-long value was a 500 from the INSERT instead
+  of a 422. The status vocabulary itself is still `str` — that is #679.
+- fix(#695): the appointment badge in the patient file's **Citas** list
+  showed `appointments.checked_in` / `appointments.in_treatment` instead
+  of a label. `AppointmentsMode.vue` read the flat `appointments.<status>`
+  namespace — a stale duplicate of `appointments.status.*` that never grew
+  the two waiting-room statuses — while its own colour helper already
+  handled them. It now uses `useAppointmentStatus().statusLabel`, the
+  canonical source every other view already shares, and the duplicate is
+  gone from the host locales (the cancel toast reads
+  `appointments.status.cancelled`, the same string in all 12).
+
 - feat(#480, ADR 0037): `source` claim on check-in tokens. Counter QRs
   (`source=counter`, the staff mint default) auto-submit; mailed reminder
   links (`source=reminder`, minted by the notification sweep with a

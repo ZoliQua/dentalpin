@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from typing import Literal
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -28,14 +29,14 @@ class CreateItemArgs(BaseModel):
 
 
 class AdjustStockArgs(BaseModel):
-    item_id: str = Field(min_length=1)
+    item_id: UUID
     delta: Decimal
     reason: Literal["restock", "consumption", "adjustment", "correction"] = "adjustment"
     note: str | None = Field(default=None, max_length=200)
 
 
 class GetMovementsArgs(BaseModel):
-    item_id: str = Field(min_length=1)
+    item_id: UUID
     limit: int = Field(default=20, ge=1, le=100)
 
 
@@ -81,12 +82,10 @@ async def _create_item(ctx: AgentContext, params: CreateItemArgs) -> dict:
 
 
 async def _adjust_stock(ctx: AgentContext, params: AdjustStockArgs) -> dict:
-    from uuid import UUID
-
     item = await InventoryService.adjust_stock(
         ctx.db,
         ctx.clinic_id,
-        UUID(params.item_id),
+        params.item_id,
         params.delta,
         reason=params.reason,
         note=params.note,
@@ -95,12 +94,10 @@ async def _adjust_stock(ctx: AgentContext, params: AdjustStockArgs) -> dict:
 
 
 async def _get_movements(ctx: AgentContext, params: GetMovementsArgs) -> dict:
-    from uuid import UUID
-
     rows, total = await InventoryService.list_movements(
         ctx.db,
         ctx.clinic_id,
-        inventory_item_id=UUID(params.item_id),
+        inventory_item_id=params.item_id,
         page=1,
         page_size=params.limit,
     )

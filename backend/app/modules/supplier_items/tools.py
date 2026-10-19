@@ -14,20 +14,20 @@ from .service import SupplierItemService
 
 
 class ListSupplierItemsArgs(BaseModel):
-    supplier_id: str | None = Field(default=None, description="UUID of the supplier to filter by")
-    inventory_item_id: str | None = Field(
-        default=None, description="UUID of the inventory item to filter by"
+    supplier_id: UUID | None = Field(default=None, description="Id of the supplier to filter by")
+    inventory_item_id: UUID | None = Field(
+        default=None, description="Id of the inventory item to filter by"
     )
     limit: int = Field(default=20, ge=1, le=100)
 
 
 class GetSupplierItemArgs(BaseModel):
-    link_id: str = Field(description="UUID of the supplier-item link")
+    link_id: UUID = Field(description="Id of the supplier-item link")
 
 
 class CreateSupplierItemArgs(BaseModel):
-    supplier_id: str = Field(description="UUID of the supplier")
-    inventory_item_id: str = Field(description="UUID of the inventory item")
+    supplier_id: UUID = Field(description="Id of the supplier")
+    inventory_item_id: UUID = Field(description="Id of the inventory item")
     supplier_sku: str | None = Field(
         default=None, max_length=100, description="Supplier's SKU for the item"
     )
@@ -35,7 +35,7 @@ class CreateSupplierItemArgs(BaseModel):
 
 
 class UpdateSupplierItemArgs(BaseModel):
-    link_id: str = Field(description="UUID of the supplier-item link")
+    link_id: UUID = Field(description="Id of the supplier-item link")
     supplier_sku: str | None = Field(default=None, max_length=100)
     price: Decimal | None = Field(default=None, ge=0)
 
@@ -54,13 +54,11 @@ def _link_summary(link, supplier_name: str, item_name: str) -> dict:
 
 
 async def _list_supplier_items(ctx: AgentContext, params: ListSupplierItemsArgs) -> dict:
-    supplier_id = UUID(params.supplier_id) if params.supplier_id else None
-    item_id = UUID(params.inventory_item_id) if params.inventory_item_id else None
     items, total = await SupplierItemService.list_links(
         ctx.db,
         ctx.clinic_id,
-        supplier_id=supplier_id,
-        inventory_item_id=item_id,
+        supplier_id=params.supplier_id,
+        inventory_item_id=params.inventory_item_id,
         page=1,
         page_size=params.limit,
     )
@@ -71,7 +69,7 @@ async def _list_supplier_items(ctx: AgentContext, params: ListSupplierItemsArgs)
 
 
 async def _get_supplier_item(ctx: AgentContext, params: GetSupplierItemArgs) -> dict:
-    result = await SupplierItemService.get_link(ctx.db, ctx.clinic_id, UUID(params.link_id))
+    result = await SupplierItemService.get_link(ctx.db, ctx.clinic_id, params.link_id)
     if not result:
         return {"error": "Supplier item link not found"}
     link, sname, iname = result
@@ -80,8 +78,8 @@ async def _get_supplier_item(ctx: AgentContext, params: GetSupplierItemArgs) -> 
 
 async def _create_supplier_item(ctx: AgentContext, params: CreateSupplierItemArgs) -> dict:
     payload = SupplierItemCreate(
-        supplier_id=UUID(params.supplier_id),
-        inventory_item_id=UUID(params.inventory_item_id),
+        supplier_id=params.supplier_id,
+        inventory_item_id=params.inventory_item_id,
         supplier_sku=params.supplier_sku,
         price=params.price,
     )
@@ -90,7 +88,7 @@ async def _create_supplier_item(ctx: AgentContext, params: CreateSupplierItemArg
 
 
 async def _update_supplier_item(ctx: AgentContext, params: UpdateSupplierItemArgs) -> dict:
-    result = await SupplierItemService.get_link(ctx.db, ctx.clinic_id, UUID(params.link_id))
+    result = await SupplierItemService.get_link(ctx.db, ctx.clinic_id, params.link_id)
     if not result:
         return {"error": "Supplier item link not found"}
     link, sname, iname = result
