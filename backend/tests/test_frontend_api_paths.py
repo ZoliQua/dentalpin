@@ -17,10 +17,14 @@ when this guard was written:
 - ``GET /api/v1/auth/users/{id}`` on the budgets list, which does not
   exist (the users router has PUT and DELETE for an id, no GET).
 
-The route table is built from *discovered* modules, not from the running
-app: under pytest almost nothing is mounted, and a module's routes exist
-whether or not the clinic installed it. Same reason as
-``test_route_permissions.py::_known_permissions``.
+The route table is built from freshly **discovered** modules, not from
+the running app and not from the registry: under pytest almost nothing is
+mounted, a module's routes exist whether or not the clinic installed it,
+and `module_registry` is process-wide state that other tests write to.
+Same reason as ``test_module_docs.py``, which also discovers rather than
+reading the registry. The table is checked for completeness before any
+path is judged — an incomplete table would report a wall of healthy
+calls as orphans (it did, once, in CI).
 
 Deliberate limits of the scan, so a reader knows what a pass means:
 
@@ -44,7 +48,7 @@ from fastapi.routing import APIRoute
 from app.core.agents.router import router as agents_router
 from app.core.auth.router import router as auth_router
 from app.core.auth.router_roles import router as roles_router
-from app.core.plugins.loader import register_discovered
+from app.core.plugins.loader import discover_modules
 from app.core.plugins.router import router as modules_router
 from app.core.security.router import router as security_router
 
@@ -67,19 +71,27 @@ VERB = {"get": "GET", "post": "POST", "put": "PUT", "patch": "PATCH", "del": "DE
 SKIP_DIRS = {"node_modules", ".nuxt", ".output", "dist"}
 
 
-def _route_table() -> dict[str, list[list[str]]]:
-    """``{method: [[segment, …], …]}`` for every mountable route."""
+def _route_table() -> tuple[dict[str, list[list[str]]], dict[str, int]]:
+    """``({method: [[segment, …], …]}, {module: route count})``."""
     table: dict[str, list[list[str]]] = {}
+    per_module: dict[str, int] = {}
 
     def add(method: str, path: str) -> None:
         table.setdefault(method, []).append([t for t in path.strip("/").split("/") if t])
 
-    for module in register_discovered():
-        for route in module.get_router().routes:
+    for module in discover_modules():
+        try:
+            routes = module.get_router().routes
+        except Exception as exc:  # pragma: no cover - fail loud, never silently
+            raise AssertionError(f"{module.name}.get_router() raised: {exc!r}") from exc
+        count = 0
+        for route in routes:
             if isinstance(route, APIRoute):
                 for method in route.methods - {"HEAD", "OPTIONS"}:
                     # app/core/plugins/loader.py mounts every module here
                     add(method, f"/api/v1/{module.name}{route.path}")
+                    count += 1
+        per_module[module.name] = count
 
     for router in (auth_router, roles_router, modules_router, agents_router, security_router):
         for route in router.routes:
@@ -87,7 +99,7 @@ def _route_table() -> dict[str, list[list[str]]]:
                 for method in route.methods - {"HEAD", "OPTIONS"}:
                     add(method, f"/api/v1{route.path}")
 
-    return table
+    return table, per_module
 
 
 def _frontend_segments(path: str) -> list[str]:
@@ -140,13 +152,17 @@ def _frontend_sources() -> list[tuple[str, str]]:
 
 
 def test_every_frontend_api_call_hits_a_mounted_route() -> None:
-    table = _route_table()
+    table, per_module = _route_table()
     sources = _frontend_sources()
 
-    # Sanity floors first: an empty route table would fail everything and
-    # an empty source sweep would pass vacuously.
-    assert sum(len(v) for v in table.values()) > 500, (
-        f"route table looks wrong: {sum(len(v) for v in table.values())} routes"
+    # Completeness first. A table missing one module turns every healthy
+    # call into that module into an "orphan", which is a far more
+    # confusing failure than the one this test is for.
+    total = sum(len(v) for v in table.values())
+    with_routes = sorted(name for name, count in per_module.items() if count)
+    assert total > 500, f"route table looks wrong: {total} routes from {len(per_module)} modules"
+    assert len(with_routes) > 50, (
+        f"route table is incomplete — only these modules contributed a route: {with_routes}"
     )
     assert len(sources) > 100, f"frontend scan looks wrong: {len(sources)} files"
 
@@ -166,6 +182,23 @@ def test_every_frontend_api_call_hits_a_mounted_route() -> None:
             unmatched.setdefault((method, match.group("path")), []).append(f"{rel}:{line}")
 
     assert checked > 300, f"literal API-call sweep looks wrong: {checked} calls"
+
+    # Before blaming the call sites: if an unmatched path belongs to a
+    # module that contributed no route at all, the table is what is
+    # broken, and saying so beats a wall of healthy calls.
+    empty_modules = {name for name, count in per_module.items() if not count}
+    suspects = sorted(
+        {
+            path.split("/")[3]
+            for _, path in unmatched
+            if len(path.split("/")) > 3 and path.split("/")[3] in empty_modules
+        }
+    )
+    assert not suspects, (
+        f"route table has no routes for {suspects} — the table is incomplete, "
+        "not the frontend (modules with routes: "
+        f"{len(per_module) - len(empty_modules)}/{len(per_module)})"
+    )
 
     assert not unmatched, "\n".join(
         [
