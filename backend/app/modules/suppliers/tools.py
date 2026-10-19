@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from uuid import UUID
+
 from pydantic import BaseModel, EmailStr, Field
 
 from app.core.agents import AgentContext, Tool, ToolCategory
@@ -17,7 +19,7 @@ class ListSuppliersArgs(BaseModel):
 
 
 class GetSupplierArgs(BaseModel):
-    supplier_id: str = Field(description="UUID of the supplier")
+    supplier_id: UUID = Field(description="Id of the supplier")
 
 
 class CreateSupplierArgs(BaseModel):
@@ -33,7 +35,7 @@ class CreateSupplierArgs(BaseModel):
 
 
 class UpdateSupplierArgs(BaseModel):
-    supplier_id: str = Field(description="UUID of the supplier")
+    supplier_id: UUID = Field(description="Id of the supplier")
     name: str | None = None
     phone: str | None = None
     email: EmailStr | None = None
@@ -73,9 +75,7 @@ async def _list_suppliers(ctx: AgentContext, params: ListSuppliersArgs) -> dict:
 
 
 async def _get_supplier(ctx: AgentContext, params: GetSupplierArgs) -> dict:
-    from uuid import UUID
-
-    result = await SupplierService.get_supplier(ctx.db, ctx.clinic_id, UUID(params.supplier_id))
+    result = await SupplierService.get_supplier(ctx.db, ctx.clinic_id, params.supplier_id)
     if not result:
         return {"error": "Supplier not found"}
     contact, supplier = result
@@ -99,11 +99,9 @@ async def _create_supplier(ctx: AgentContext, params: CreateSupplierArgs) -> dic
 
 
 async def _update_supplier(ctx: AgentContext, params: UpdateSupplierArgs) -> dict:
-    from uuid import UUID
-
     from .schemas import SupplierUpdate
 
-    result = await SupplierService.get_supplier(ctx.db, ctx.clinic_id, UUID(params.supplier_id))
+    result = await SupplierService.get_supplier(ctx.db, ctx.clinic_id, params.supplier_id)
     if not result:
         return {"error": "Supplier not found"}
     contact, supplier = result

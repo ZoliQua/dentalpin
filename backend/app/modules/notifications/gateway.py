@@ -354,6 +354,15 @@ class NotificationGateway:
             msg.error_message = None
             await db.commit()
             await NotificationGateway._publish(msg, EventType.NOTIFICATION_SENT)
+        elif result.status == SendStatus.SKIPPED:
+            # The adapter resolved but had nothing to do (email globally
+            # disabled, or a push with an empty body). That is an expected
+            # outcome: record it without retrying or publishing a failure.
+            msg.status = "skipped"
+            msg.provider = result.provider
+            msg.error_message = result.error_message[:2000] if result.error_message else None
+            msg.next_attempt_at = None
+            await db.commit()
         else:
             await NotificationGateway._mark_failed(db, msg, result.error_message or "send failed")
 

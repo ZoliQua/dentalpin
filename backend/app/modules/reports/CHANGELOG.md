@@ -3,6 +3,18 @@
 ## Unreleased
 
 - docs: the reports user manual (en + es) described the dashboard as extended through the `reports.categories` slot, which the page stopped rendering when it moved to native drill-down chips. Rewritten to describe what the page does, and `last_verified_commit` bumped in both locales.
+- fix(#690): receivables are net of refunds again. `get_summary`'s
+  `total_pending` and `get_overdue_invoices`' per-row `balance_due` summed
+  `invoice_payments.amount` raw, so a refunded payment kept reducing what the
+  clinic was owed: a fully refunded invoice reported `0` outstanding on the
+  manager dashboard and sat in the overdue list with nothing to chase, while
+  the invoice page and the patient tab both showed it unpaid. Both now go
+  through `compute_paid_summaries_for_invoices`, the helper
+  `billing/CLAUDE.md` names as the only paid arithmetic and the one
+  `get_patient_summary` already used (#178). `total_paid` is unchanged — it
+  is the gross "cobrado via factura" fiscal axis on purpose, and a test now
+  pins that too so the pair cannot be "fixed" into two inconsistent
+  balances.
 
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
