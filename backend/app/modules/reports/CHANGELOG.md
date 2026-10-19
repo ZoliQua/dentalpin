@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- docs: the reports user manual (en + es) described the dashboard as extended through the `reports.categories` slot, which the page stopped rendering when it moved to native drill-down chips. Rewritten to describe what the page does, and `last_verified_commit` bumped in both locales.
 - fix(#690): receivables are net of refunds again. `get_summary`'s
   `total_pending` and `get_overdue_invoices`' per-row `balance_due` summed
   `invoice_payments.amount` raw, so a refunded payment kept reducing what the
