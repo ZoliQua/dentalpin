@@ -103,8 +103,8 @@ class MetricsResponse(BaseModel):
 
 
 class SettingsUpdate(BaseModel):
-    provider: str | None = None
-    model: str | None = None
+    provider: str | None = Field(default=None, max_length=20)
+    model: str | None = Field(default=None, max_length=100)
     redaction_enabled: bool | None = None
     monthly_token_limit: int | None = None
     monthly_cost_limit_cents: int | None = None
