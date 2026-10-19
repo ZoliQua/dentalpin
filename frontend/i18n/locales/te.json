@@ -873,14 +873,6 @@
       "cancelled": "రద్దు చేయబడింది",
       "no_show": "రాలేదు"
     },
-    "scheduled": "షెడ్యూల్ అయింది",
-    "confirmed": "నిర్ధారించబడింది",
-    "inProgress": "పురోగతిలో",
-    "in_progress": "పురోగతిలో",
-    "completed": "పూర్తయింది",
-    "cancelled": "రద్దు చేయబడింది",
-    "noShow": "రాలేదు",
-    "no_show": "రాలేదు",
     "transitions": {
       "confirmed": "నిర్ధారించినట్లు గుర్తించండి",
       "checked_in": "రాకను నమోదు చేయండి",
@@ -2634,6 +2626,8 @@
         "bank_transfer": "బ్యాంక్ బదిలీ",
         "direct_debit": "డైరెక్ట్ డెబిట్",
         "insurance": "బీమా",
+        "upi": "UPI",
+        "netbanking": "నెట్ బ్యాంకింగ్",
         "other": "ఇతర"
       }
     },

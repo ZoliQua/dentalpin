@@ -873,14 +873,6 @@
       "cancelled": "Lemondva",
       "no_show": "Nem jelent meg"
     },
-    "scheduled": "Beütemezve",
-    "confirmed": "Megerősítve",
-    "inProgress": "Folyamatban",
-    "in_progress": "Folyamatban",
-    "completed": "Befejezve",
-    "cancelled": "Lemondva",
-    "noShow": "Nem jelent meg",
-    "no_show": "Nem jelent meg",
     "actionsMenu": "Időpont műveletei",
     "transitions": {
       "confirmed": "Megjelölés megerősítettként",
@@ -2624,6 +2616,8 @@
         "bank_transfer": "Átutalás",
         "direct_debit": "Csoportos beszedés",
         "insurance": "Biztosító",
+        "upi": "UPI",
+        "netbanking": "Netbank",
         "other": "Egyéb"
       }
     },

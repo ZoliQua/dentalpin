@@ -873,14 +873,6 @@
       "cancelled": "Cancelada",
       "no_show": "No se presentó"
     },
-    "scheduled": "Programada",
-    "confirmed": "Confirmada",
-    "inProgress": "En curso",
-    "in_progress": "En curso",
-    "completed": "Completada",
-    "cancelled": "Cancelada",
-    "noShow": "No se presentó",
-    "no_show": "No se presentó",
     "transitions": {
       "confirmed": "Marcar como confirmada",
       "checked_in": "Marcar llegada",
@@ -2489,6 +2481,8 @@
         "bank_transfer": "Transferencia",
         "direct_debit": "Domiciliación",
         "insurance": "Aseguradora",
+        "upi": "UPI",
+        "netbanking": "Banca online",
         "other": "Otro"
       }
     },

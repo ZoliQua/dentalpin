@@ -873,14 +873,6 @@
       "cancelled": "Abgesagt",
       "no_show": "Nicht erschienen"
     },
-    "scheduled": "Geplant",
-    "confirmed": "Bestätigt",
-    "inProgress": "In Behandlung",
-    "in_progress": "In Behandlung",
-    "completed": "Abgeschlossen",
-    "cancelled": "Abgesagt",
-    "noShow": "Nicht erschienen",
-    "no_show": "Nicht erschienen",
     "actionsMenu": "Terminaktionen",
     "transitions": {
       "confirmed": "Als bestätigt markieren",
@@ -2624,6 +2616,8 @@
         "bank_transfer": "Überweisung",
         "direct_debit": "Lastschrift",
         "insurance": "Versicherung",
+        "upi": "UPI",
+        "netbanking": "Online-Banking",
         "other": "Sonstige"
       }
     },

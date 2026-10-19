@@ -873,14 +873,6 @@
       "cancelled": "ملغى",
       "no_show": "لم يحضر"
     },
-    "scheduled": "مجدول",
-    "confirmed": "مؤكد",
-    "inProgress": "جارٍ",
-    "in_progress": "جارٍ",
-    "completed": "منجز",
-    "cancelled": "ملغى",
-    "noShow": "لم يحضر",
-    "no_show": "لم يحضر",
     "actionsMenu": "إجراءات الموعد",
     "transitions": {
       "confirmed": "تحديد كمؤكد",
@@ -2624,6 +2616,8 @@
         "bank_transfer": "حوالة بنكية",
         "direct_debit": "خصم مباشر",
         "insurance": "تأمين",
+        "upi": "UPI",
+        "netbanking": "تحويل إلكتروني",
         "other": "أخرى"
       }
     },

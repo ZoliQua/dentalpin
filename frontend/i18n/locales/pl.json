@@ -874,14 +874,6 @@
       "cancelled": "Odwołana",
       "no_show": "Nieobecność"
     },
-    "scheduled": "Zaplanowana",
-    "confirmed": "Potwierdzona",
-    "inProgress": "W trakcie",
-    "in_progress": "W trakcie",
-    "completed": "Zakończona",
-    "cancelled": "Odwołana",
-    "noShow": "Nieobecność",
-    "no_show": "Nieobecność",
     "transitions": {
       "confirmed": "Oznacz jako potwierdzoną",
       "checked_in": "Zarejestruj przybycie",
@@ -2624,6 +2616,8 @@
         "bank_transfer": "Przelew",
         "direct_debit": "Polecenie zapłaty",
         "insurance": "Ubezpieczenie",
+        "upi": "UPI",
+        "netbanking": "Bankowość internetowa",
         "other": "Inna"
       }
     },
