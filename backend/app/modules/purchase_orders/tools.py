@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from decimal import Decimal
 from uuid import UUID
 
@@ -20,32 +21,32 @@ from .service import PurchaseOrderService
 
 class ListPurchaseOrdersArgs(BaseModel):
     order_status: str | None = Field(default=None, description="PO status to filter by")
-    supplier_id: str | None = Field(default=None, description="UUID of the supplier to filter by")
+    supplier_id: UUID | None = Field(default=None, description="Id of the supplier to filter by")
     limit: int = Field(default=20, ge=1, le=100)
 
 
 class GetPurchaseOrderArgs(BaseModel):
-    order_id: str = Field(description="UUID of the purchase order")
+    order_id: UUID = Field(description="Id of the purchase order")
 
 
 class CreatePurchaseOrderArgs(BaseModel):
-    supplier_id: str = Field(description="UUID of the supplier contact")
-    expected_date: str | None = Field(default=None, description="ISO date the goods are expected")
+    supplier_id: UUID = Field(description="Id of the supplier contact")
+    expected_date: date | None = Field(default=None, description="Date the goods are expected")
     notes: str | None = Field(default=None)
-    line_item_ids: list[str] = Field(description="UUIDs of the inventory items to order")
+    line_item_ids: list[UUID] = Field(description="Ids of the inventory items to order")
     line_quantities: list[Decimal] = Field(
         description="Ordered quantity per line, parallel to line_item_ids"
     )
 
 
 class TransitionPurchaseOrderArgs(BaseModel):
-    order_id: str = Field(description="UUID of the purchase order")
+    order_id: UUID = Field(description="Id of the purchase order")
     status: str = Field(description="Target status: draft, sent, confirmed or cancelled")
 
 
 class ReceivePurchaseOrderArgs(BaseModel):
-    order_id: str = Field(description="UUID of the purchase order")
-    line_ids: list[str] = Field(description="UUIDs of the PO lines being delivered")
+    order_id: UUID = Field(description="Id of the purchase order")
+    line_ids: list[UUID] = Field(description="Ids of the PO lines being delivered")
     quantities: list[Decimal] = Field(
         description="Received quantity per line, parallel to line_ids"
     )
@@ -83,12 +84,11 @@ async def _get_response(ctx: AgentContext, order_id: UUID) -> dict:
 
 
 async def _list_purchase_orders(ctx: AgentContext, params: ListPurchaseOrdersArgs) -> dict:
-    supplier_id = UUID(params.supplier_id) if params.supplier_id else None
     orders, total = await PurchaseOrderService.list_order_responses(
         ctx.db,
         ctx.clinic_id,
         order_status=params.order_status,
-        supplier_id=supplier_id,
+        supplier_id=params.supplier_id,
         page=1,
         page_size=params.limit,
     )
@@ -96,19 +96,19 @@ async def _list_purchase_orders(ctx: AgentContext, params: ListPurchaseOrdersArg
 
 
 async def _get_purchase_order(ctx: AgentContext, params: GetPurchaseOrderArgs) -> dict:
-    return _order_summary(await _get_response(ctx, UUID(params.order_id)))
+    return _order_summary(await _get_response(ctx, params.order_id))
 
 
 async def _create_purchase_order(ctx: AgentContext, params: CreatePurchaseOrderArgs) -> dict:
     if len(params.line_item_ids) != len(params.line_quantities):
         return {"error": "line_quantities must be parallel to line_item_ids"}
     payload = PurchaseOrderCreate(
-        supplier_id=UUID(params.supplier_id),
+        supplier_id=params.supplier_id,
         expected_date=params.expected_date,
         notes=params.notes,
         lines=[
             PurchaseOrderLineCreate(
-                inventory_item_id=UUID(item_id),
+                inventory_item_id=item_id,
                 quantity_ordered=quantity,
             )
             for item_id, quantity in zip(params.line_item_ids, params.line_quantities)
@@ -123,7 +123,7 @@ async def _transition_purchase_order(
     ctx: AgentContext, params: TransitionPurchaseOrderArgs
 ) -> dict:
     order = await PurchaseOrderService.transition_order(
-        ctx.db, ctx.clinic_id, UUID(params.order_id), params
+        ctx.db, ctx.clinic_id, params.order_id, params
     )
     return _order_summary(await _get_response(ctx, order.id))
 
@@ -137,7 +137,7 @@ async def _receive_purchase_order(ctx: AgentContext, params: ReceivePurchaseOrde
     payload = PurchaseReceiptCreate(
         lines=[
             ReceiptLineCreate(
-                purchase_order_line_id=UUID(line_id),
+                purchase_order_line_id=line_id,
                 quantity_received=quantity,
                 quality=verdict,
             )
@@ -145,7 +145,7 @@ async def _receive_purchase_order(ctx: AgentContext, params: ReceivePurchaseOrde
         ]
     )
     order = await PurchaseOrderService.receive_order(
-        ctx.db, ctx.clinic_id, UUID(params.order_id), payload, received_by=None
+        ctx.db, ctx.clinic_id, params.order_id, payload, received_by=None
     )
     return _order_summary(await _get_response(ctx, order.id))
 

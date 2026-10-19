@@ -104,13 +104,23 @@ class SearchPatientsArgs(BaseModel):
 
 async def _search(ctx: AgentContext, p: SearchPatientsArgs):
     items, _ = await PatientService.list_patients(ctx.db, ctx.clinic_id, search=p.query, page=1, page_size=p.limit)
-    return [{"id": str(i.id), "full_name": f"{i.first_name} {i.last_name}", "phone": i.phone} for i in items]
+    return [{"id": i.id, "full_name": f"{i.first_name} {i.last_name}", "phone": i.phone} for i in items]
 
 def get_tools() -> list[Tool]:
     return [Tool(name="search_patients", description="Buscar pacientes por nombre/teléfono/email.",
                  parameters=SearchPatientsArgs, handler=_search,
                  permissions=["patients.read"], category=ToolCategory.READ)]
 ```
+
+**Native types on both sides of the boundary.** The parameter model is the
+JSON schema the model is shown *and* the validation step `tool_registry.call`
+runs before the handler, so an id is `UUID` and a day is `date` — never `str`
+with the real shape explained in the description. The annotation is what emits
+`format: uuid`, and what makes a bad value fail at the chokepoint naming the
+parameter instead of deep in the handler as `badly formed hexadecimal UUID
+string` (#677; `tests/test_tool_param_types.py` guards it). Returns are native
+too — `jsonify` at the registry coerces `UUID`/`Decimal`/`datetime`, so no
+hand-`str()`.
 
 ### 3.2 v1 tool set (only what the slice needs)
 | Module | Tool | Category | Wraps | Permission |
