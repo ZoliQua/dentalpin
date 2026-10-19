@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#705): the order PDF footer stamped the server's clock
+  (`datetime.now()`); it now uses the clinic timezone like billing's.
 - fix(#679): `PO_STATUSES` is derived from a new `PurchaseOrderStatus`
   Literal (one vocabulary, two shapes, no drift), and the agent tools are
   typed with it: `list_purchase_orders.order_status` rejects an unknown
