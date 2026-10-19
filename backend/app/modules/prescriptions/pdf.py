@@ -10,8 +10,9 @@ optional QR data — never HTML (PR #210 rule). No email delivery in v1
 from __future__ import annotations
 
 import html
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 
 def _e(value: Any) -> str:
@@ -292,6 +293,13 @@ def build_pdf_data(
     labels = _get_labels(locale)
     labels = {**labels, **(label_overrides or {})}
     status = getattr(prescription, "status", "issued")
+    # ``issued_at`` is timestamptz, i.e. UTC: printed in UTC, a prescription
+    # issued after midnight local time carries yesterday's date. The clinic's
+    # own zone is the only correct one on a clinical document.
+    try:
+        clinic_tz = ZoneInfo(clinic.get("timezone") or "UTC")
+    except (KeyError, ValueError):
+        clinic_tz = UTC
     return {
         "clinic_name": _e(clinic.get("name")),
         "clinic_address": _format_address(clinic.get("address")),
@@ -300,9 +308,9 @@ def build_pdf_data(
         "status": status,
         "status_mark": _e(labels.get("draft" if status == "draft" else "cancelled", "")),
         "date": _e(
-            prescription.issued_at.strftime(labels["date_format"])
+            prescription.issued_at.astimezone(clinic_tz).strftime(labels["date_format"])
             if prescription.issued_at
-            else datetime.now().strftime(labels["date_format"])
+            else datetime.now(clinic_tz).strftime(labels["date_format"])
         ),
         "patient_name": _e(patient_name),
         "prescriber_name": _e(prescription.prescriber_name),

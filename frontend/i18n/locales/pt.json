@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Editar",
+    "change": "Alterar",
     "cancel": "Cancelar",
     "save": "Guardar",
     "create": "Criar",
     "delete": "Eliminar",
     "close": "Fechar",
     "remove": "Remover"
+  },
+  "attachments": {
+    "linkError": "Erro ao associar o anexo"
   },
   "patients": {
     "title": "Pacientes",
@@ -760,7 +764,8 @@
       "continuePlan": "Continuar o plano \"{name}\"",
       "selectPlan": "Selecionar plano",
       "continue": "Continuar",
-      "odontogramTab": "Odontograma"
+      "odontogramTab": "Odontograma",
+      "openNotes": "Abrir notas"
     },
     "plans": {
       "title": "Planos de tratamento",
@@ -873,14 +878,6 @@
       "cancelled": "Cancelada",
       "no_show": "Faltou"
     },
-    "scheduled": "Agendada",
-    "confirmed": "Confirmada",
-    "inProgress": "Em curso",
-    "in_progress": "Em curso",
-    "completed": "Concluída",
-    "cancelled": "Cancelada",
-    "noShow": "Faltou",
-    "no_show": "Faltou",
     "transitions": {
       "confirmed": "Marcar como confirmada",
       "checked_in": "Registar chegada",
@@ -1366,6 +1363,8 @@
     "retry": "Tentar novamente",
     "refresh": "Atualizar",
     "hide": "Ocultar",
+    "expand": "Expandir",
+    "collapse": "Recolher",
     "forbidden": "Acesso negado",
     "confirm": "Confirmar",
     "yes": "Sim",
@@ -1389,6 +1388,7 @@
     "deselectAll": "Nenhum",
     "all": "Todos",
     "required": "Este campo é obrigatório",
+    "optional": "Opcional",
     "invalidEmail": "Email inválido",
     "networkError": "Erro de ligação",
     "serverError": "Erro do servidor",
@@ -2624,6 +2624,8 @@
         "bank_transfer": "Transferência bancária",
         "direct_debit": "Débito direto",
         "insurance": "Seguro",
+        "upi": "UPI",
+        "netbanking": "Net banking",
         "other": "Outro"
       }
     },
@@ -3058,6 +3060,7 @@
     "uploadSuccess": "Documento carregado com sucesso",
     "uploadError": "Erro ao carregar o documento",
     "downloadError": "Erro ao descarregar o documento",
+    "viewError": "Erro ao carregar o documento",
     "deleteSuccess": "Documento eliminado",
     "deleteError": "Erro ao eliminar o documento",
     "updateSuccess": "Documento atualizado",
@@ -3095,6 +3098,9 @@
     "showingOf": "A mostrar {count} de {total}",
     "upload": "Carregar fotografia",
     "uploadHelp": "Classifique para que apareça na categoria correta",
+    "fetchError": "Erro ao carregar as fotografias",
+    "uploadError": "Erro ao carregar a fotografia",
+    "uploadSuccess": "Fotografia carregada com sucesso",
     "dropHere": "Arraste uma fotografia para aqui ou clique",
     "category": "Tipo",
     "subtype": "Vista",

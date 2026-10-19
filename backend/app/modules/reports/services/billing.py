@@ -213,26 +213,31 @@ class BillingReportService:
         )
         totals = result.one()
 
-        # ``total_pending`` = Σ invoice.total − Σ imputed payments, across
-        # all outstanding invoices in the clinic. LEFT JOIN keeps invoices
-        # without any payment imputed.
-        pending_total = await db.execute(
-            select(func.coalesce(func.sum(Invoice.total), Decimal("0"))).where(
-                Invoice.clinic_id == clinic_id,
-                Invoice.status.in_(["issued", "partial"]),
-                Invoice.deleted_at.is_(None),
+        from app.modules.billing.service import compute_paid_summaries_for_invoices
+
+        # ``total_pending`` is Σ balance_due across the clinic's outstanding
+        # invoices, through the same refund-aware helper the invoice page and
+        # the patient tab use. Subtracting a raw Σ ``InvoicePayment.amount``
+        # from the invoiced total let a refunded payment keep reducing
+        # receivables, so the dashboard reported nothing outstanding on an
+        # invoice the invoice page showed as unpaid (#690).
+        open_invoice_ids = (
+            (
+                await db.execute(
+                    select(Invoice.id).where(
+                        Invoice.clinic_id == clinic_id,
+                        Invoice.status.in_(["issued", "partial"]),
+                        Invoice.deleted_at.is_(None),
+                    )
+                )
             )
+            .scalars()
+            .all()
         )
-        pending_paid = await db.execute(
-            select(func.coalesce(func.sum(InvoicePayment.amount), Decimal("0")))
-            .join(Invoice, Invoice.id == InvoicePayment.invoice_id)
-            .where(
-                Invoice.clinic_id == clinic_id,
-                Invoice.status.in_(["issued", "partial"]),
-                Invoice.deleted_at.is_(None),
-            )
+        paid_by_invoice = await compute_paid_summaries_for_invoices(
+            db, clinic_id, list(open_invoice_ids)
         )
-        total_pending = pending_total.scalar_one() - pending_paid.scalar_one()
+        total_pending = sum((balance for _, balance in paid_by_invoice.values()), Decimal("0"))
 
         # Total paid in period for billed invoices. Computed from the
         # InvoicePayment link table — this represents the fiscal "cobrado
@@ -374,15 +379,14 @@ class BillingReportService:
 
         invoices = result.scalars().all()
 
-        invoice_ids = [i.id for i in invoices]
-        paid_by_inv: dict[UUID, Decimal] = {}
-        if invoice_ids:
-            paid_rows = await db.execute(
-                select(InvoicePayment.invoice_id, func.sum(InvoicePayment.amount))
-                .where(InvoicePayment.invoice_id.in_(invoice_ids))
-                .group_by(InvoicePayment.invoice_id)
-            )
-            paid_by_inv = {row[0]: row[1] or Decimal("0") for row in paid_rows.all()}
+        # Refund-aware, like the invoice page: a raw Σ ``InvoicePayment.amount``
+        # left a refunded invoice sitting in the overdue list with
+        # ``balance_due`` 0, i.e. reading as nothing to chase (#690).
+        from app.modules.billing.service import compute_paid_summaries_for_invoices
+
+        paid_by_inv = await compute_paid_summaries_for_invoices(
+            db, clinic_id, [i.id for i in invoices]
+        )
 
         return [
             {
@@ -394,7 +398,7 @@ class BillingReportService:
                 "issue_date": inv.issue_date,
                 "due_date": inv.due_date,
                 "days_overdue": (today - inv.due_date).days,
-                "balance_due": inv.total - paid_by_inv.get(inv.id, Decimal("0")),
+                "balance_due": paid_by_inv.get(inv.id, (Decimal("0"), inv.total))[1],
             }
             for inv in invoices
         ]

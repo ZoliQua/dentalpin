@@ -239,13 +239,18 @@ async function professionalFetcher(query: string) {
 }
 
 async function professionalResolver(id: string) {
+  // There is no `GET /auth/users/{id}`; the professionals list is the
+  // endpoint this page already reads (and the one the permission covers),
+  // and a clinic has a handful of them.
   try {
-    const res = await api.get<{ data: { id: string, first_name: string, last_name: string } }>(
-      `/api/v1/auth/users/${id}`
+    const res = await api.get<{ data: Array<{ id: string, first_name: string, last_name: string }> }>(
+      '/api/v1/auth/professionals'
     )
+    const match = res.data.find(p => p.id === id)
+    if (!match) return null
     return {
-      id: res.data.id,
-      label: `${res.data.first_name} ${res.data.last_name}`.trim()
+      id: match.id,
+      label: `${match.first_name} ${match.last_name}`.trim()
     }
   } catch {
     return null

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#703): `mc_0002` makes `created_at` / `updated_at` NOT NULL.
+  `mc_0001` created them with a `now()` server default but without
+  `nullable=False`, while `TimestampMixin` declares both as
+  `Mapped[datetime]` — this table was one of the two places in the schema
+  where the column could hold NULL against a response schema that types
+  it as a required `datetime`.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

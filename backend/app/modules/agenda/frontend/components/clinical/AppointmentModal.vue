@@ -640,7 +640,7 @@ async function handleCancel() {
     await cancelAppointment(props.appointment.id)
     toast.add({
       title: t('common.success'),
-      description: t('appointments.cancelled'),
+      description: t('appointments.status.cancelled'),
       color: 'success'
     })
     emit('cancelled', props.appointment.id)

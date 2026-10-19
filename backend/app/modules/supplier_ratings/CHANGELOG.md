@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- fix(#677): the `get_supplier_rating` / `create_supplier_review` tool
+  parameter `supplier_id` is typed `UUID` instead of `str`.
+  The tool schema now advertises `format: uuid`, and a malformed id is
+  rejected by `tool_registry.call`'s validation step naming the parameter,
+  rather than reaching the handler and raising `badly formed hexadecimal
+  UUID string`, which named nothing.
+
 ### Added
 
 - `PATCH /reviews/{id}` is a partial update: omitted fields are left untouched.

@@ -2,9 +2,11 @@
 
 Mirrors expenses/inventory: install -> uninstall -> reinstall must drop
 ONLY the junction table and leave every other module (including the
-``catalog`` and ``inventory`` tables it points at) untouched. The module
-owns a single revision (tc_0001), so the branch-scoped downgrade target
-is ``treatment_consumables@-1``. Marked ``alembic_roundtrip``.
+``catalog`` and ``inventory`` tables it points at) untouched. The
+branch-scoped downgrade walks ``treatment_consumables@-1`` until the
+table is gone — never ``@base``, which resolves to the whole-graph base
+in the merged multi-head graph (same reasoning as the verifactu test).
+Marked ``alembic_roundtrip``.
 """
 
 from __future__ import annotations
@@ -63,11 +65,13 @@ def test_treatment_consumables_uninstall_roundtrip_is_branch_scoped() -> None:
     )
     baseline_other = before - LINK_TABLES
 
-    _alembic("downgrade", "treatment_consumables@-1")
-    after_down = _list_tables()
-    assert LINK_TABLES.isdisjoint(after_down), (
-        f"junction table survived downgrade: {LINK_TABLES & after_down}"
-    )
+    for _ in range(10):
+        _alembic("downgrade", "treatment_consumables@-1")
+        after_down = _list_tables()
+        if LINK_TABLES.isdisjoint(after_down):
+            break
+    else:
+        raise AssertionError(f"junction table survived downgrade: {LINK_TABLES & _list_tables()}")
     assert baseline_other <= after_down, (
         f"downgrade leaked into other modules; missing: {baseline_other - after_down}"
     )
