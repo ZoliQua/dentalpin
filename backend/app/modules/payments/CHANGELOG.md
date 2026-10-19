@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix: the patient ledger's row menu offered **View detail**, a link to
+  `/payments/{id}` — a page no layer has, so it opened the 404 screen. The
+  item and its `rowMenu.detail` key are gone; the trigger's aria-label is
+  now `common.actions`, and a row whose role can neither reassign nor
+  refund no longer shows an empty menu.
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

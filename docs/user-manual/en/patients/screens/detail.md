@@ -14,7 +14,7 @@ related_permissions:
 related_paths:
   - backend/app/modules/patients/router.py
   - backend/app/modules/patients/frontend/pages/patients/[id].vue
-last_verified_commit: 838a6767
+last_verified_commit: 27442250
 ---
 
 # Patient detail
@@ -98,9 +98,10 @@ a **Pending to charge** card at the top.
   touches neither invoices nor quotes; the modal says so.
 - After the payment is recorded, the card disappears (or shrinks)
   depending on how much was collected.
-- Each payment in the timeline has a row menu: **View detail**,
-  **Assign to quote…** (moves an on-account deposit to the chosen
-  quote and, if it has issued invoices, applies it) and **Refund**.
+- Each payment in the timeline has a row menu: **Assign to quote…**
+  (moves an on-account deposit to the chosen quote and, if it has
+  issued invoices, applies it) and **Refund**. The menu shows only the
+  actions your role allows.
 
 ## Budgets tab
 
