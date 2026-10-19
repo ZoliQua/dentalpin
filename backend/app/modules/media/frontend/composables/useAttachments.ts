@@ -42,7 +42,7 @@ export function useAttachments() {
       console.error('Error linking attachment:', error)
       toast.add({
         title: t('common.error'),
-        description: t('attachments.linkError', 'Error linking attachment'),
+        description: t('attachments.linkError'),
         color: 'error'
       })
       return null

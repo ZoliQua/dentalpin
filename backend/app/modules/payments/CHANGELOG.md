@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs: the `reports.categories` row in CLAUDE.md said the card renders on `/reports`; it has not since the dashboard moved to native drill-down chips (reports/CHANGELOG.md). Marked dormant, with the successor slot named. No code change — the chip itself is hardcoded by `reports` and still appears.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

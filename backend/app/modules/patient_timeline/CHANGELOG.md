@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- docs(#707): CLAUDE.md claimed the routes mount at
+  `/api/v1/patient-timeline/`; the loader mounts every module under its
+  Python name, so the real prefix is `/api/v1/patient_timeline/`.
+
 - feat(#657): owns the `patient_timeline` GDPR erasure coverage scope
   (`get_erasure_contributors()`). The feed is retained as the clinic's
   record of events (Art. 17(3)(b)) and nothing is redacted; the row only

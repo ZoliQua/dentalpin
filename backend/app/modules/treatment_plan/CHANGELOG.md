@@ -4,6 +4,17 @@
 
 - docs(#711): `treatment_plan.items_reordered` was missing from the
   Published table.
+- docs(#707): CLAUDE.md claimed the routes mount at
+  `/api/v1/treatment-plans/`, which answers nothing — the prefix is
+  `/api/v1/treatment_plan/` and the paths listed under it are relative,
+  so the detail endpoint is `/api/v1/treatment_plan/treatment-plans/{id}`.
+  That reading is what produced the broken call fixed in #699.
+- fix(#699): the post-visit "mark the leftover linked treatments
+  performed" prompt (#207) listed nothing, ever. It fetched the
+  appointment detail from `/api/v1/appointments/{id}`; agenda mounts that
+  route under its own prefix (`/api/v1/agenda/appointments/{id}`), so the
+  404 landed in the component's `catch` and it rendered its empty state
+  after every completed appointment.
 
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

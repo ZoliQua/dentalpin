@@ -2,10 +2,11 @@
 
 import asyncio
 import hashlib
-from datetime import date
+from datetime import UTC, datetime
 from decimal import Decimal
 from io import BytesIO
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 from app.core.pdf_locales import LOCALE_BY_LANG as _LOCALE_BY_LANG
 from app.core.utils.currency import format_currency as _fmt_currency
@@ -88,6 +89,7 @@ class BudgetPDFService:
         signature: "BudgetSignature | None",
         labels: dict,
         locale: str,
+        clinic_tz: ZoneInfo | None = None,
     ) -> str:
         """Render the signature block — empty when no signature, with
         the captured PNG + audit footer otherwise."""
@@ -115,8 +117,13 @@ class BudgetPDFService:
             if isinstance(raw_png, str) and raw_png.startswith("data:image"):
                 png_data = raw_png
 
+        # The column is timestamptz, so the value is UTC: render it in the
+        # clinic's own zone or the audit line is an hour or two off the
+        # moment the patient actually signed.
         signed_at_str = (
-            signature.signed_at.strftime("%d/%m/%Y %H:%M") if signature.signed_at else "—"
+            signature.signed_at.astimezone(clinic_tz or UTC).strftime("%d/%m/%Y %H:%M")
+            if signature.signed_at
+            else "—"
         )
         method_key = signature.signature_method or "click_accept"
         method_label = labels.get(
@@ -166,6 +173,16 @@ class BudgetPDFService:
         """Generate HTML content for the budget."""
         # Localized labels
         labels = BudgetPDFService._get_labels(locale)
+
+        # Printed timestamps belong to the clinic, not to the server: the
+        # columns are timestamptz (UTC) and the footer is "now" (#204, fixed
+        # in billing/pdf.py at the time and missed here).
+        try:
+            clinic_tz = ZoneInfo(clinic.timezone or "UTC")
+        except (KeyError, ValueError):
+            clinic_tz = UTC
+        created_at_str = budget.created_at.astimezone(clinic_tz).strftime("%d/%m/%Y")
+        generated_at = datetime.now(clinic_tz).strftime("%d/%m/%Y %H:%M")
 
         # Format currency from clinic.currency, locale derived from language.
         money_locale = _LOCALE_BY_LANG.get(locale, "es_ES")
@@ -510,7 +527,7 @@ class BudgetPDFService:
                     <div class="budget-number">{labels["budget"]} {budget.budget_number}</div>
                     <div class="budget-meta">
                         {labels["version"]}: {budget.version}<br>
-                        {labels["date"]}: {budget.created_at.strftime("%d/%m/%Y")}
+                        {labels["date"]}: {created_at_str}
                     </div>
                     <span class="status-badge status-{budget.status}">{status_label}</span>
                 </div>
@@ -604,10 +621,10 @@ class BudgetPDFService:
             else ""
         }
 
-            {BudgetPDFService._render_signature_section(signature, labels, locale)}
+            {BudgetPDFService._render_signature_section(signature, labels, locale, clinic_tz)}
 
             <div class="footer">
-                {labels["generated_by"]} DentalPin | {date.today().strftime("%d/%m/%Y %H:%M")}
+                {labels["generated_by"]} DentalPin | {generated_at}
             </div>
         </body>
         </html>

@@ -14,16 +14,16 @@ import { resolve } from 'node:path'
  * across four modules came to show `errors.loadFailed` to a clinic as a
  * toast title (#631).
  *
- * Two call shapes are deliberately out of scope:
+ * `t('key', 'Fallback')` is checked like any other call. A string second
+ * argument is a default message, so a missing key is not *visible* as a
+ * key — it is visible as the wrong language: vue-i18n renders that one
+ * hardcoded string to every locale. Ten such keys existed in no locale
+ * file, so an English clinic read "Cambiar" on the media upload button
+ * and a Spanish one read "Error loading photos" in a toast. The default
+ * may stay; the key has to exist.
  *
- * - `` t(`status.${s}`) `` — a template literal is not statically
- *   resolvable, so there is nothing to check here.
- * - `t('key', 'Fallback')` — a *string* second argument is a default
- *   message, which vue-i18n renders instead of the key, so a missing key
- *   is not user-visible. (A second argument that is anything else —
- *   interpolation params, a plural count — does not substitute for the
- *   key, so those calls are checked.) The hardcoded-default sites are a
- *   separate problem: they pin one language for every locale.
+ * One call shape is out of scope: `` t(`status.${s}`) `` — a template
+ * literal is not statically resolvable, so there is nothing to look up.
  *
  * Runs in plain Node, reading straight off the repository tree, for the
  * same reason the parity test does: no Nuxt context needed.
@@ -103,10 +103,6 @@ describe('i18n key resolution', () => {
     for (const file of files) {
       const src = readFileSync(file, 'utf-8')
       for (const match of src.matchAll(CALL)) {
-        if (match[3] === ',') {
-          const rest = src.slice(match.index + match[0].length).trimStart()
-          if (rest.startsWith('\'') || rest.startsWith('"')) continue // default message
-        }
         checked++
         const key = match[2]
         if (known.has(key)) continue
@@ -123,8 +119,9 @@ describe('i18n key resolution', () => {
       .map(([key, sites]) => `${key} (${sites.length}): ${[...new Set(sites)].join(', ')}`)
     expect(
       report,
-      `keys rendered raw to the user — add them to en.json (and every locale), `
-      + `or pass a default message:\n${report.join('\n')}`
+      `keys with no message behind them — add them to en.json (and every `
+      + `locale). A default message does not count: it renders the same `
+      + `one language to every locale:\n${report.join('\n')}`
     ).toEqual([])
   })
 })

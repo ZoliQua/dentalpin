@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#701): `PatientUpdate.status` (inherited by
+  `PatientExtendedUpdate`) is capped at the column length (`VARCHAR(20)`)
+  instead of 500-ing on the INSERT. The status vocabulary itself is still
+  an unvalidated `str` — that is #679.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix(#473): `GET /patients` takes a repeatable `status` query

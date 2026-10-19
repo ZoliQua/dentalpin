@@ -179,7 +179,7 @@ class AppointmentUpdate(BaseModel):
     end_time: datetime | None = None
     treatment_type: str | None = Field(default=None, max_length=100)
     planned_item_ids: list[UUID] | None = None
-    status: str | None = None
+    status: str | None = Field(default=None, max_length=20)
     color: str | None = Field(default=None, max_length=7)
 
 

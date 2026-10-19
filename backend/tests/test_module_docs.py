@@ -22,6 +22,7 @@ defeat the purpose; CI rejects them.
 from __future__ import annotations
 
 import importlib.util
+import re
 import sys
 from pathlib import Path
 
@@ -71,6 +72,41 @@ def test_every_module_has_doc(discovered_module_names: list[str], doc_name: str)
     assert not too_short, (
         f"Modules with sparse {doc_name} (<{threshold} non-blank lines): "
         f"{too_short}. Flesh out the doc — empty stubs defeat the purpose."
+    )
+
+
+# ---------------------------------------------------------------------------
+# The mount prefix a CLAUDE.md claims (#707)
+# ---------------------------------------------------------------------------
+
+
+def test_claude_md_states_the_real_mount_prefix(discovered_module_names: list[str]) -> None:
+    """``Routes mounted at `/api/v1/<name>/``` has to be the real prefix.
+
+    ``core/plugins/loader.py`` mounts every module router under
+    ``/api/v1/<module name>`` — the Python name, underscores and all.
+    Three CLAUDE.md files claimed a hyphenated prefix that no router
+    answers (``/api/v1/treatment-plans``, ``/api/v1/patient-timeline``,
+    ``/api/v1/patients-clinical``). These files are the brief an agent
+    reads before writing a call, and a wrong path there produces exactly
+    the silent 404 fixed in #699.
+    """
+
+    wrong: list[str] = []
+    checked = 0
+    for module_name in discovered_module_names:
+        text = (MODULES_ROOT / module_name / "CLAUDE.md").read_text()
+        match = re.search(r"[Rr]outes mounted at\s*`([^`]+)`", text)
+        if match is None:
+            continue  # not every module exposes routes
+        checked += 1
+        claimed = match.group(1).strip().rstrip("/")
+        if claimed != f"/api/v1/{module_name}":
+            wrong.append(f"  {module_name}: claims {claimed!r}, mounts at '/api/v1/{module_name}'")
+
+    assert checked > 20, f"CLAUDE.md prefix sweep looks wrong: {checked} claims"
+    assert not wrong, "\n".join(
+        ["these CLAUDE.md files state a mount prefix no router answers:", *wrong]
     )
 
 
