@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - docs: the reports user manual (en + es) described the dashboard as extended through the `reports.categories` slot, which the page stopped rendering when it moved to native drill-down chips. Rewritten to describe what the page does, and `last_verified_commit` bumped in both locales.
 - fix(#690): receivables are net of refunds again. `get_summary`'s
   `total_pending` and `get_overdue_invoices`' per-row `balance_due` summed

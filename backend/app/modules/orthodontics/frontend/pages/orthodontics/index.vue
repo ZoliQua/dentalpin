@@ -6,6 +6,7 @@
 import type { OrthoCase } from '../../composables/useOrthodontics'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import OrthoCaseSheet from '../../components/OrthoCaseSheet.vue'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const { t, locale } = useI18n()
 const { can } = usePermissions()
@@ -27,7 +28,7 @@ const editProcedures = ref('')
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—'
-  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(iso))
+  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(parseDateOnly(iso))
 }
 
 function isOverdue(c: OrthoCase): boolean {

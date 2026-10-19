@@ -149,6 +149,7 @@
 <script setup lang="ts">
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const { t, locale } = useI18n()
 const { can } = usePermissions()
@@ -231,7 +232,7 @@ function getStatusLabel(status: string) {
 }
 
 function formatDate(date: string) {
-  return new Date(date).toLocaleDateString()
+  return parseDateOnly(date).toLocaleDateString()
 }
 
 function openCreateModal() {

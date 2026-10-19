@@ -9,7 +9,7 @@ import type {
 } from '~~/app/types'
 import type { InvoiceAgingBucket, IssuedTrendPoint } from '../../composables/useReports'
 import { PERMISSIONS } from '~~/app/config/permissions'
-import { toISODate } from '~~/app/utils/wallClock'
+import { parseDateOnly, toISODate } from '~~/app/utils/wallClock'
 
 const { t, locale } = useI18n()
 const { can } = usePermissions()
@@ -155,7 +155,7 @@ onMounted(() => {
 
 // Format date
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(locale.value, {
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value, {
     year: 'numeric',
     month: 'short',
     day: 'numeric'

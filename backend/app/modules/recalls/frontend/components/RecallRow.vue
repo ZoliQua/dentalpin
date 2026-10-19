@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import type { Recall } from '../composables/useRecalls'
 import { errorDetail } from '~~/app/utils/error'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 interface Props { recall: Recall }
 const props = defineProps<Props>()
@@ -34,7 +35,7 @@ const phoneHref = computed(() =>
 )
 
 const monthLabel = computed(() => {
-  const date = new Date(props.recall.due_month)
+  const date = parseDateOnly(props.recall.due_month)
   return new Intl.DateTimeFormat(locale.value, {
     year: 'numeric',
     month: 'long'

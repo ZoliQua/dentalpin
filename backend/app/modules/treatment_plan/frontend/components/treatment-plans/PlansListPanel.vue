@@ -2,6 +2,7 @@
 import type { TreatmentPlan, TreatmentPlanStatus } from '~~/app/types'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   q: string
@@ -84,7 +85,7 @@ async function handleDelete(plan: TreatmentPlan, event: Event) {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(locale.value)
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value)
 }
 
 function getPatientName(plan: TreatmentPlan): string {

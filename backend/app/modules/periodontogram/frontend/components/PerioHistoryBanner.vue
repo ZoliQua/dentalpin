@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { parseDateOnly } from '~~/app/utils/wallClock'
 /**
  * Soft warning shown when the user is viewing a closed snapshot in
  * read-only mode. Mirrors the odontogram's "viendo histórico"
@@ -17,7 +18,7 @@ const { t, locale } = useI18n()
 
 function formatDate(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString(locale.value, {
+    return parseDateOnly(iso).toLocaleDateString(locale.value, {
       day: '2-digit',
       month: 'long',
       year: 'numeric'

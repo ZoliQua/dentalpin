@@ -18,6 +18,7 @@
  */
 
 import type { PatientExtended } from '~~/app/types'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 interface Props {
   patient: PatientExtended
@@ -47,7 +48,7 @@ const initials = computed(() => {
 const age = computed(() => {
   if (!props.patient.date_of_birth) return null
   const today = new Date()
-  const birth = new Date(props.patient.date_of_birth)
+  const birth = parseDateOnly(props.patient.date_of_birth)
   let years = today.getFullYear() - birth.getFullYear()
   const m = today.getMonth() - birth.getMonth()
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) years--

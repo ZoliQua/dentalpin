@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#705): the quote PDF footer printed `00:00` on every document —
   `date.today().strftime("%d/%m/%Y %H:%M")`, the same line #204 fixed in
   `billing/pdf.py` — and the signed-quote audit line rendered
