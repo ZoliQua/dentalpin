@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- docs(#711): the events doc said the module publishes nothing; it
+  publishes seven events, now tabled. CLAUDE.md also put the
+  photo/X-ray de-duplication in the publisher — it lives in
+  `patient_timeline`'s handler, `document.uploaded` fires for every upload
+  — and listed `document.archived` as emitted while nothing publishes it.
+
 - fix(#631): the document card's view tooltip used `common.view`, which
   exists in no locale file, so it rendered the key string; it now reuses
   `common.viewDetails`, matching the button's own `aria-label`. The

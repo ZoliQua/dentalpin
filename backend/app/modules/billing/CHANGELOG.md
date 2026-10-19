@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- docs(#711): `docs/technical/billing/events.md` said the module publishes
+  no events; it publishes `invoice.issued`, `invoice.paid` (read by
+  verifactu) and `invoice.sent`. The Published table now lists all three
+  with trigger, payload and subscribers.
+
 - fix: a duplicate invoice-series prefix is a 409 instead of a 500.
   Neither `POST /series` nor `PUT /series/{id}` caught the
   `uq_invoice_series_clinic_prefix` violation, so creating a series twice

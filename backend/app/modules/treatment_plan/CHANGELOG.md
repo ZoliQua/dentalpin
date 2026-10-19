@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- docs(#711): `treatment_plan.items_reordered` was missing from the
+  Published table.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - refactor: the nine `event_bus.publish` call sites that named their event

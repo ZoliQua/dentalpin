@@ -150,3 +150,46 @@ def test_normalise_strips_example_query_strings(docs_coverage) -> None:
         docs_coverage._normalise_endpoint("GET", "/api/v1/payroll/reports/annual?year=")
         == "GET /api/v1/payroll/reports/annual"
     )
+
+
+# ---------------------------------------------------------------------------
+# Every event a module publishes is in its events.md
+# ---------------------------------------------------------------------------
+
+
+def test_published_events_are_in_the_module_events_doc() -> None:
+    """``docs/technical/<module>/events.md`` lists what the module publishes.
+
+    CLAUDE.md asks for a row there for every event published or consumed,
+    and three files said *"This module does not publish any events."*
+    while publishing 3 (billing), 7 (media) and 4 (recalls) events that
+    other modules subscribe to. The publishers come from
+    ``docs/events-catalog.md``, which ``generate_catalogs.py`` derives from
+    the ``event_bus.publish`` call sites and CI keeps current — so this
+    reuses a list that is already checked rather than grepping again.
+    """
+    import re
+
+    docs_root = MODULES_ROOT.parents[2] / "docs"
+    catalog = (docs_root / "events-catalog.md").read_text(encoding="utf-8")
+    summary = catalog.split("## Summary", 1)[1].split("\n## ", 1)[0]
+
+    rows = 0
+    missing: list[str] = []
+    for line in summary.splitlines():
+        match = re.match(r"^\|\s*`([^`]+)`\s*\|\s*`[^`]*`\s*\|(.*?)\|(.*?)\|\s*$", line)
+        if match is None:
+            continue
+        rows += 1
+        event = match.group(1)
+        for module in re.findall(r"`([a-z_]+)`", match.group(2)):
+            doc = docs_root / "technical" / module / "events.md"
+            if not doc.exists():
+                missing.append(f"  {module}: no events.md for {event}")
+            elif f"`{event}`" not in doc.read_text(encoding="utf-8"):
+                missing.append(
+                    f"  {module}: `{event}` missing from docs/technical/{module}/events.md"
+                )
+
+    assert rows > 100, f"events catalog parse looks wrong: {rows} rows"
+    assert not missing, "\n".join(["published events no events.md documents:", *missing])
