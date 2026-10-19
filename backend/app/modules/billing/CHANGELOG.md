@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- docs(#711): `docs/technical/billing/events.md` said the module publishes
+  no events; it publishes `invoice.issued`, `invoice.paid` (read by
+  verifactu) and `invoice.sent`. The Published table now lists all three
+  with trigger, payload and subscribers.
 - fix(#701): `InvoiceItemCreate.internal_code` (50),
   `InvoiceItem{Create,Update}.vat_exempt_reason` (200) and
   `InvoiceSeries{Create,Update}.description` (200) now carry the

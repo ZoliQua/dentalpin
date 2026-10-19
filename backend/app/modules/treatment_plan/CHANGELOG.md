@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs(#711): `treatment_plan.items_reordered` was missing from the
+  Published table.
 - docs(#707): CLAUDE.md claimed the routes mount at
   `/api/v1/treatment-plans/`, which answers nothing — the prefix is
   `/api/v1/treatment_plan/` and the paths listed under it are relative,

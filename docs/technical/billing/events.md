@@ -1,6 +1,6 @@
 ---
 module: billing
-last_verified_commit: 0000000
+last_verified_commit: 27442250
 ---
 
 # Billing — events
@@ -10,7 +10,12 @@ Per-module slice of [`docs/events-catalog.md`](../../events-catalog.md)
 
 ## Published
 
-_This module does not publish any events._
+| Event | When | Payload | Subscribers |
+|-------|------|---------|-------------|
+| `invoice.issued` | `InvoiceWorkflowService.issue_invoice` — draft → issued, after the number is allocated. | `clinic_id`, `invoice_id`, `patient_id`, `invoice_number`, `total`, `issued_by`, `occurred_at` | `patient_timeline` |
+| `invoice.paid` | `recalc_invoice_status` lands on `paid` (a payment or allocation covers the total). | `clinic_id`, `invoice_id`, `patient_id`, `invoice_number`, `total`, `total_paid`, `occurred_at` | `patient_timeline`, `verifactu` (updates `compliance_data['ES']`) |
+| `invoice.sent` | `POST /invoices/{id}/send` — published **transactionally** (`db=db`, ADR 0019). | `clinic_id`, `invoice_id`, `patient_id`, `send_method`, `recipient_email`, `custom_message` | `activity_journal`, `notifications` |
+
 
 ## Subscribed
 

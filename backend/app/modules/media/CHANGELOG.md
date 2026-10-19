@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- docs(#711): the events doc said the module publishes nothing; it
+  publishes seven events, now tabled. CLAUDE.md also put the
+  photo/X-ray de-duplication in the publisher — it lives in
+  `patient_timeline`'s handler, `document.uploaded` fires for every upload
+  — and listed `document.archived` as emitted while nothing publishes it.
 - fix(#697): the upload controls' "Change" button and the "Optional"
   field hint, and the photo/document/attachment toasts, existed in no
   locale file — the hardcoded default message rendered for every
