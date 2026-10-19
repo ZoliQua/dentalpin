@@ -1,18 +1,22 @@
 ---
 module: recalls
-last_verified_commit: 0000000
+last_verified_commit: 27442250
 ---
 
 # Recalls — events
-
-> _Scaffolded stub — replace with proper documentation when this module is next touched._
 
 Per-module slice of [`docs/events-catalog.md`](../../events-catalog.md)
 (auto-generated). Update both files when adding or removing events.
 
 ## Published
 
-_This module does not publish any events._
+| Event | When | Payload | Subscribers |
+|-------|------|---------|-------------|
+| `recall.created` | `RecallService.create`; transactional (`db=db`). | `recall_id`, `clinic_id`, `patient_id`, `reason`, `due_month`, `priority`, `status`, … (`_build_event_payload`) | `activity_journal`, `recall_reminders` |
+| `recall.snoozed` | `snooze` — due month pushed forward. | the recall payload + `snoozed_months` | — |
+| `recall.cancelled` | `cancel`. | the recall payload | — |
+| `recall.completed` | `mark_done`. | the recall payload | — |
+
 
 ## Subscribed
 

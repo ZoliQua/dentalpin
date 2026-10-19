@@ -217,6 +217,7 @@ async def download_prescription_pdf(
         {
             "name": ctx.clinic.name,
             "address": ctx.clinic.address if isinstance(ctx.clinic.address, dict) else {},
+            "timezone": ctx.clinic.timezone,
         },
         hook_data=hook_data,
         label_overrides=label_overrides,

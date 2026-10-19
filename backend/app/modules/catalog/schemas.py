@@ -74,7 +74,7 @@ class CategoryCreate(BaseModel):
     descriptions: dict[str, str] | None = None
     parent_id: UUID | None = None
     display_order: int = 0
-    icon: str | None = None
+    icon: str | None = Field(default=None, max_length=50)
 
 
 class CategoryUpdate(BaseModel):
@@ -85,7 +85,7 @@ class CategoryUpdate(BaseModel):
     descriptions: dict[str, str] | None = None
     parent_id: UUID | None = None
     display_order: int | None = None
-    icon: str | None = None
+    icon: str | None = Field(default=None, max_length=50)
     is_active: bool | None = None
 
 

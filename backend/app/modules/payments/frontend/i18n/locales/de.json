@@ -218,7 +218,6 @@
           "in_progress": "In Bearbeitung"
         },
         "rowMenu": {
-          "detail": "Details anzeigen",
           "refund": "Erstatten",
           "reallocate": "Kostenvoranschlag zuordnen…"
         }

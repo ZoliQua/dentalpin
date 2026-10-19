@@ -139,6 +139,7 @@ class InvoiceNumberService:
         db: AsyncSession,
         clinic_id: UUID,
         series_id: UUID,
+        today: date | None = None,
     ) -> tuple[str, int]:
         """Generate the next invoice number for a series.
 
@@ -148,6 +149,8 @@ class InvoiceNumberService:
             db: Database session
             clinic_id: Clinic ID
             series_id: Series ID
+            today: The clinic's calendar date (``clinic_today``); its year
+                goes into the number. Defaults to the server's date.
 
         Returns:
             Tuple of (invoice_number, sequential_number)
@@ -172,7 +175,7 @@ class InvoiceNumberService:
         if not series.is_active:
             raise ValueError(f"Series {series.prefix} is not active")
 
-        current_year = date.today().year
+        current_year = (today or date.today()).year
 
         # Check for yearly reset
         if series.reset_yearly and series.last_reset_year != current_year:

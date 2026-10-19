@@ -43,10 +43,12 @@ class AppointmentTreatmentNoteUpdate(BaseModel):
 
 
 class CheckinTokenResponse(BaseModel):
-    """Minted QR check-in token (15-minute TTL, single appointment).
+    """Minted check-in token (single appointment).
 
-    ``url`` is the patient-facing link, built server-side — the
-    frontend copies it verbatim and builds no check-in URLs itself.
+    Counter tokens keep the 15-minute TTL; reminder tokens live until
+    the end of the appointment's clinic-local day (ADR 0037). ``url``
+    is the patient-facing link, built server-side — the frontend
+    copies it verbatim and builds no check-in URLs itself.
     """
 
     token: str
@@ -177,7 +179,7 @@ class AppointmentUpdate(BaseModel):
     end_time: datetime | None = None
     treatment_type: str | None = Field(default=None, max_length=100)
     planned_item_ids: list[UUID] | None = None
-    status: str | None = None
+    status: str | None = Field(default=None, max_length=20)
     color: str | None = Field(default=None, max_length=7)
 
 

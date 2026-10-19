@@ -106,13 +106,23 @@ class SearchPatientsArgs(BaseModel):
 
 async def _search(ctx: AgentContext, p: SearchPatientsArgs):
     items, _ = await PatientService.list_patients(ctx.db, ctx.clinic_id, search=p.query, page=1, page_size=p.limit)
-    return [{"id": str(i.id), "full_name": f"{i.first_name} {i.last_name}", "phone": i.phone} for i in items]
+    return [{"id": i.id, "full_name": f"{i.first_name} {i.last_name}", "phone": i.phone} for i in items]
 
 def get_tools() -> list[Tool]:
     return [Tool(name="search_patients", description="Buscar pacientes por nombre/teléfono/email.",
                  parameters=SearchPatientsArgs, handler=_search,
                  permissions=["patients.read"], category=ToolCategory.READ)]
 ```
+
+**Native types on both sides of the boundary.** The parameter model is the
+JSON schema the model is shown *and* the validation step `tool_registry.call`
+runs before the handler, so an id is `UUID` and a day is `date` — never `str`
+with the real shape explained in the description. The annotation is what emits
+`format: uuid`, and what makes a bad value fail at the chokepoint naming the
+parameter instead of deep in the handler as `badly formed hexadecimal UUID
+string` (#677; `tests/test_tool_param_types.py` guards it). Returns are native
+too — `jsonify` at the registry coerces `UUID`/`Decimal`/`datetime`, so no
+hand-`str()`.
 
 ### 3.2 v1 tool set (only what the slice needs)
 | Module | Tool | Category | Wraps | Permission |
@@ -319,33 +329,47 @@ tokenization means under GDPR.
 
 ### What is guaranteed
 
-1. **Structured fields** — any JSON key matching the PII denylist
-   (`first_name`, `last_name`, `full_name`, `name`, `patient_name`,
-   `phone`, `mobile`, `telephone`, `phone_number`, `email`,
-   `email_address`, `dni`, `nif`, `tax_id`, `national_id`) is replaced
-   with a deterministic token (`NAME_<hash>`, `PHONE_<hash>`, etc.)
-   before the payload leaves the server.  UUID-valued reference keys
-   (`id`, `patient_id`, `appointment_id`) are tokenized when the value
-   is a valid UUID.
+1. **Structured fields** — any JSON key matching the PII denylist is
+   replaced with a deterministic token (`NAME_<hash>`, `PHONE_<hash>`,
+   `FILE_<hash>`, etc.) before the payload leaves the server.  UUID-valued
+   reference keys (`id`, `patient_id`, `suggested_patient_id`,
+   `appointment_id`) are tokenized when the value is a valid UUID.  The
+   sets live in `app/core/agents/redaction.py` and are the source of truth
+   — they cover patient *and* staff names (`professional_name`,
+   `created_by_name`), contact details including `recipient_email` /
+   `billing_email`, national ids, dates of birth, and scanned file names
+   (an RVG is routinely filed as `Surname_Firstname_date.dcm`).
 
-2. **Seeded context entities** — names and IDs from the conversation's
+   Because that is a denylist, `tests/test_redaction_key_coverage.py` walks
+   every module's tool results and fails on a new `*_name` / `*email` /
+   `*phone` / `*patient_id` key that is neither covered nor declared
+   non-personal with a reason (#687).
+
+2. **Known values under any key** — a value the symbol table already holds
+   is tokenized even when it appears under a key nobody listed, so the same
+   address cannot be a token under `email` and cleartext under
+   `recipient_email` in one payload.  Whole-value match only: the substring
+   form is reserved for free text (guarantee 4), where a token landing
+   mid-word is a tolerable trade.
+
+3. **Seeded context entities** — names and IDs from the conversation's
    `context_jsonb` blob are pre-loaded into the per-session symbol table
    at session start, so they are redacted even if they appear as
    free-text later in the conversation.
 
-3. **Known-entity free text** — substring replacement of every value
+4. **Known-entity free text** — substring replacement of every value
    already present in the symbol table.  If "María García" was loaded
    as a structured field, any subsequent user-typed occurrence of that
    exact string is tokenized.
 
-4. **Free-text-returning tools excluded** — tools carrying
+5. **Free-text-returning tools excluded** — tools carrying
    `Tool.exposes_free_text=True` are filtered out of the tool list
    offered to the cloud provider when redaction is enabled.  Today
    that flag is set by tools in `recalls`, `activity_journal` and
    `expenses` (grep `exposes_free_text=True`); those tools are simply
    unavailable to the model while redaction is on.
 
-5. **Deterministic-per-conversation tokens** — the same real value
+6. **Deterministic-per-conversation tokens** — the same real value
    always maps to the same token *within one conversation*
    (`SHA-256(salt:real)[:12]`, salted per conversation), so the model
    can reason about "the same patient" across turns without seeing the
@@ -370,7 +394,15 @@ tokenization means under GDPR.
    holds neither table nor salt, so dictionary attacks over the
    value space do not apply to it (#586).
 
-3. **Cross-session correlation** — tokens are salted per conversation,
+3. **A value's first appearance under an unlisted key** — key coverage
+   plus the known-value fallback leaves one case open: a PHI value that has
+   never been seen under a covered key in this conversation, appearing for
+   the first time under a key nobody listed.  The guard test makes that a
+   deliberate omission rather than an oversight, but closing it properly
+   needs value-shape detection (an `@`-shaped or E.164-shaped string is a
+   contact detail whatever the key is called) — deferred with NER below.
+
+4. **Cross-session correlation** — tokens are salted per conversation,
    so the same patient yields unrelated tokens in different
    conversations: a provider observing many sessions cannot link them
    or build frequency patterns.  (Pre-salt history is real-valued

@@ -35,6 +35,9 @@ function normalizeTreatment<T extends { status: string }>(treatment: T): T {
   return { ...treatment, status: fromBackendStatus(treatment.status) }
 }
 
+// The list endpoint's `le=` cap.
+const TREATMENTS_PAGE_SIZE = 100
+
 export function useTreatments() {
   const api = useApi()
   const toast = useToast()
@@ -83,15 +86,26 @@ export function useTreatments() {
   ): Promise<void> {
     loading.value = true
     try {
-      let url = `/api/v1/odontogram/patients/${patientId}/treatments`
       const params = new URLSearchParams()
       if (filters?.status) params.append('status', filters.status)
       if (filters?.tooth_number) params.append('tooth_number', String(filters.tooth_number))
       if (filters?.clinical_type) params.append('clinical_type', filters.clinical_type)
-      if (params.toString()) url += `?${params.toString()}`
+      params.set('page_size', String(TREATMENTS_PAGE_SIZE))
 
-      const response = await api.get<PaginatedResponse<Treatment>>(url)
-      treatments.value = response.data.map(normalizeTreatment)
+      // The chart draws every tooth from this list, so it must be complete:
+      // the endpoint pages (newest first, default 50), and a long-standing
+      // patient's oldest rows — the initial charting — would fall off the
+      // chart. Walk every page.
+      const rows: Treatment[] = []
+      for (let page = 1; ; page++) {
+        params.set('page', String(page))
+        const response = await api.get<PaginatedResponse<Treatment>>(
+          `/api/v1/odontogram/patients/${patientId}/treatments?${params.toString()}`
+        )
+        rows.push(...response.data)
+        if (response.data.length < TREATMENTS_PAGE_SIZE || rows.length >= response.total) break
+      }
+      treatments.value = rows.map(normalizeTreatment)
     } catch (err) {
       console.error('Error fetching treatments:', err)
     } finally {

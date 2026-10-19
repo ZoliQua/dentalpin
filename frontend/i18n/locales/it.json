@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Modifica",
+    "change": "Cambia",
     "cancel": "Annulla",
     "save": "Salva",
     "create": "Crea",
     "delete": "Elimina",
     "close": "Chiudi",
     "remove": "Rimuovi"
+  },
+  "attachments": {
+    "linkError": "Errore nel collegamento dell'allegato"
   },
   "patients": {
     "title": "Pazienti",
@@ -760,7 +764,8 @@
       "continuePlan": "Continua il piano \"{name}\"",
       "selectPlan": "Seleziona piano",
       "continue": "Continua",
-      "odontogramTab": "Odontogramma"
+      "odontogramTab": "Odontogramma",
+      "openNotes": "Apri le note"
     },
     "plans": {
       "title": "Piani di cura",
@@ -832,7 +837,11 @@
       "copyLink": "Copia link di registrazione",
       "openTitle": "Accettazione in clinica",
       "success": "Registrazione completata. Prego, si accomodi.",
-      "invalid": "Questo codice di registrazione non è valido o è scaduto. Chiedine uno nuovo alla reception."
+      "invalid": "Questo codice di registrazione non è valido o è scaduto. Chiedine uno nuovo alla reception.",
+      "confirm": "Sono qui",
+      "confirmHint": "Premi il pulsante per confermare il tuo arrivo.",
+      "tooEarly": "È ancora presto per registrarti. Il tuo appuntamento è alle {time}.",
+      "tooLate": "La registrazione per questo appuntamento è chiusa. Rivolgiti alla reception."
     },
     "create": "Nuovo appuntamento",
     "edit": "Modifica appuntamento",
@@ -870,14 +879,6 @@
       "cancelled": "Annullato",
       "no_show": "Assente"
     },
-    "scheduled": "Programmato",
-    "confirmed": "Confermato",
-    "inProgress": "In corso",
-    "in_progress": "In corso",
-    "completed": "Completato",
-    "cancelled": "Annullato",
-    "noShow": "Assente",
-    "no_show": "Assente",
     "transitions": {
       "confirmed": "Segna come confermato",
       "checked_in": "Registra l'arrivo",
@@ -1362,6 +1363,8 @@
     "retry": "Riprova",
     "refresh": "Aggiorna",
     "hide": "Nascondi",
+    "expand": "Espandi",
+    "collapse": "Comprimi",
     "forbidden": "Accesso negato",
     "confirm": "Conferma",
     "yes": "Sì",
@@ -1385,6 +1388,7 @@
     "deselectAll": "Nessuno",
     "all": "Tutti",
     "required": "Questo campo è obbligatorio",
+    "optional": "Facoltativo",
     "invalidEmail": "E-mail non valida",
     "networkError": "Errore di connessione",
     "serverError": "Errore del server",
@@ -2620,6 +2624,8 @@
         "bank_transfer": "Bonifico",
         "direct_debit": "Addebito diretto",
         "insurance": "Assicurazione",
+        "upi": "UPI",
+        "netbanking": "Internet banking",
         "other": "Altro"
       }
     },
@@ -3054,6 +3060,7 @@
     "uploadSuccess": "Documento caricato con successo",
     "uploadError": "Errore nel caricamento del documento",
     "downloadError": "Errore nello scaricamento del documento",
+    "viewError": "Errore nel caricamento del documento",
     "deleteSuccess": "Documento eliminato",
     "deleteError": "Errore nell'eliminazione del documento",
     "updateSuccess": "Documento aggiornato",
@@ -3091,6 +3098,9 @@
     "showingOf": "Mostrate {count} di {total}",
     "upload": "Carica foto",
     "uploadHelp": "Classifica perché compaia nella categoria corretta",
+    "fetchError": "Errore nel caricamento delle foto",
+    "uploadError": "Errore nel caricamento della foto",
+    "uploadSuccess": "Foto caricata con successo",
     "dropHere": "Trascina una foto qui o fai clic",
     "category": "Tipo",
     "subtype": "Vista",

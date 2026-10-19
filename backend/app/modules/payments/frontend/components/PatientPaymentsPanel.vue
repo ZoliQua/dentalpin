@@ -229,13 +229,7 @@ function openRefund(entry: PatientLedgerEntry) {
 
 function rowMenuItems(entry: PatientLedgerEntry) {
   if (entry.entry_type !== 'payment') return []
-  const items: DropdownMenuItem[] = [
-    {
-      label: t('payments.patientPanel.timeline.rowMenu.detail'),
-      icon: 'i-lucide-eye',
-      to: `/payments/${entry.reference_id}`
-    }
-  ]
+  const items: DropdownMenuItem[] = []
   if (canCollect.value) {
     items.push({
       label: t('payments.patientPanel.timeline.rowMenu.reallocate'),
@@ -468,7 +462,7 @@ function handleRefunded() {
                 {{ entryAmountSign(entry) }}
               </span>
               <UDropdownMenu
-                v-if="entry.entry_type === 'payment'"
+                v-if="rowMenuItems(entry).length"
                 :items="rowMenuItems(entry)"
               >
                 <UButton
@@ -476,7 +470,7 @@ function handleRefunded() {
                   color="neutral"
                   icon="i-lucide-more-vertical"
                   size="xs"
-                  :aria-label="t('payments.patientPanel.timeline.rowMenu.detail')"
+                  :aria-label="t('common.actions')"
                 />
               </UDropdownMenu>
             </div>

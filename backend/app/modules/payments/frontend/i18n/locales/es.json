@@ -218,7 +218,6 @@
           "in_progress": "En curso"
         },
         "rowMenu": {
-          "detail": "Ver detalle",
           "refund": "Reembolsar",
           "reallocate": "Asignar a presupuesto…"
         }

@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "திருத்து",
+    "change": "மாற்று",
     "cancel": "ரத்துசெய்",
     "save": "சேமி",
     "create": "உருவாக்கு",
     "delete": "நீக்கு",
     "close": "மூடு",
     "remove": "அகற்று"
+  },
+  "attachments": {
+    "linkError": "இணைப்பை இணைப்பதில் பிழை"
   },
   "patients": {
     "title": "நோயாளிகள்",
@@ -760,7 +764,8 @@
       "continuePlan": "\"{name}\" திட்டத்தைத் தொடரவும்",
       "selectPlan": "திட்டத்தைத் தேர்ந்தெடுக்கவும்",
       "continue": "தொடரவும்",
-      "odontogramTab": "பல் வரைபடம்"
+      "odontogramTab": "பல் வரைபடம்",
+      "openNotes": "குறிப்புகளைத் திற"
     },
     "plans": {
       "title": "சிகிச்சை திட்டங்கள்",
@@ -832,7 +837,11 @@
       "copyLink": "வருகை இணைப்பை நகலெடு",
       "openTitle": "கிளினிக் வருகைப் பதிவு",
       "success": "பதிவு முடிந்தது. அமரவும்.",
-      "invalid": "இந்த வருகைக் குறியீடு தவறானது அல்லது காலாவதியானது. வரவேற்பில் புதியது கேட்கவும்."
+      "invalid": "இந்த வருகைக் குறியீடு தவறானது அல்லது காலாவதியானது. வரவேற்பில் புதியது கேட்கவும்.",
+      "confirm": "I'm here",
+      "confirmHint": "Press the button to confirm your arrival.",
+      "tooEarly": "It's too early to check in. Your appointment is at {time}.",
+      "tooLate": "Check-in for this appointment is closed. Please ask at reception."
     },
     "create": "புதிய சந்திப்பு",
     "edit": "சந்திப்பைத் திருத்து",
@@ -869,14 +878,6 @@
       "cancelled": "ரத்துசெய்யப்பட்டது",
       "no_show": "வரவில்லை"
     },
-    "scheduled": "திட்டமிடப்பட்டது",
-    "confirmed": "உறுதிசெய்யப்பட்டது",
-    "inProgress": "நடைபெறுகிறது",
-    "in_progress": "நடைபெறுகிறது",
-    "completed": "முடிக்கப்பட்டது",
-    "cancelled": "ரத்துசெய்யப்பட்டது",
-    "noShow": "வரவில்லை",
-    "no_show": "வரவில்லை",
     "transitions": {
       "confirmed": "உறுதிசெய்யப்பட்டதாகக் குறிக்கவும்",
       "checked_in": "வருகையைக் குறிக்கவும்",
@@ -1362,6 +1363,8 @@
     "retry": "மீண்டும் முயற்சி",
     "refresh": "புதுப்பி",
     "hide": "மறை",
+    "expand": "விரிவாக்கு",
+    "collapse": "சுருக்கு",
     "forbidden": "அணுகல் மறுக்கப்பட்டது",
     "confirm": "உறுதிசெய்",
     "yes": "ஆம்",
@@ -1385,6 +1388,7 @@
     "deselectAll": "ஏதுமில்லை",
     "all": "அனைத்தும்",
     "required": "இந்தப் புலம் அவசியமானது",
+    "optional": "விருப்பமானது",
     "invalidEmail": "தவறான மின்னஞ்சல்",
     "networkError": "இணைப்புப் பிழை",
     "serverError": "சேவையக பிழை",
@@ -2620,6 +2624,8 @@
         "bank_transfer": "வங்கி பரிமாற்றம்",
         "direct_debit": "நேரடி வரம்பு பிடித்தம்",
         "insurance": "காப்பீடு",
+        "upi": "UPI",
+        "netbanking": "இணைய வங்கி",
         "other": "மற்றவை"
       }
     },
@@ -3054,6 +3060,7 @@
     "uploadSuccess": "ஆவணம் வெற்றிகரமாக பதிவேற்றப்பட்டது",
     "uploadError": "ஆவணத்தைப் பதிவேற்றுவதில் பிழை",
     "downloadError": "ஆவணத்தைப் பதிவிறக்குவதில் பிழை",
+    "viewError": "ஆவணத்தை ஏற்றுவதில் பிழை",
     "deleteSuccess": "ஆவணம் நீக்கப்பட்டது",
     "deleteError": "ஆவணத்தை நீக்குவதில் பிழை",
     "updateSuccess": "ஆவணம் புதுப்பிக்கப்பட்டது",
@@ -3091,6 +3098,9 @@
     "showingOf": "{total}-இல் {count} காட்டப்படுகிறது",
     "upload": "புகைப்படத்தைப் பதிவேற்று",
     "uploadHelp": "சரியான வகையில் தோன்ற வகைப்படுத்தவும்",
+    "fetchError": "புகைப்படங்களை ஏற்றுவதில் பிழை",
+    "uploadError": "புகைப்படத்தைப் பதிவேற்றுவதில் பிழை",
+    "uploadSuccess": "புகைப்படம் வெற்றிகரமாக பதிவேற்றப்பட்டது",
     "dropHere": "புகைப்படத்தை இங்கே இழுக்கவும் அல்லது கிளிக் செய்யவும்",
     "category": "வகை",
     "subtype": "பார்வை",

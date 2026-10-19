@@ -17,11 +17,11 @@ class ListSupplierRatingsArgs(BaseModel):
 
 
 class GetSupplierRatingArgs(BaseModel):
-    supplier_id: str = Field(description="UUID of the supplier contact")
+    supplier_id: UUID = Field(description="Id of the supplier contact")
 
 
 class CreateSupplierReviewArgs(BaseModel):
-    supplier_id: str = Field(description="UUID of the supplier contact")
+    supplier_id: UUID = Field(description="Id of the supplier contact")
     score: int = Field(ge=1, le=5, description="1-5 communication rating")
     comment: str | None = Field(default=None, description="Optional note")
 
@@ -71,9 +71,7 @@ async def _list_supplier_ratings(ctx: AgentContext, params: ListSupplierRatingsA
 
 
 async def _get_supplier_rating(ctx: AgentContext, params: GetSupplierRatingArgs) -> dict:
-    item, _ = await SupplierRatingsService.get_ratings(
-        ctx.db, ctx.clinic_id, UUID(params.supplier_id)
-    )
+    item, _ = await SupplierRatingsService.get_ratings(ctx.db, ctx.clinic_id, params.supplier_id)
     return _rating_summary(item)
 
 
@@ -85,7 +83,7 @@ async def _create_supplier_review(ctx: AgentContext, params: CreateSupplierRevie
         ctx.db,
         ctx.clinic_id,
         SupplierReviewCreate(
-            supplier_id=UUID(params.supplier_id), score=params.score, comment=params.comment
+            supplier_id=params.supplier_id, score=params.score, comment=params.comment
         ),
         created_by=None,
     )

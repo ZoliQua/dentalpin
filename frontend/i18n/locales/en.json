@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "Edit",
+    "change": "Change",
     "cancel": "Cancel",
     "save": "Save",
     "create": "Create",
     "delete": "Delete",
     "close": "Close",
     "remove": "Remove"
+  },
+  "attachments": {
+    "linkError": "Error linking attachment"
   },
   "patients": {
     "title": "Patients",
@@ -760,7 +764,8 @@
       "continuePlan": "Continue Plan \"{name}\"",
       "selectPlan": "Select plan",
       "continue": "Continue",
-      "odontogramTab": "Odontogram"
+      "odontogramTab": "Odontogram",
+      "openNotes": "Open notes"
     },
     "plans": {
       "title": "Treatment Plans",
@@ -832,7 +837,11 @@
       "copyLink": "Copy check-in link",
       "openTitle": "Clinic check-in",
       "success": "You are checked in. Please take a seat.",
-      "invalid": "This check-in code is invalid or expired. Please ask reception for a new one."
+      "invalid": "This check-in code is invalid or expired. Please ask reception for a new one.",
+      "confirm": "I'm here",
+      "confirmHint": "Press the button to confirm your arrival.",
+      "tooEarly": "It's too early to check in. Your appointment is at {time}.",
+      "tooLate": "Check-in for this appointment is closed. Please ask at reception."
     },
     "create": "New appointment",
     "edit": "Edit appointment",
@@ -869,14 +878,6 @@
       "cancelled": "Cancelled",
       "no_show": "No show"
     },
-    "scheduled": "Scheduled",
-    "confirmed": "Confirmed",
-    "inProgress": "In progress",
-    "in_progress": "In progress",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "noShow": "No show",
-    "no_show": "No show",
     "transitions": {
       "confirmed": "Mark as confirmed",
       "checked_in": "Mark arrival",
@@ -1362,6 +1363,8 @@
     "retry": "Retry",
     "refresh": "Refresh",
     "hide": "Hide",
+    "expand": "Expand",
+    "collapse": "Collapse",
     "forbidden": "Access denied",
     "confirm": "Confirm",
     "yes": "Yes",
@@ -1385,6 +1388,7 @@
     "deselectAll": "None",
     "all": "All",
     "required": "This field is required",
+    "optional": "Optional",
     "invalidEmail": "Invalid email",
     "networkError": "Connection error",
     "serverError": "Server error",
@@ -2620,6 +2624,8 @@
         "bank_transfer": "Bank transfer",
         "direct_debit": "Direct debit",
         "insurance": "Insurance",
+        "upi": "UPI",
+        "netbanking": "Net banking",
         "other": "Other"
       }
     },
@@ -3054,6 +3060,7 @@
     "uploadSuccess": "Document uploaded successfully",
     "uploadError": "Error uploading document",
     "downloadError": "Error downloading document",
+    "viewError": "Error loading document",
     "deleteSuccess": "Document deleted",
     "deleteError": "Error deleting document",
     "updateSuccess": "Document updated",
@@ -3091,6 +3098,9 @@
     "showingOf": "Showing {count} of {total}",
     "upload": "Upload photo",
     "uploadHelp": "Classify so it appears in the correct category",
+    "fetchError": "Error loading photos",
+    "uploadError": "Error uploading photo",
+    "uploadSuccess": "Photo uploaded successfully",
     "dropHere": "Drag a photo here or click",
     "category": "Type",
     "subtype": "View",

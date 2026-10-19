@@ -140,12 +140,16 @@
   },
   "actions": {
     "edit": "సవరించండి",
+    "change": "మార్చండి",
     "cancel": "రద్దు చేయండి",
     "save": "సేవ్ చేయండి",
     "create": "సృష్టించండి",
     "delete": "తొలగించు",
     "close": "మూసివేయండి",
     "remove": "తొలగించండి"
+  },
+  "attachments": {
+    "linkError": "అటాచ్‌మెంట్‌ను లింక్ చేయడంలో లోపం"
   },
   "patients": {
     "title": "రోగులు",
@@ -760,7 +764,8 @@
       "continuePlan": "\"{name}\" ప్రణాళికను కొనసాగించండి",
       "selectPlan": "ప్రణాళికను ఎంచుకోండి",
       "continue": "కొనసాగించండి",
-      "odontogramTab": "ఓడోంటోగ్రామ్"
+      "odontogramTab": "ఓడోంటోగ్రామ్",
+      "openNotes": "గమనికలు తెరవండి"
     },
     "plans": {
       "title": "చికిత్స ప్రణాళికలు",
@@ -832,7 +837,11 @@
       "copyLink": "చెక్-ఇన్ లింక్ కాపీ చేయండి",
       "openTitle": "క్లినిక్ చెక్-ఇన్",
       "success": "మీరు చెక్-ఇన్ అయ్యారు. దయచేసి కూర్చోండి.",
-      "invalid": "ఈ చెక్-ఇన్ కోడ్ చెల్లదు లేదా గడువు ముగిసింది. దయచేసి రిసెప్షన్‌లో కొత్తది అడగండి."
+      "invalid": "ఈ చెక్-ఇన్ కోడ్ చెల్లదు లేదా గడువు ముగిసింది. దయచేసి రిసెప్షన్‌లో కొత్తది అడగండి.",
+      "confirm": "I'm here",
+      "confirmHint": "Press the button to confirm your arrival.",
+      "tooEarly": "It's too early to check in. Your appointment is at {time}.",
+      "tooLate": "Check-in for this appointment is closed. Please ask at reception."
     },
     "create": "కొత్త అపాయింట్‌మెంట్",
     "edit": "అపాయింట్‌మెంట్ సవరించండి",
@@ -869,14 +878,6 @@
       "cancelled": "రద్దు చేయబడింది",
       "no_show": "రాలేదు"
     },
-    "scheduled": "షెడ్యూల్ అయింది",
-    "confirmed": "నిర్ధారించబడింది",
-    "inProgress": "పురోగతిలో",
-    "in_progress": "పురోగతిలో",
-    "completed": "పూర్తయింది",
-    "cancelled": "రద్దు చేయబడింది",
-    "noShow": "రాలేదు",
-    "no_show": "రాలేదు",
     "transitions": {
       "confirmed": "నిర్ధారించినట్లు గుర్తించండి",
       "checked_in": "రాకను నమోదు చేయండి",
@@ -1372,6 +1373,8 @@
     "retry": "మళ్ళీ ప్రయత్నించండి",
     "refresh": "రిఫ్రెష్ చేయండి",
     "hide": "దాచండి",
+    "expand": "విస్తరించండి",
+    "collapse": "కుదించండి",
     "forbidden": "యాక్సెస్ నిరాకరించబడింది",
     "confirm": "నిర్ధారించండి",
     "yes": "అవును",
@@ -1395,6 +1398,7 @@
     "deselectAll": "ఏదీ కాదు",
     "all": "అన్నీ",
     "required": "ఈ ఫీల్డ్ తప్పనిసరి",
+    "optional": "ఐచ్ఛికం",
     "invalidEmail": "చెల్లని ఈమెయిల్",
     "networkError": "కనెక్షన్ లోపం",
     "serverError": "సర్వర్ లోపం",
@@ -2630,6 +2634,8 @@
         "bank_transfer": "బ్యాంక్ బదిలీ",
         "direct_debit": "డైరెక్ట్ డెబిట్",
         "insurance": "బీమా",
+        "upi": "UPI",
+        "netbanking": "నెట్ బ్యాంకింగ్",
         "other": "ఇతర"
       }
     },
@@ -3064,6 +3070,7 @@
     "uploadSuccess": "పత్రం విజయవంతంగా అప్‌లోడ్ అయింది",
     "uploadError": "పత్రాన్ని అప్‌లోడ్ చేయడంలో లోపం",
     "downloadError": "పత్రాన్ని డౌన్‌లోడ్ చేయడంలో లోపం",
+    "viewError": "పత్రాన్ని లోడ్ చేయడంలో లోపం",
     "deleteSuccess": "పత్రం తొలగించబడింది",
     "deleteError": "పత్రాన్ని తొలగించడంలో లోపం",
     "updateSuccess": "పత్రం నవీకరించబడింది",
@@ -3101,6 +3108,9 @@
     "showingOf": "{total} లో {count} చూపిస్తోంది",
     "upload": "ఫోటో అప్‌లోడ్ చేయండి",
     "uploadHelp": "సరైన వర్గంలో కనిపించేలా వర్గీకరించండి",
+    "fetchError": "ఫోటోలను లోడ్ చేయడంలో లోపం",
+    "uploadError": "ఫోటోను అప్‌లోడ్ చేయడంలో లోపం",
+    "uploadSuccess": "ఫోటో విజయవంతంగా అప్‌లోడ్ అయింది",
     "dropHere": "ఫోటోను ఇక్కడ లాగండి లేదా క్లిక్ చేయండి",
     "category": "రకం",
     "subtype": "వీక్షణ",

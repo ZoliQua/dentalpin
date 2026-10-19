@@ -76,7 +76,7 @@ export function usePhotos() {
       console.error('Error fetching photos:', error)
       toast.add({
         title: t('common.error'),
-        description: t('photoGallery.fetchError', 'Error loading photos'),
+        description: t('photoGallery.fetchError'),
         color: 'error'
       })
     } finally {
@@ -109,7 +109,7 @@ export function usePhotos() {
       )
       toast.add({
         title: t('common.success'),
-        description: t('photoGallery.uploadSuccess', 'Photo uploaded'),
+        description: t('photoGallery.uploadSuccess'),
         color: 'success'
       })
       return response.data
@@ -117,7 +117,7 @@ export function usePhotos() {
       console.error('Error uploading photo:', error)
       toast.add({
         title: t('common.error'),
-        description: t('photoGallery.uploadError', 'Error uploading photo'),
+        description: t('photoGallery.uploadError'),
         color: 'error'
       })
       return null
