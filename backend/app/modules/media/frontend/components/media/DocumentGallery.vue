@@ -227,9 +227,9 @@ const totalPages = computed(() => Math.ceil(total.value / pageSize))
       class="flex justify-center"
     >
       <UPagination
-        v-model="page"
+        v-model:page="page"
         :total="total"
-        :page-count="pageSize"
+        :items-per-page="pageSize"
       />
     </div>
 
