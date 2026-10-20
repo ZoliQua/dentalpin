@@ -56,7 +56,7 @@ function pagePatterns(): RegExp[] {
   for (const root of layerRoots()) {
     const pagesDir = resolve(root, 'pages')
     for (const file of walk(pagesDir, /\.vue$/)) {
-      const segments = relative(pagesDir, file).replace(/\.vue$/, '').split('/')
+      const segments = relative(pagesDir, file).replace(/\.vue$/, '').split(/[\\/]/)
       if (segments.at(-1) === 'index') segments.pop()
       const body = segments
         .map((s) => {
