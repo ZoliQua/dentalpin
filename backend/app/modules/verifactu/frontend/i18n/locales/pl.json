@@ -240,6 +240,7 @@
       "subtitle": "Niezmienna historia rekordów wysłanych do AEAT.",
       "filterState": "Stan",
       "filterTipo": "Typ",
+      "all": "Wszystkie",
       "columns": {
         "createdAt": "Data",
         "tipoFactura": "Typ",

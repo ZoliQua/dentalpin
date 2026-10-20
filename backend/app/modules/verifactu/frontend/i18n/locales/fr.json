@@ -240,6 +240,7 @@
       "subtitle": "Historique immuable des enregistrements envoyés à l'AEAT.",
       "filterState": "État",
       "filterTipo": "Type",
+      "all": "Tous",
       "columns": {
         "createdAt": "Date",
         "tipoFactura": "Type",

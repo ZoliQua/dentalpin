@@ -4,8 +4,24 @@ const { listRecords } = useVerifactu()
 
 const page = ref(1)
 const pageSize = ref(50)
-const stateFilter = ref<string | undefined>(undefined)
-const tipoFilter = ref<string | undefined>(undefined)
+// Nuxt UI's USelect cannot model "no selection" as undefined (the item would
+// vanish and the filter could never clear, #471/#505): use an explicit "all"
+// sentinel and drop it before the API call.
+const stateFilter = ref<string>('all')
+const tipoFilter = ref<string>('all')
+const stateItems = computed(() => [
+  { label: t('verifactu.records.all'), value: 'all' },
+  { label: t('verifactu.recordState.accepted'), value: 'accepted' },
+  { label: t('verifactu.recordState.accepted_with_errors'), value: 'accepted_with_errors' },
+  { label: t('verifactu.recordState.rejected'), value: 'rejected' },
+  { label: t('verifactu.recordState.pending'), value: 'pending' }
+])
+const tipoItems = computed(() => [
+  { label: t('verifactu.records.all'), value: 'all' },
+  { label: 'F1', value: 'F1' },
+  { label: 'F2', value: 'F2' },
+  { label: 'R1', value: 'R1' }
+])
 const data = ref<Awaited<ReturnType<typeof listRecords>> | null>(null)
 const loading = ref(false)
 
@@ -15,15 +31,23 @@ async function refresh() {
     data.value = await listRecords({
       page: page.value,
       page_size: pageSize.value,
-      state: stateFilter.value,
-      tipo_factura: tipoFilter.value
+      state: stateFilter.value === 'all' ? undefined : stateFilter.value,
+      tipo_factura: tipoFilter.value === 'all' ? undefined : tipoFilter.value
     })
   } finally {
     loading.value = false
   }
 }
 
-watch([page, stateFilter, tipoFilter], refresh)
+function changePage(delta: number) {
+  page.value += delta
+  refresh()
+}
+
+watch([stateFilter, tipoFilter], () => {
+  page.value = 1
+  refresh()
+})
 onMounted(refresh)
 </script>
 
@@ -45,24 +69,13 @@ onMounted(refresh)
     <div class="flex flex-wrap gap-2">
       <USelect
         v-model="stateFilter"
-        :options="[
-          { label: '—', value: undefined },
-          { label: t('verifactu.recordState.accepted'), value: 'accepted' },
-          { label: t('verifactu.recordState.accepted_with_errors'), value: 'accepted_with_errors' },
-          { label: t('verifactu.recordState.rejected'), value: 'rejected' },
-          { label: t('verifactu.recordState.pending'), value: 'pending' }
-        ]"
+        :items="stateItems"
         :placeholder="t('verifactu.records.filterState')"
         class="min-w-[140px]"
       />
       <USelect
         v-model="tipoFilter"
-        :options="[
-          { label: '—', value: undefined },
-          { label: 'F1', value: 'F1' },
-          { label: 'F2', value: 'F2' },
-          { label: 'R1', value: 'R1' }
-        ]"
+        :items="tipoItems"
         :placeholder="t('verifactu.records.filterTipo')"
         class="min-w-[120px]"
       />
@@ -156,7 +169,7 @@ onMounted(refresh)
           :disabled="page <= 1"
           variant="soft"
           size="sm"
-          @click="page--"
+          @click="changePage(-1)"
         >
           ‹
         </UButton>
@@ -164,7 +177,7 @@ onMounted(refresh)
           :disabled="(data.page * data.page_size) >= data.total"
           variant="soft"
           size="sm"
-          @click="page++"
+          @click="changePage(1)"
         >
           ›
         </UButton>

@@ -32,24 +32,50 @@ related_permissions:
   - verifactu.environment.promote
 related_paths:
   - backend/app/modules/verifactu/frontend/pages/settings/verifactu/records.vue
-last_verified_commit: 0000000
+last_verified_commit: f3ef82cd
 ---
 
-# /settings/verifactu/records
+# Fiscal ledger
 
-> _Scaffolded stub — replace with proper documentation when this module is next touched._
+The immutable history of the records submitted to the AEAT. Every row is
+one chained record: changing or deleting an accepted record would break
+the hash chain, so this page is read-only.
 
-_Screen `/settings/verifactu/records` of the `verifactu` module._
+## How to use it
+
+1. Open **Settings > Verifactu > Fiscal ledger**.
+2. Narrow the list with the two filters:
+   - **State**: all, accepted, accepted with errors, rejected, or pending.
+   - **Type**: all, F1, F2, or R1.
+   Changing either filter reloads the list from the first page.
+3. Move between pages with the arrows at the bottom (50 records per
+   page). The total count is shown next to them.
+
+## What each column means
+
+| Column | Meaning |
+|--------|---------|
+| Date | When the record was created. |
+| Type | `F1` full invoice, `F2` simplified invoice, `R1` rectification. |
+| Number | Series and number of the invoice the record belongs to. |
+| Amount | Total amount sent to the AEAT. |
+| State | `accepted`, `accepted_with_errors`, `rejected`, or `pending`. |
+| AEAT CSV | The CSV code the AEAT returns once the record is accepted. |
 
 ## Permissions
 
-- `verifactu.settings.read`
-- `verifactu.settings.configure`
-- `verifactu.records.read`
-- `verifactu.queue.manage`
-- `verifactu.environment.promote`
+| What you see / can do | Permission |
+|-----------------------|------------|
+| View the ledger and use the filters | `verifactu.records.read` |
 
-## What this screen does
+## Troubleshooting
 
-_Documentation pending._
-
+- **The ledger is empty.** The module only writes a record when an
+  invoice is issued with Verifactu enabled. Check **Settings > Verifactu**
+  for the producer setup and the active environment.
+- **A filter returns no rows.** Accepted records only reach that state
+  after the AEAT confirms them; use **State: all** to see pending and
+  rejected records too.
+- **The menu entry is missing.** The module is optional: an admin must
+  install it from the module administration and grant
+  `verifactu.records.read`.
