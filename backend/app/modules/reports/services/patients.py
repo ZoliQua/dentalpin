@@ -14,6 +14,7 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.utils.dates import clinic_today_for
 from app.modules.agenda.models import Appointment
 from app.modules.patients.models import Patient
 
@@ -38,7 +39,7 @@ class PatientStatsService:
         unparseable groups under ``unknown`` rather than being guessed.
         Archived patients are left out, as everywhere else in the app.
         """
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
         rows = (
             await db.execute(
                 select(

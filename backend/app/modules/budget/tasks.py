@@ -20,6 +20,7 @@ from uuid import UUID
 from sqlalchemy import select, text
 
 from app.core.auth.models import Clinic
+from app.core.utils.dates import clinic_today
 from app.database import async_session_maker
 
 from .models import Budget
@@ -40,10 +41,10 @@ async def _list_clinics() -> list[UUID]:
     return [row.id for row in rows]
 
 
-async def _list_clinics_with_settings() -> list[tuple[UUID, dict]]:
+async def _list_clinics_with_settings() -> list[tuple[UUID, dict, str]]:
     async with async_session_maker() as db:
-        rows = (await db.execute(select(Clinic.id, Clinic.settings))).all()
-    return [(row.id, row.settings or {}) for row in rows]
+        rows = (await db.execute(select(Clinic.id, Clinic.settings, Clinic.timezone))).all()
+    return [(row.id, row.settings or {}, row.timezone) for row in rows]
 
 
 async def _expire_for_clinic(clinic_id: UUID, sem: asyncio.Semaphore) -> None:
@@ -129,14 +130,16 @@ async def send_budget_reminders() -> None:
     the notifications module subscribes and queues the patient message
     through its gateway (preferred channel + fallback, issue #287).
     """
-    today = date.today()
     clinics = await _list_clinics_with_settings()
-    enabled_clinic_ids = [
-        cid for cid, settings_json in clinics if settings_json.get("budget_reminders_enabled")
+    enabled = [
+        (cid, timezone)
+        for cid, settings_json, timezone in clinics
+        if settings_json.get("budget_reminders_enabled")
     ]
     sem = asyncio.Semaphore(_CLINIC_CONCURRENCY)
+    # Each clinic's own calendar: "7 days after sending" is a local date.
     await asyncio.gather(
-        *(_send_reminders_for_clinic(cid, today, sem) for cid in enabled_clinic_ids),
+        *(_send_reminders_for_clinic(cid, clinic_today(tz), sem) for cid, tz in enabled),
         return_exceptions=False,
     )
 
