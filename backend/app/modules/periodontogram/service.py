@@ -49,7 +49,7 @@ class PeriodontogramService:
                 PeriodontogramSnapshot.clinic_id == clinic_id,
                 PeriodontogramSnapshot.patient_id == patient_id,
             )
-            .order_by(PeriodontogramSnapshot.recorded_at.desc())
+            .order_by(PeriodontogramSnapshot.recorded_at.desc(), PeriodontogramSnapshot.id)
             .offset(offset)
             .limit(page_size)
         )

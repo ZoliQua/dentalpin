@@ -107,7 +107,7 @@ class LeadService:
         stmt = (
             select(Lead)
             .where(*conditions)
-            .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT))
+            .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT), Lead.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

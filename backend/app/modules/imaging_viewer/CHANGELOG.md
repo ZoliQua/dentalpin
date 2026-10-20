@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - fix(#679): `list_rvg_imports.status` is typed with a new
   `RvgImportStatus` Literal, so an unrecognized queue status is rejected by
   name instead of reporting an empty approval queue — which reads as

@@ -183,7 +183,7 @@ class AiJobService:
         stmt = select(AiJob).where(AiJob.clinic_id == clinic_id)
         if patient_id is not None:
             stmt = stmt.where(AiJob.patient_id == patient_id)
-        stmt = stmt.order_by(AiJob.created_at.desc())
+        stmt = stmt.order_by(AiJob.created_at.desc(), AiJob.id)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         page_size = min(max(page_size, 1), 100)
         offset = (max(page, 1) - 1) * page_size

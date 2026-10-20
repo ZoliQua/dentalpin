@@ -394,7 +394,7 @@ class BudgetService:
                 joinedload(Budget.creator),
                 joinedload(Budget.assigned_professional),
             )
-            .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT))
+            .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT), Budget.id)
             .offset(offset)
             .limit(page_size)
         )

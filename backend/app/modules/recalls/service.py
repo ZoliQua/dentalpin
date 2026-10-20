@@ -157,7 +157,7 @@ class RecallService:
             else_=3,
         )
         stmt = (
-            stmt.order_by(priority_order, Recall.due_month, Recall.created_at)
+            stmt.order_by(priority_order, Recall.due_month, Recall.created_at, Recall.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

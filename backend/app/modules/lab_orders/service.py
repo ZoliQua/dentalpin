@@ -122,7 +122,7 @@ class LabOrderService:
         rows = (
             (
                 await db.execute(
-                    stmt.order_by(LabOrder.sent_date.desc())
+                    stmt.order_by(LabOrder.sent_date.desc(), LabOrder.id)
                     .offset((page - 1) * page_size)
                     .limit(page_size)
                 )

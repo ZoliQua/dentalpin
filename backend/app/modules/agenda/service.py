@@ -252,7 +252,8 @@ class AppointmentService:
         ).scalar() or 0
 
         query = query.order_by(
-            Appointment.start_time.desc() if order == "desc" else Appointment.start_time
+            Appointment.start_time.desc() if order == "desc" else Appointment.start_time,
+            Appointment.id,
         )
         query = query.offset(offset).limit(page_size)
         result = await db.execute(query)

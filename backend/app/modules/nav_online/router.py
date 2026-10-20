@@ -132,7 +132,7 @@ async def list_records(
     rows = (
         (
             await db.execute(
-                stmt.order_by(NavOnlineRecord.created_at.desc())
+                stmt.order_by(NavOnlineRecord.created_at.desc(), NavOnlineRecord.id)
                 .offset((page - 1) * page_size)
                 .limit(page_size)
             )

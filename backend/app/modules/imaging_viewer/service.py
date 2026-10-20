@@ -288,7 +288,7 @@ class ImagingStudyService:
         )
         if not include_archived:
             stmt = stmt.where(ImagingStudy.status == "active")
-        stmt = stmt.order_by(ImagingStudy.created_at.desc())
+        stmt = stmt.order_by(ImagingStudy.created_at.desc(), ImagingStudy.id)
 
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
 
@@ -898,7 +898,7 @@ class RvgService:
         stmt = select(RvgImport).where(RvgImport.clinic_id == clinic_id)
         if status:
             stmt = stmt.where(RvgImport.status == status)
-        stmt = stmt.order_by(RvgImport.created_at.desc())
+        stmt = stmt.order_by(RvgImport.created_at.desc(), RvgImport.id)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         page_size = min(max(page_size, 1), 100)
         offset = (max(page, 1) - 1) * page_size

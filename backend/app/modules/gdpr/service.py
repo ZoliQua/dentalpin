@@ -102,7 +102,7 @@ class GdprService:
             stmt = stmt.where(GdprRequest.request_type == request_type)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(GdprRequest.received_at.desc())
+            stmt.order_by(GdprRequest.received_at.desc(), GdprRequest.id)
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )
@@ -521,7 +521,7 @@ class ErasureService:
         stmt = select(ErasureAuditLog).where(ErasureAuditLog.clinic_id == clinic_id)
         total = (await db.execute(select(func.count()).select_from(stmt.subquery()))).scalar_one()
         stmt = (
-            stmt.order_by(ErasureAuditLog.executed_at.desc())
+            stmt.order_by(ErasureAuditLog.executed_at.desc(), ErasureAuditLog.id)
             .offset((max(page, 1) - 1) * min(max(page_size, 1), 100))
             .limit(min(max(page_size, 1), 100))
         )
