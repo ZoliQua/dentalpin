@@ -119,7 +119,7 @@ class ImportJobService:
         rows = await db.execute(
             select(ImportJob)
             .where(ImportJob.clinic_id == clinic_id)
-            .order_by(ImportJob.created_at.desc())
+            .order_by(ImportJob.created_at.desc(), ImportJob.id)
             .offset(offset)
             .limit(page_size)
         )
@@ -873,7 +873,7 @@ class ImportJobService:
         rows = await db.execute(
             select(ImportWarning)
             .where(*conditions)
-            .order_by(ImportWarning.created_at.asc())
+            .order_by(ImportWarning.created_at.asc(), ImportWarning.id)
             .offset(offset)
             .limit(page_size)
         )

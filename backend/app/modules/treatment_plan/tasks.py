@@ -19,6 +19,7 @@ from uuid import UUID
 from sqlalchemy import select, text
 
 from app.core.auth.models import Clinic
+from app.core.utils.dates import clinic_today
 from app.database import async_session_maker
 
 logger = logging.getLogger(__name__)
@@ -95,7 +96,6 @@ async def auto_close_expired_plans() -> None:
     Idempotent — re-runs on a clinic with no eligible plans are no-ops.
     Errors per-plan are logged but do not poison the run.
     """
-    today = date.today()
     async with async_session_maker() as db:
         # ORM, not raw SQL: this used to be
         # ``text("SELECT id, settings FROM clinics WHERE deleted_at IS NULL")``
@@ -104,7 +104,7 @@ async def auto_close_expired_plans() -> None:
         # plan was ever auto-closed. A column that does not exist is a test
         # failure through the mapper; in a text() string it is a 03:00 log
         # line nobody reads.
-        clinic_rows = (await db.execute(select(Clinic.id, Clinic.settings))).all()
+        clinic_rows = (await db.execute(select(Clinic.id, Clinic.settings, Clinic.timezone))).all()
 
     sem = asyncio.Semaphore(_CLINIC_CONCURRENCY)
     tasks = []
@@ -114,6 +114,8 @@ async def auto_close_expired_plans() -> None:
             settings_json.get("plan_auto_close_days_after_expiry", DEFAULT_PLAN_AUTO_CLOSE_DAYS)
         )
         clinic_id: UUID = clinic_row.id
+        # Each clinic's own calendar decides when the threshold has passed.
+        today = clinic_today(clinic_row.timezone)
         tasks.append(_close_for_clinic(clinic_id, threshold_days, today, sem))
 
     await asyncio.gather(*tasks, return_exceptions=False)

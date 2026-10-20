@@ -403,6 +403,7 @@ class CatalogService:
             .order_by(
                 TreatmentCatalogItem.category_id,
                 TreatmentCatalogItem.internal_code,
+                TreatmentCatalogItem.id,
             )
             .offset(offset)
             .limit(page_size)

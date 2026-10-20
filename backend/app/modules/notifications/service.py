@@ -97,7 +97,7 @@ class NotificationService:
 
         # Get items
         query = select(NotificationTemplate).order_by(
-            NotificationTemplate.template_key, NotificationTemplate.locale
+            NotificationTemplate.template_key, NotificationTemplate.locale, NotificationTemplate.id
         )
         for condition in conditions:
             query = query.where(condition)
@@ -575,7 +575,9 @@ class NotificationService:
         total = total_result.scalar() or 0
 
         # Get items
-        query = select(CommunicationMessage).order_by(CommunicationMessage.created_at.desc())
+        query = select(CommunicationMessage).order_by(
+            CommunicationMessage.created_at.desc(), CommunicationMessage.id
+        )
         for condition in conditions:
             query = query.where(condition)
 

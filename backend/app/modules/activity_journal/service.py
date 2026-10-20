@@ -54,7 +54,7 @@ class ActivityJournalService:
         total = (await db.execute(count_stmt)).scalar_one()
 
         stmt = (
-            stmt.order_by(ActivityJournalEntry.occurred_at.desc())
+            stmt.order_by(ActivityJournalEntry.occurred_at.desc(), ActivityJournalEntry.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

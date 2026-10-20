@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - fix(#677): the `adjust_inventory_stock` / `get_stock_movements` tool
   parameter `item_id` is typed `UUID` instead of `str = Field(min_length=1)`,
   a constraint that admitted any non-empty string.

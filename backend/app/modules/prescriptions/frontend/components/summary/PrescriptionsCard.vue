@@ -5,6 +5,7 @@
  */
 import type { PatientExtended } from '~~/app/types'
 import type { Prescription } from '../../composables/usePrescriptions'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 interface Ctx {
   patient: PatientExtended
@@ -20,7 +21,7 @@ const isLoading = ref(false)
 
 function formatDate(iso: string | null): string {
   if (!iso) return ''
-  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(iso))
+  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(parseDateOnly(iso))
 }
 
 onMounted(async () => {

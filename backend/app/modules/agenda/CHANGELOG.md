@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - docs(#707): the router docstring still said cabinets gate on
   `admin.clinic.write` "until Etapa B.2 chunk 3" — they have gated on
   `agenda.cabinets.{read,write}` since that chunk landed. The permissions

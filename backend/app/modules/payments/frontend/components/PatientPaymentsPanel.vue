@@ -19,6 +19,7 @@ import type { TotalLine } from '~~/app/components/shared/EntityTotalsCard.vue'
 import type { SemanticRole } from '~~/app/config/severity'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import PendingChargesCard from './payments/PendingChargesCard.vue'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 interface PendingCharge {
   entry_id: string
@@ -155,7 +156,7 @@ function entryAmountSign(entry: PatientLedgerEntry): string {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(locale.value, {
+  return parseDateOnly(iso).toLocaleDateString(locale.value, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'

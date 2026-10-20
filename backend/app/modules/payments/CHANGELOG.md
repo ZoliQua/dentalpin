@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix: the patient ledger's row menu offered **View detail**, a link to
   `/payments/{id}` — a page no layer has, so it opened the 404 screen. The
   item and its `rowMenu.detail` key are gone; the trigger's aria-label is

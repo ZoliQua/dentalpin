@@ -276,7 +276,7 @@ class TreatmentPlanService:
                 ),
                 selectinload(TreatmentPlan.items).selectinload(PlannedTreatmentItem.sessions),
             )
-            .order_by(TreatmentPlan.created_at.desc())
+            .order_by(TreatmentPlan.created_at.desc(), TreatmentPlan.id)
             .offset(offset)
             .limit(page_size)
         )

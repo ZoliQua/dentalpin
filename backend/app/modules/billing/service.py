@@ -11,6 +11,7 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from app.core.i18n_names import catalog_name
 from app.core.list_query import parse_sort
+from app.core.utils.dates import clinic_today_for
 from app.modules.payments.models import Payment as PaymentModel
 from app.modules.payments.models import Refund as RefundModel
 
@@ -695,7 +696,7 @@ class InvoiceService:
             conditions.append(Invoice.due_date <= due_to)
 
         if overdue:
-            today = date.today()
+            today = await clinic_today_for(db, clinic_id)
             conditions.append(
                 and_(
                     Invoice.due_date < today,
@@ -766,7 +767,7 @@ class InvoiceService:
                 joinedload(Invoice.patient),
                 joinedload(Invoice.creator),
             )
-            .order_by(parse_sort(sort, _INVOICE_SORT_ALLOW, _INVOICE_SORT_DEFAULT))
+            .order_by(parse_sort(sort, _INVOICE_SORT_ALLOW, _INVOICE_SORT_DEFAULT), Invoice.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

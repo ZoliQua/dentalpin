@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PipelineRow, PipelineTab } from '../../composables/usePipeline'
 import type { UiColor } from '~~/app/config/severity'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   tab: PipelineTab
@@ -54,7 +55,7 @@ function patientName(row: PipelineRow): string {
 function formatDate(iso: string | null): string {
   if (!iso) return '—'
   try {
-    return new Date(iso).toLocaleDateString(locale.value, {
+    return parseDateOnly(iso).toLocaleDateString(locale.value, {
       day: '2-digit',
       month: 'short'
     })

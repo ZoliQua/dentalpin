@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.dependencies import ClinicContext, get_clinic_context, require_permission
 from app.core.schemas import ApiResponse, PaginatedApiResponse
+from app.core.utils.dates import clinic_today
 from app.database import get_db
 
 from .schemas import (
@@ -755,7 +756,6 @@ async def generate_budget_from_plan(
         )
 
     # Create budget via budget service
-    from datetime import date
 
     budget = await BudgetService.create_budget(
         db,
@@ -763,7 +763,7 @@ async def generate_budget_from_plan(
         ctx.user_id,
         {
             "patient_id": plan.patient_id,
-            "valid_from": date.today(),
+            "valid_from": clinic_today(ctx.clinic.timezone),
             "items": budget_items,
             "internal_notes": f"Generated from treatment plan {plan.plan_number}",
         },

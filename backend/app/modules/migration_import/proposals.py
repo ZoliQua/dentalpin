@@ -157,7 +157,9 @@ class ProposalsService:
         result = await db.execute(
             select(MappingDecision)
             .where(*base_filters)
-            .order_by(MappingDecision.operator_action, MappingDecision.source_label)
+            .order_by(
+                MappingDecision.operator_action, MappingDecision.source_label, MappingDecision.id
+            )
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

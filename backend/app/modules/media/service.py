@@ -73,7 +73,7 @@ class DocumentService:
             select(Document)
             .where(*conditions)
             .options(selectinload(Document.uploader))
-            .order_by(Document.created_at.desc())
+            .order_by(Document.created_at.desc(), Document.id)
             .offset(offset)
             .limit(page_size)
         )
@@ -340,6 +340,7 @@ class PhotoService:
             .order_by(
                 func.coalesce(Document.captured_at, Document.created_at).desc(),
                 Document.created_at.desc(),
+                Document.id,
             )
             .offset(offset)
             .limit(page_size)

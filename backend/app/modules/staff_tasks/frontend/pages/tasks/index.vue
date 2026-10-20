@@ -6,7 +6,7 @@ import {
   type TaskPriority,
   type TaskStatus
 } from '../../composables/useStaffTasks'
-import { toISODate } from '~~/app/utils/wallClock'
+import { parseDateOnly, toISODate } from '~~/app/utils/wallClock'
 
 definePageMeta({ middleware: ['auth'] })
 
@@ -91,7 +91,7 @@ function statusItems(current: TaskStatus) {
 }
 
 function formatDate(iso: string | null | undefined): string {
-  return iso ? new Date(iso).toLocaleDateString(locale.value) : '—'
+  return iso ? parseDateOnly(iso).toLocaleDateString(locale.value) : '—'
 }
 
 function isOverdue(task: StaffTask): boolean {

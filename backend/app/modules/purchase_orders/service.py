@@ -132,7 +132,7 @@ class PurchaseOrderService:
         rows = (
             (
                 await db.execute(
-                    stmt.order_by(PurchaseOrder.created_at.desc())
+                    stmt.order_by(PurchaseOrder.created_at.desc(), PurchaseOrder.id)
                     .offset((page - 1) * page_size)
                     .limit(page_size)
                 )

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#705): the printed prescription date rendered `issued_at` (a
   `timestamptz`, so UTC) without converting, so a prescription issued
   after midnight clinic-local carried the previous day's date; the

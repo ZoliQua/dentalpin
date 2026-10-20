@@ -114,7 +114,7 @@ class SupplierService:
                 | Contact.email.ilike(search_str)
             )
 
-        stmt = stmt.order_by(Contact.name.asc())
+        stmt = stmt.order_by(Contact.name.asc(), Contact.id)
 
         # Total count
         total_stmt = select(func.count()).select_from(stmt.subquery())

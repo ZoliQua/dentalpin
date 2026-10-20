@@ -87,7 +87,7 @@ class ExpenseService:
         total = (await db.execute(count_stmt)).scalar_one()
 
         stmt = (
-            stmt.order_by(Expense.expense_date.desc())
+            stmt.order_by(Expense.expense_date.desc(), Expense.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

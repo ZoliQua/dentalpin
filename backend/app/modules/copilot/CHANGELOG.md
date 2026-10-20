@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+- feat(#332): Ollama LLM provider adapter (self-hosted, local, no API key)
+  over its OpenAI-compatible endpoint. `OLLAMA_SPEC` declares
+  `needs_api_key=False`, a nullable `api_key_setting` and a new
+  `base_url_setting` (`OLLAMA_BASE_URL`, default `http://ollama:11434`,
+  `/v1` appended by the adapter) the factory now threads into
+  `ProviderConfig`. `COPILOT_MODEL_CHAT_OLLAMA` default `llama3.1:8b`;
+  spec registered from `on_activate`. No bridge, settings or UI change.
+  The mandatory PHI redactor still runs upstream (the local-tier
+  redaction relaxation from the #332 brief stays deferred), and save-time
+  validation stays key-only: Ollama is not probed for reachability or
+  model tool support (the brief's tool-use-incapable 422 stays deferred
+  too). The endpoint is deployment-level (`OLLAMA_BASE_URL`), not
+  per-clinic (the brief's per-clinic `base_url` stays deferred). Since the
+  endpoint is the only one that can be dropped rather than unkeyed, the
+  adapter wraps its stream and re-raises a connection failure as an
+  `LLMConfigError` naming `OLLAMA_BASE_URL` (the setting) and the dialed
+  URL, reporting a stall (`APITimeoutError`, the subclass) as a timeout
+  rather than an unreachable host, instead of the SDK's bare
+  `Connection error.`
+
 - fix(#701): `SettingsUpdate.model` (100) and `provider` (20) are capped
   at their column lengths. `provider` was already rejected by the
   provider registry with a 400; `model` is free text and a long one hit

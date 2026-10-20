@@ -327,7 +327,7 @@ class OdontogramService:
         total = len(count_result.scalars().all())
         result = await db.execute(
             base.options(selectinload(OdontogramHistory.user))
-            .order_by(OdontogramHistory.changed_at.desc())
+            .order_by(OdontogramHistory.changed_at.desc(), OdontogramHistory.id)
             .offset(offset)
             .limit(page_size)
         )
@@ -350,7 +350,7 @@ class OdontogramService:
         total = len(count_result.scalars().all())
         result = await db.execute(
             base.options(selectinload(OdontogramHistory.user))
-            .order_by(OdontogramHistory.changed_at.desc())
+            .order_by(OdontogramHistory.changed_at.desc(), OdontogramHistory.id)
             .offset(offset)
             .limit(page_size)
         )
@@ -538,7 +538,7 @@ class TreatmentService:
 
         result = await db.execute(
             base.where(*conditions)
-            .order_by(Treatment.recorded_at.desc())
+            .order_by(Treatment.recorded_at.desc(), Treatment.id)
             .offset(offset)
             .limit(page_size)
         )

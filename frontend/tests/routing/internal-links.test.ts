@@ -56,6 +56,8 @@ function pagePatterns(): RegExp[] {
   for (const root of layerRoots()) {
     const pagesDir = resolve(root, 'pages')
     for (const file of walk(pagesDir, /\.vue$/)) {
+      // `relative` yields the platform separator; split on both so the
+      // scan also resolves pages on Windows (`\`) as it does on CI (`/`).
       const segments = relative(pagesDir, file).replace(/\.vue$/, '').split(/[\\/]/)
       if (segments.at(-1) === 'index') segments.pop()
       const body = segments

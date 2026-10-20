@@ -11,6 +11,7 @@ from sqlalchemy import delete, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.events import EventType, event_bus
+from app.core.utils.dates import clinic_today_for
 
 from .models import Budget, BudgetAccessLog, BudgetSignature
 from .pricing import allocate_global_discount, net_line_amount
@@ -485,9 +486,7 @@ class BudgetWorkflowService:
         treatment_plan module can keep its pending plans visible with a
         "presupuesto caducado" badge until the auto-close cron kicks in.
         """
-        from datetime import date
-
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
 
         # Find draft or sent budgets past their valid_until date
         result = await db.execute(
