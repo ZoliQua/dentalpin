@@ -960,8 +960,8 @@ Si no existe esta distinción, añadir campo `is_diagnosis: bool` al modelo.
 Nota: este árbol refleja el plan original. El código vive hoy en los layers de
 `odontogram` (`ClinicalModeToggle`, `HistoryMode`, `DiagnosisMode`,
 `DiagnosisCTA`) y `treatment_plan` (`PlansMode`, `PlanDetailView`,
-`PlanTreatmentList`); las rutas `**Path:**` de las secciones 2.1-2.4 y 2.6-2.9
-también son históricas. Ver §2.5 para la ruta exacta de `DiagnosisCTA`.
+`PlanTreatmentList`); las rutas `**Path:**` de las secciones 2.1-2.4, 2.6-2.8 y
+3.1 también son históricas. Ver §2.5 para la ruta exacta de `DiagnosisCTA`.
 
 ```
 frontend/app/components/clinical/
