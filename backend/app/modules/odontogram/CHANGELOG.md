@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix: the "Continue plan" dropdown on the diagnosis banner rendered empty.
+  `DiagnosisCTA` bound the Nuxt UI v3 `options` / `option-attribute` /
+  `value-attribute` props, which v4 ignores, so with two or more drafts the
+  select had no items and no plan could be continued. It now uses `items`
+  with `value-key` / `label-key`, and a host test scans the odontogram layer
+  for the ignored props.
 - fix: the chart showed at most 50 treatments per patient. `fetchTreatments`
   sent no `page_size`, so the list endpoint's default (50, newest first)
   applied and a long-standing patient's oldest rows — the initial charting —
