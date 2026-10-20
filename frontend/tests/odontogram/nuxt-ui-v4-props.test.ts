@@ -18,7 +18,7 @@ const MODULES_ROOT = existsSync('/module_layers')
   : resolve(__dirname, '../../../backend/app/modules')
 const LAYER = resolve(MODULES_ROOT, 'odontogram/frontend')
 
-const LEGACY_PROP = /(?:^|\s)(?::options|option-attribute|value-attribute)\s*=/
+const LEGACY_PROP = /(?:^|\s):?(?:options|option-attribute|value-attribute)\s*=/
 const OPEN_TAG = /<(USelect|USelectMenu)\b/g
 
 function walk(dir: string, out: string[] = []): string[] {
@@ -30,6 +30,11 @@ function walk(dir: string, out: string[] = []): string[] {
     else if (entry.name.endsWith('.vue')) out.push(path)
   }
   return out
+}
+
+/** Comments are not live tags; a commented-out snippet must not turn the scan red. */
+function stripComments(source: string): string {
+  return source.replace(/<!--[\s\S]*?-->/g, '')
 }
 
 /** Opening tags, quote-aware so `>` inside `=>` does not end the tag early. */
@@ -66,19 +71,32 @@ describe('odontogram select components use the Nuxt UI v4 API', () => {
     expect(files.some(file => file.endsWith('DiagnosisCTA.vue'))).toBe(true)
   })
 
-  it('detects the props it forbids', () => {
-    expect(selectTags('<USelectMenu :options="draftOptions" />')).toHaveLength(1)
-    expect(selectTags('<USelect :options="items" />').filter(tag => LEGACY_PROP.test(tag))).toHaveLength(1)
+  it('detects every forbidden prop spelling', () => {
+    for (const spelling of ['options', ':options', 'option-attribute', ':option-attribute', 'value-attribute', ':value-attribute']) {
+      const tag = `<USelectMenu ${spelling}="x" />`
+      expect(selectTags(tag).filter(t => LEGACY_PROP.test(t)), spelling).toHaveLength(1)
+    }
     expect(
-      selectTags('<USelectMenu :items="items" @update:model-value="v => set(v)" />')
+      selectTags('<USelectMenu :items="items" value-key="value" label-key="label" @update:model-value="v => set(v)" />')
         .filter(tag => LEGACY_PROP.test(tag))
     ).toHaveLength(0)
+  })
+
+  it('ignores commented-out tags', () => {
+    expect(selectTags(stripComments('<!-- <USelectMenu :options="x" /> -->')).filter(tag => LEGACY_PROP.test(tag))).toHaveLength(0)
+  })
+
+  it('keeps the draft selector bound to the plan id', () => {
+    const source = stripComments(readFileSync(resolve(LAYER, 'components/clinical/DiagnosisCTA.vue'), 'utf-8'))
+    const tag = selectTags(source).find(t => t.includes('items="draftOptions"'))
+    expect(tag).toBeDefined()
+    expect(tag).toContain('value-key="value"')
   })
 
   it('uses items instead of the ignored v3 props', () => {
     const offenders: string[] = []
     for (const file of files) {
-      for (const tag of selectTags(readFileSync(file, 'utf-8'))) {
+      for (const tag of selectTags(stripComments(readFileSync(file, 'utf-8')))) {
         if (LEGACY_PROP.test(tag)) {
           offenders.push(`${file}: ${tag.replace(/\s+/g, ' ').slice(0, 100)}`)
         }

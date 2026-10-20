@@ -957,6 +957,11 @@ Si no existe esta distinción, añadir campo `is_diagnosis: bool` al modelo.
 
 ## Archivos a Crear (9 componentes)
 
+Nota: este árbol refleja el plan original. El código vive hoy en los layers de
+`odontogram` (`ClinicalModeToggle`, `HistoryMode`, `DiagnosisMode`,
+`DiagnosisCTA`) y `treatment_plan` (`PlansMode`, `PlanDetailView`,
+`PlanTreatmentList`); ver §2.5 para la ruta exacta de `DiagnosisCTA`.
+
 ```
 frontend/app/components/clinical/
 ├── ClinicalModeToggle.vue
