@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#718): the `overdue` filter, the suggested due month and the dashboard
+  month/week windows use the clinic's calendar date instead of the server's.
 - docs(#711): the events doc said the module publishes nothing; it
   publishes `recall.created` (read by activity_journal and
   recall_reminders), `snoozed`, `cancelled` and `completed`.

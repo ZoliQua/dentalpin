@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#718): the `overdue` invoice filter compared due dates with the server's
+  date (UTC); it now uses the clinic's calendar (`clinic_today_for`).
 - fix: issuing without an explicit date stamped the **server's** date (UTC)
   on the invoice — tomorrow's date for a UTC-6 clinic from 18:00 local,
   yesterday's for a UTC+2 clinic until 02:00. The issue route now passes the

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from app.core.auth.models import User
+from app.core.utils.dates import clinic_today_for
 from app.modules.billing.models import Invoice, InvoiceItem, InvoicePayment, InvoiceSeries
 from app.modules.budget.models import Budget, BudgetItem
 from app.modules.catalog.models import VatType
@@ -271,7 +272,7 @@ class BillingReportService:
 
         # Count overdue invoices. ``status in (issued, partial)`` implies
         # balance > 0 — fully paid invoices transition to ``paid``.
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
         result = await db.execute(
             select(func.count(Invoice.id)).where(
                 Invoice.clinic_id == clinic_id,
@@ -362,7 +363,7 @@ class BillingReportService:
         cover the action board; callers that need the full list should
         paginate (no usage today, surface added when needed).
         """
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
 
         result = await db.execute(
             select(Invoice)

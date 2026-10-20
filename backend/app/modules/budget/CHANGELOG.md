@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#718): "today" is the clinic's calendar date, not the server's (UTC):
+  the `expired` list filter, the expiry check, `valid_from` on plan-generated
+  and duplicated quotes, and the reminder cron's milestone dates (now
+  computed per clinic).
 - fix(#705): the quote PDF footer printed `00:00` on every document —
   `date.today().strftime("%d/%m/%Y %H:%M")`, the same line #204 fixed in
   `billing/pdf.py` — and the signed-quote audit line rendered
