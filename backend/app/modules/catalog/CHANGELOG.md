@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#736): a deleted treatment frees its internal code. `uq_catalog_item_clinic_code` is now a partial unique index over live rows (`cat_0005`); creating or renaming an item to a deleted item's code used to pass the duplicate check and 500 on the constraint.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix(#701): `Category{Create,Update}.icon` is capped at the column
