@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#732): the settings error alert's close button did nothing. It listened for `@close`, which Nuxt UI v4 `UAlert` never emits; it now handles `@update:open`.
+
 - fix: the fiscal-ledger filters work again. Both `USelect`s bound `:options` (a Nuxt UI v3 prop that v4 ignores) and modelled "no filter" as `undefined`, so the dropdowns rendered empty and every change was a no-op; they now use `:items` with an explicit `all` sentinel mapped to no query parameter, and a filter change resets pagination to page 1. The `records.all` label ships in all ten locales.
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
