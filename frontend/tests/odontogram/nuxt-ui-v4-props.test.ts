@@ -9,8 +9,8 @@ import { resolve } from 'node:path'
  * select bound with them renders empty and its filters never change - and
  * vue-tsc cannot see it because unknown props still type-check.
  *
- * Static scan of the odontogram layer. `SegmentedControl` and `SortMenu` keep
- * their own `options` prop; only the USelect family is checked.
+ * Static scan of the odontogram layer. `SegmentedControl` keeps its own
+ * `options` prop; only the USelect family is checked.
  */
 
 const MODULES_ROOT = existsSync('/module_layers')
@@ -90,7 +90,9 @@ describe('odontogram select components use the Nuxt UI v4 API', () => {
     const source = stripComments(readFileSync(resolve(LAYER, 'components/clinical/DiagnosisCTA.vue'), 'utf-8'))
     const tag = selectTags(source).find(t => t.includes('items="draftOptions"'))
     expect(tag).toBeDefined()
+    expect(tag).toContain('v-model="selectedDraftId"')
     expect(tag).toContain('value-key="value"')
+    expect(source).toContain('value: plan.id')
   })
 
   it('uses items instead of the ignored v3 props', () => {
