@@ -2,6 +2,7 @@
 import type { ToothTreatmentView, TreatmentStatus } from '~~/app/types'
 import { getTreatmentColor } from '~~/app/config/odontogramConstants'
 import { getTreatmentDisplayName } from '~~/app/utils/treatmentView'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   toothNumber: number
@@ -67,7 +68,7 @@ function _getStatusColor(status: TreatmentStatus): string {
 }
 
 function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString()
+  return parseDateOnly(dateString).toLocaleDateString()
 }
 
 function handleEditClick(event: Event, treatment: ToothTreatmentView) {

@@ -13,6 +13,13 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **Dates showed one day early in the Americas.** `new Date('2026-10-20')`
+  is UTC midnight per spec, so in any zone behind UTC every date-only field
+  (invoice and due dates, quote validity, payment dates, dates of birth, a
+  recall's due month) rendered as the previous day — a November recall
+  read as October in Mexico City. The host now exports `parseDateOnly`
+  (`frontend/app/utils/wallClock.ts`, promoted from the payments report),
+  and the date formatters in 13 modules go through it.
 - **Two backend vocabularies reached the UI with no label** (#695). The
   patient file's appointment list rendered `appointments.checked_in` /
   `appointments.in_treatment` in the status badge, because it read a stale
@@ -56,6 +63,14 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Added
 
+- **Copilot: Ollama LLM provider adapter** (self-hosted, local, no API
+  key) over its OpenAI-compatible endpoint. `OLLAMA_SPEC` needs no key
+  and reads its endpoint from a new `base_url_setting`
+  (`OLLAMA_BASE_URL`, default `http://ollama:11434`); the factory threads
+  it into `ProviderConfig`. Per-clinic selection; dev, prod and Coolify
+  compose forward the setting, and an unreachable host raises an
+  `LLMConfigError` naming `OLLAMA_BASE_URL` instead of the SDK's bare
+  `Connection error.`. No bridge, settings or UI change (#332).
 - **Copilot: OpenRouter + Groq LLM provider adapters** over their
   OpenAI-compatible endpoints (same subclass shape as Gemini;
   `OPENROUTER_API_KEY` / `GROQ_API_KEY` + per-clinic selection, specs

@@ -18,6 +18,7 @@
  */
 import { computed, ref } from 'vue'
 import type { PerioIndices, PerioSnapshotSummary } from '../types'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   indices: PerioIndices | null
@@ -48,7 +49,7 @@ const saveState = computed<'saving' | 'dirty' | 'saved'>(() => {
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return ''
   try {
-    return new Date(iso).toLocaleDateString(locale.value, {
+    return parseDateOnly(iso).toLocaleDateString(locale.value, {
       day: '2-digit',
       month: 'short',
       year: 'numeric'

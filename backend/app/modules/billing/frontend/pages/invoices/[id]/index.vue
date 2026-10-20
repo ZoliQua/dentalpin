@@ -7,6 +7,7 @@ import type { EntityChip } from '~~/app/components/shared/EntityStatusChips.vue'
 import type { EntityAction } from '~~/app/components/shared/EntityActionBar.vue'
 import type { TotalLine } from '~~/app/components/shared/EntityTotalsCard.vue'
 import type { InfoItem } from '~~/app/components/shared/EntityInfoCard.vue'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const route = useRoute()
 const router = useRouter()
@@ -115,7 +116,7 @@ onMounted(async () => {
 // Format date
 function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString(locale.value)
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value)
 }
 
 // Days overdue (positive when due_date is past). Only meaningful for
@@ -124,7 +125,7 @@ const daysOverdue = computed<number | null>(() => {
   const inv = currentInvoice.value
   if (!inv?.due_date) return null
   if (!['issued', 'partial'].includes(inv.status)) return null
-  const due = new Date(inv.due_date)
+  const due = parseDateOnly(inv.due_date)
   const now = new Date()
   const diff = Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
   return diff > 0 ? diff : null

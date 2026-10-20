@@ -91,7 +91,7 @@ class DocumentService:
         count_query = select(func.count()).select_from(query.subquery())
         total = (await db.execute(count_query)).scalar_one()
 
-        query = query.order_by(GeneratedDocument.created_at.desc())
+        query = query.order_by(GeneratedDocument.created_at.desc(), GeneratedDocument.id)
         query = query.offset((page - 1) * page_size).limit(page_size)
         items = (await db.execute(query)).scalars().all()
         return list(items), total

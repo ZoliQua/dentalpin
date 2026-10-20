@@ -90,7 +90,9 @@ class InventoryService:
         total = (await db.execute(count_stmt)).scalar_one()
 
         stmt = (
-            stmt.order_by(InventoryItem.name.asc()).offset((page - 1) * page_size).limit(page_size)
+            stmt.order_by(InventoryItem.name.asc(), InventoryItem.id)
+            .offset((page - 1) * page_size)
+            .limit(page_size)
         )
         rows = (await db.execute(stmt)).scalars().all()
         return list(rows), total

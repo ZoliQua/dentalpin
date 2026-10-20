@@ -51,7 +51,7 @@ class MedicationCatalogService:
         total = (await db.execute(count_stmt)).scalar_one()
 
         stmt = (
-            stmt.order_by(MedicationCatalogItem.name.asc())
+            stmt.order_by(MedicationCatalogItem.name.asc(), MedicationCatalogItem.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

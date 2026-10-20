@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#677): the `update_staff_task_status` tool parameter `task_id` is
   typed `UUID` instead of `str = Field(min_length=1)`, a constraint that
   admitted any non-empty string.

@@ -215,7 +215,7 @@ async def list_documents(
     rows = (
         (
             await db.execute(
-                base.order_by(SistemaTsDocument.created_at.desc())
+                base.order_by(SistemaTsDocument.created_at.desc(), SistemaTsDocument.id)
                 .offset((page - 1) * page_size)
                 .limit(page_size)
             )

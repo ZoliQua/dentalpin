@@ -18,6 +18,7 @@ import type { AdministrationMode } from './AdministrationModeToggle.vue'
 import type { BudgetListItem, PaginatedResponse, PatientExtended } from '~~/app/types'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { useModuleSlots } from '~~/app/composables/useModuleSlots'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 interface Props {
   patientId: string
@@ -118,7 +119,7 @@ watch(availableModes, (modes) => {
 
 // Format date
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(locale.value, {
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'

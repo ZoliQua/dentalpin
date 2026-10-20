@@ -8,7 +8,13 @@ number) must ask the clinic's clock instead.
 """
 
 from datetime import date, datetime
+from uuid import UUID
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.auth.models import Clinic
 
 
 def clinic_today(timezone: str | None) -> date:
@@ -18,3 +24,9 @@ def clinic_today(timezone: str | None) -> date:
     except (ZoneInfoNotFoundError, ValueError):
         tz = ZoneInfo("UTC")
     return datetime.now(tz).date()
+
+
+async def clinic_today_for(db: AsyncSession, clinic_id: UUID) -> date:
+    """``clinic_today`` for a clinic known only by id (one indexed read)."""
+    timezone = await db.scalar(select(Clinic.timezone).where(Clinic.id == clinic_id))
+    return clinic_today(timezone)

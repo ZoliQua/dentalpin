@@ -242,7 +242,7 @@ class PatientService:
                 select(Patient)
                 .outerjoin(last_visit_sq, last_visit_sq.c.patient_id == Patient.id)
                 .where(*conditions)
-                .order_by(order_clause, Patient.last_name, Patient.first_name)
+                .order_by(order_clause, Patient.last_name, Patient.first_name, Patient.id)
                 .offset(offset)
                 .limit(page_size)
             )
@@ -250,7 +250,9 @@ class PatientService:
             query = (
                 select(Patient)
                 .where(*conditions)
-                .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT), Patient.first_name)
+                .order_by(
+                    parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT), Patient.first_name, Patient.id
+                )
                 .offset(offset)
                 .limit(page_size)
             )

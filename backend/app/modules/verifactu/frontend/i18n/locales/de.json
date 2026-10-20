@@ -240,6 +240,7 @@
       "subtitle": "Unveränderlicher Verlauf der an die AEAT übermittelten Datensätze.",
       "filterState": "Status",
       "filterTipo": "Typ",
+      "all": "Alle",
       "columns": {
         "createdAt": "Datum",
         "tipoFactura": "Typ",

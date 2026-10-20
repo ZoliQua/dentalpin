@@ -16,6 +16,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.events import EventType, event_bus
+from app.core.utils.dates import clinic_today_for
 from app.modules.agenda.models import Appointment
 from app.modules.patients.models import Patient
 from app.modules.recalls.service import RecallService
@@ -273,7 +274,7 @@ class OrthoCaseService:
     async def list_overdue(db: AsyncSession, clinic_id: UUID) -> list[tuple[OrthoCase, dict]]:
         """Active/paused cases whose latest next-due date is past."""
         rows = await OrthoCaseService.list_active(db, clinic_id)
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
         return [
             (case, annotation)
             for case, annotation in rows

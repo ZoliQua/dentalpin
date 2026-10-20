@@ -2,6 +2,8 @@
 
 ## Unreleased — phase 2
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 - Nuxt layer: Settings → Billing pages "Sistema Tessera Sanitaria"
   (credentials, certificate upload, identity, year overview with the
