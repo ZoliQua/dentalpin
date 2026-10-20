@@ -13,6 +13,13 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **Dates showed one day early in the Americas.** `new Date('2026-10-20')`
+  is UTC midnight per spec, so in any zone behind UTC every date-only field
+  (invoice and due dates, quote validity, payment dates, dates of birth, a
+  recall's due month) rendered as the previous day — a November recall
+  read as October in Mexico City. The host now exports `parseDateOnly`
+  (`frontend/app/utils/wallClock.ts`, promoted from the payments report),
+  and the date formatters in 13 modules go through it.
 - **Two backend vocabularies reached the UI with no label** (#695). The
   patient file's appointment list rendered `appointments.checked_in` /
   `appointments.in_treatment` in the status badge, because it read a stale

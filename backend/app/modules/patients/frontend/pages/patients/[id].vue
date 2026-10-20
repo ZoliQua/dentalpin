@@ -18,6 +18,7 @@
 import type { PatientExtended, ApiResponse } from '~~/app/types'
 import { errorMessage } from '~~/app/utils/error'
 import { PERMISSIONS } from '~~/app/config/permissions'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -230,7 +231,7 @@ async function archivePatient() {
 const isMinor = computed(() => {
   if (!patient.value?.date_of_birth) return false
   const today = new Date()
-  const birth = new Date(patient.value.date_of_birth)
+  const birth = parseDateOnly(patient.value.date_of_birth)
   let years = today.getFullYear() - birth.getFullYear()
   const m = today.getMonth() - birth.getMonth()
   if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) years--

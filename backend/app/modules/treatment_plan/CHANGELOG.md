@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#718): `valid_from` on a plan-generated quote and the auto-close cron's
   threshold use each clinic's calendar date instead of the server's (UTC).
 - docs(#711): `treatment_plan.items_reordered` was missing from the

@@ -2,6 +2,7 @@
 import type { ToothTreatmentView, Treatment, TreatmentStatus } from '~~/app/types'
 import { TREATMENT_COLORS } from './ToothSVGPaths'
 import { viewForTooth } from '~~/app/utils/treatmentView'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   treatments: Treatment[]
@@ -53,7 +54,7 @@ function getTreatmentColor(type: string): string {
 }
 
 function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString()
+  return parseDateOnly(dateString).toLocaleDateString()
 }
 </script>
 

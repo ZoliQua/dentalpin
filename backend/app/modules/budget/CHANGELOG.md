@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#718): "today" is the clinic's calendar date, not the server's (UTC):
   the `expired` list filter, the expiry check, `valid_from` on plan-generated
   and duplicated quotes, and the reminder cron's milestone dates (now

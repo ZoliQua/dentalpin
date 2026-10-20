@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#718): the `overdue` invoice filter compared due dates with the server's
   date (UTC); it now uses the clinic's calendar (`clinic_today_for`).
 - fix: issuing without an explicit date stamped the **server's** date (UTC)

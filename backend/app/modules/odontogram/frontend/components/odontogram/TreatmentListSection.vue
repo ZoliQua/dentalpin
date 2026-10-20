@@ -2,6 +2,7 @@
 import type { Treatment } from '~~/app/types'
 import { getToothNameKey, getToothPositionKeys, getTreatmentColor } from '~~/app/config/odontogramConstants'
 import { getTreatmentDisplayName, viewForTooth } from '~~/app/utils/treatmentView'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   treatments: Treatment[]
@@ -36,7 +37,7 @@ function getToothFullName(toothNumber: number): string {
 }
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr)
+  const date = parseDateOnly(dateStr)
   const day = date.getDate().toString().padStart(2, '0')
   const month = (date.getMonth() + 1).toString().padStart(2, '0')
   const year = date.getFullYear()

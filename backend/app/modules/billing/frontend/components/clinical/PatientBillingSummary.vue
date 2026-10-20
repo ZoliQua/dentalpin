@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PatientBillingSummary, InvoiceListItem, InvoicePaymentDetail, PaginatedResponse } from '~~/app/types'
 import { PERMISSIONS } from '~~/app/config/permissions'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   patientId: string
@@ -82,7 +83,7 @@ const { format: formatCurrency } = useCurrency()
 // Format date
 function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return '-'
-  return new Date(dateStr).toLocaleDateString(locale.value, {
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value, {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit'

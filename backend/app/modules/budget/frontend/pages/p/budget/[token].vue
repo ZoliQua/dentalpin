@@ -12,6 +12,7 @@
 
 import type { PublicBudgetItem } from '../../../composables/usePublicBudget'
 import BudgetVerifyForm from '../../../components/public/BudgetVerifyForm.vue'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 definePageMeta({ layout: 'public' })
 
@@ -200,7 +201,7 @@ function formatMoney(amount: number | string | null | undefined, currency: strin
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—'
   try {
-    return new Date(iso).toLocaleDateString(locale.value, {
+    return parseDateOnly(iso).toLocaleDateString(locale.value, {
       day: '2-digit',
       month: 'long',
       year: 'numeric'
