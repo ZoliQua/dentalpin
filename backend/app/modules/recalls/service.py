@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.events import event_bus
 from app.core.events.types import EventType
+from app.core.utils.dates import clinic_today_for
 from app.modules.patients.models import Patient
 
 from .models import (
@@ -127,7 +128,7 @@ class RecallService:
         if filters.status:
             conditions.append(Recall.status == filters.status)
         if filters.overdue:
-            current_month = _normalize_due_month(date.today())
+            current_month = _normalize_due_month(await clinic_today_for(db, clinic_id))
             conditions.append(
                 and_(
                     Recall.due_month < current_month,
@@ -525,7 +526,7 @@ class RecallService:
         interval = settings.reason_intervals.get(reason)
         if not interval:
             return None
-        due_month = _add_months(date.today(), int(interval))
+        due_month = _add_months(await clinic_today_for(db, clinic_id), int(interval))
         return {
             "patient_id": patient_id,
             "reason": reason,
@@ -542,7 +543,7 @@ class RecallService:
     async def dashboard_stats(
         db: AsyncSession, clinic_id: UUID, today: date | None = None
     ) -> dict[str, int | float]:
-        today = today or date.today()
+        today = today or await clinic_today_for(db, clinic_id)
         month_start = _normalize_due_month(today)
         month_end = _add_months(month_start, 1)
         week_end = today + timedelta(days=7)

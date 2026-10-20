@@ -20,7 +20,7 @@ import type {
   AgingBuckets,
   RefundsReport
 } from '~~/app/types'
-import { toISODate } from '~~/app/utils/wallClock'
+import { parseDateOnly, toISODate } from '~~/app/utils/wallClock'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -50,10 +50,6 @@ interface Range {
  * fields. Mixing the two frames moves the calendar day by one in one
  * direction or the other (#522), so date-only strings are parsed local.
  */
-function parseDateOnly(value: string): Date {
-  return new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value)
-}
-
 function defaultRange(): Range {
   const to = new Date()
   const from = new Date()

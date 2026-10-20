@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { clinicNow, clinicToday, parseWallClock, toISODate } from '~/utils/wallClock'
+import { clinicNow, clinicToday, parseDateOnly, parseWallClock, toISODate } from '~/utils/wallClock'
 
 describe('parseWallClock', () => {
   it('keeps the clinic wall-clock hour regardless of the offset', () => {
@@ -112,5 +112,23 @@ describe('toISODate', () => {
 
   it('pads single-digit months and days', () => {
     expect(toISODate(new Date(2026, 0, 5))).toBe('2026-01-05')
+  })
+})
+
+describe('parseDateOnly', () => {
+  it('reads a date-only value as local midnight of that day', () => {
+    // `new Date('2026-10-20')` is UTC midnight: 18:00 on the 19th in
+    // Mexico City, 02:00 on the 20th in Madrid. Local midnight is the
+    // calendar day in every zone.
+    const d = parseDateOnly('2026-10-20')
+    expect([d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes()])
+      .toEqual([2026, 9, 20, 0, 0])
+    expect(toISODate(d)).toBe('2026-10-20')
+  })
+
+  it('leaves full timestamps to new Date', () => {
+    for (const iso of ['2026-10-20T15:30:00Z', '2026-10-20T15:30:00+02:00', '2026-10-20T15:30:00']) {
+      expect(parseDateOnly(iso).getTime()).toBe(new Date(iso).getTime())
+    }
   })
 })

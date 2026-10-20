@@ -3,6 +3,7 @@ import type { InvoiceListItem, InvoiceStatus, PaginatedResponse } from '~~/app/t
 import { INVOICE_STATUS_ROLE, roleToUiColor } from '~~/app/config/severity'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 /**
  * /invoices — list page.
@@ -140,7 +141,7 @@ const activeFilterCount = computed(() => {
 
 function formatDate(s: string | undefined | null): string {
   if (!s) return '—'
-  return new Date(s).toLocaleDateString(locale.value)
+  return parseDateOnly(s).toLocaleDateString(locale.value)
 }
 
 function patientName(inv: InvoiceListItem): string {

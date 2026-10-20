@@ -14,6 +14,7 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.utils.dates import clinic_today_for
 from app.modules.billing.models import Invoice
 
 # Outstanding = issued or partially processed, never drafts, cancelled,
@@ -42,7 +43,7 @@ class FinancialReportService:
         netted against anything else) plus invoice and distinct-patient
         counts.
         """
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
         rows = (
             await db.execute(
                 select(

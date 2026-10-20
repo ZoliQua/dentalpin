@@ -10,6 +10,7 @@ import type { InfoItem } from '~~/app/components/shared/EntityInfoCard.vue'
 import { errorMessage } from '~~/app/utils/error'
 import PublicBudgetLinkCard from '../../components/budget/PublicBudgetLinkCard.vue'
 import BudgetSignatureCard from '../../components/budget/BudgetSignatureCard.vue'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const route = useRoute()
 const router = useRouter()
@@ -421,7 +422,7 @@ async function handleDownloadPDF() {
 const { format: formatMoney } = useCurrency()
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(locale.value)
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value)
 }
 
 const statusChips = computed<EntityChip[]>(() => {

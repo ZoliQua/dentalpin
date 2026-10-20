@@ -13,6 +13,7 @@
  * via the ``collect`` emit so the host owns the modal lifecycle.
  */
 import { useCurrency } from '~~/app/composables/useCurrency'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 interface PendingCharge {
   entry_id: string
@@ -43,7 +44,7 @@ const visibleCharges = computed(() => props.charges.slice(0, 5))
 const overflow = computed(() => Math.max(0, props.charges.length - visibleCharges.value.length))
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(locale.value, {
+  return parseDateOnly(iso).toLocaleDateString(locale.value, {
     day: '2-digit',
     month: 'short',
     hour: '2-digit',

@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload
 
 from app.core.auth.models import ClinicMembership
 from app.core.list_query import parse_sort
+from app.core.utils.dates import clinic_today_for
 from app.modules.catalog.models import TreatmentCatalogItem, VatType
 
 from .models import Budget, BudgetHistory, BudgetItem
@@ -344,7 +345,7 @@ class BudgetService:
             conditions.append(Budget.valid_until >= valid_until_after)
 
         if expired is not None:
-            today = date.today()
+            today = await clinic_today_for(db, clinic_id)
             if expired:
                 conditions.append(Budget.valid_until.isnot(None))
                 conditions.append(Budget.valid_until < today)
@@ -562,7 +563,7 @@ class BudgetService:
 
         clinic_settings = await _resolve_clinic_settings(db, clinic_id)
         validity_days = int(clinic_settings.get("budget_expiry_days", DEFAULT_BUDGET_VALIDITY_DAYS))
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
 
         budget_number = await BudgetNumberService.generate_number(db, clinic_id)
         public_auth_method = await BudgetWorkflowService.resolve_public_auth_method(
@@ -816,7 +817,7 @@ class BudgetService:
             version=next_version,
             parent_budget_id=source_budget.id,
             status="draft",
-            valid_from=date.today(),
+            valid_from=await clinic_today_for(db, source_budget.clinic_id),
             valid_until=source_budget.valid_until,
             created_by=created_by,
             assigned_professional_id=source_budget.assigned_professional_id,

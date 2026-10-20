@@ -46,6 +46,9 @@ services:
       # Output ceiling per assistant turn (tokens). Forwarded so the
       # value in .env actually reaches the container.
       COPILOT_MAX_TOKENS: ${COPILOT_MAX_TOKENS:-4096}
+      # Self-hosted Ollama endpoint (#332); empty falls back to the
+      # provider default (http://ollama:11434).
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-}
     ports:
       - "8000:8000"
     depends_on:

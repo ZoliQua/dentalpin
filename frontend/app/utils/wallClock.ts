@@ -53,6 +53,18 @@ export function clinicNow(timeZone: string | null | undefined): Date {
 }
 
 /**
+ * Parse an API date for display. A date-only `YYYY-MM-DD` (an invoice's
+ * `issue_date`, a quote's `valid_until`, a recall's `due_month`, a date of
+ * birth) is **UTC** midnight under `new Date(s)`, so every zone behind UTC
+ * — all of the Americas — renders it as the previous day. Date-only values
+ * become local midnight here; anything else (a full timestamp) goes
+ * through `new Date` unchanged.
+ */
+export function parseDateOnly(value: string): Date {
+  return new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T00:00:00` : value)
+}
+
+/**
  * A `Date` rendered as the calendar day it holds, `YYYY-MM-DD`.
  *
  * `d.toISOString().slice(0, 10)` renders the same *instant* in UTC, so a

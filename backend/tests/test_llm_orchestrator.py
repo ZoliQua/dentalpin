@@ -514,6 +514,234 @@ def test_openrouter_groq_spec_shape() -> None:
         assert isinstance(spec.factory(ProviderConfig(api_key="test-key")), cls)
 
 
+# --- ollama provider --------------------------------------------------------
+
+
+def test_ollama_provider_needs_no_key() -> None:
+    from app.core.llm.ollama_provider import OLLAMA_PLACEHOLDER_API_KEY, OllamaProvider
+
+    provider = OllamaProvider()
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+    assert provider._client.api_key == OLLAMA_PLACEHOLDER_API_KEY
+
+
+def test_ollama_provider_targets_configured_endpoint() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    assert str(provider._client.base_url) == "http://192.168.1.20:11434/v1/"
+
+
+def test_ollama_provider_strips_trailing_slash() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://ollama:11434/")
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
+def test_ollama_provider_accepts_full_compat_url() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://host.docker.internal:11434/v1")
+    assert str(provider._client.base_url) == "http://host.docker.internal:11434/v1/"
+
+
+def test_ollama_provider_accepts_full_compat_url_with_trailing_slash() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434/v1/")
+    assert str(provider._client.base_url) == "http://192.168.1.20:11434/v1/"
+
+
+def test_ollama_provider_empty_base_url_uses_default() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="")
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
+def test_ollama_provider_whitespace_base_url_uses_default() -> None:
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="   ")
+    assert str(provider._client.base_url) == "http://ollama:11434/v1/"
+
+
+@pytest.mark.asyncio
+async def test_ollama_provider_names_base_url_when_unreachable() -> None:
+    """A down self-hosted host must name OLLAMA_BASE_URL, not the SDK default."""
+    from types import SimpleNamespace
+
+    import httpx
+    from openai import APIConnectionError
+
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    request = httpx.Request("POST", "http://192.168.1.20:11434/v1/chat/completions")
+
+    class _Completions:
+        async def create(self, **kwargs):
+            raise APIConnectionError(request=request)
+
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=_Completions()))
+
+    with pytest.raises(LLMConfigError, match="OLLAMA_BASE_URL") as excinfo:
+        async for _ in provider.complete(
+            system="", messages=[], tools=[], model="llama3.1:8b", max_tokens=64
+        ):
+            pass
+    assert "192.168.1.20:11434" in str(excinfo.value)
+
+
+@pytest.mark.asyncio
+async def test_ollama_provider_wraps_connection_error_from_any_iteration_point() -> None:
+    """Pin the wrapper, not the SDK: its ``except`` spans the whole iteration.
+
+    The SDK itself raises ``APIConnectionError`` only before the first chunk;
+    this fixture pins the wrapper's defensive branch so a future narrowing
+    cannot silently drop a prefix of the stream.
+    """
+    from types import SimpleNamespace
+
+    import httpx
+    from openai import APIConnectionError
+
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    request = httpx.Request("POST", "http://192.168.1.20:11434/v1/chat/completions")
+    chunk = SimpleNamespace(
+        usage=None,
+        choices=[
+            SimpleNamespace(
+                delta=SimpleNamespace(content="Hola", tool_calls=None),
+                finish_reason=None,
+            )
+        ],
+    )
+
+    async def _stream():
+        yield chunk
+        raise APIConnectionError(request=request)
+
+    class _Completions:
+        async def create(self, **kwargs):
+            return _stream()
+
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=_Completions()))
+
+    received: list[ProviderEvent] = []
+    with pytest.raises(LLMConfigError, match="OLLAMA_BASE_URL"):
+        async for event in provider.complete(
+            system="", messages=[], tools=[], model="llama3.1:8b", max_tokens=64
+        ):
+            received.append(event)
+    # The wrapper must stream through unchanged, not swallow the first chunk.
+    assert received == [TextDelta(text="Hola")]
+
+
+@pytest.mark.asyncio
+async def test_ollama_provider_reports_timeout_apart_from_unreachable() -> None:
+    """A stalled server is a timeout, not an unreachable host; both name the setting."""
+    from types import SimpleNamespace
+
+    import httpx
+    from openai import APITimeoutError
+
+    from app.core.llm.ollama_provider import OllamaProvider
+
+    provider = OllamaProvider(base_url="http://192.168.1.20:11434")
+    request = httpx.Request("POST", "http://192.168.1.20:11434/v1/chat/completions")
+
+    class _Completions:
+        async def create(self, **kwargs):
+            raise APITimeoutError(request=request)
+
+    provider._client = SimpleNamespace(chat=SimpleNamespace(completions=_Completions()))
+
+    with pytest.raises(LLMConfigError, match="timed out") as excinfo:
+        async for _ in provider.complete(
+            system="", messages=[], tools=[], model="llama3.1:8b", max_tokens=64
+        ):
+            pass
+    assert "OLLAMA_BASE_URL" in str(excinfo.value)
+
+
+def test_ollama_spec_shape() -> None:
+    from app.config import Settings, settings
+    from app.core.llm.factory import OLLAMA_SPEC
+    from app.core.llm.ollama_provider import OLLAMA_DEFAULT_BASE_URL, OllamaProvider
+    from app.core.llm.spec import ProviderConfig
+
+    assert OLLAMA_SPEC.name == "ollama"
+    assert OLLAMA_SPEC.tool_dialect == "openai"
+    assert OLLAMA_SPEC.needs_api_key is False
+    assert OLLAMA_SPEC.api_key_setting is None
+    assert OLLAMA_SPEC.base_url_setting == "OLLAMA_BASE_URL"
+    assert OLLAMA_SPEC.default_model == settings.COPILOT_MODEL_CHAT_OLLAMA
+    # The provider's fallback default must track the deployment setting's
+    # default, or a config edit silently diverges from direct construction.
+    # Assert the *field default*, not the ambient value: an operator who
+    # sets OLLAMA_BASE_URL (as the prod compose comment invites) must not
+    # turn this suite red.
+    assert OLLAMA_DEFAULT_BASE_URL == Settings.model_fields["OLLAMA_BASE_URL"].default
+    assert isinstance(OLLAMA_SPEC.factory(ProviderConfig(api_key=None)), OllamaProvider)
+
+
+def test_factory_normalizes_blank_base_url_to_none(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import settings
+    from app.core.llm.factory import OLLAMA_SPEC, get_configured_base_url
+
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "")
+    assert get_configured_base_url(OLLAMA_SPEC) is None
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "   ")
+    assert get_configured_base_url(OLLAMA_SPEC) is None
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "http://192.168.1.20:11434")
+    assert get_configured_base_url(OLLAMA_SPEC) == "http://192.168.1.20:11434"
+
+
+def test_get_provider_ollama_threads_configured_base_url(monkeypatch: pytest.MonkeyPatch) -> None:
+    from app.config import settings
+    from app.core.llm.factory import OLLAMA_SPEC, get_provider
+    from app.core.llm.registry import llm_provider_registry
+
+    monkeypatch.setattr(settings, "OLLAMA_BASE_URL", "http://192.168.1.20:11434")
+    previous = llm_provider_registry.get("ollama")
+    llm_provider_registry.register(OLLAMA_SPEC)
+    try:
+        provider = get_provider("ollama")
+        assert str(provider._client.base_url) == "http://192.168.1.20:11434/v1/"
+    finally:
+        if previous is None:
+            llm_provider_registry.unregister("ollama")
+        else:
+            llm_provider_registry.register(previous)
+
+
+def test_compose_forwards_ollama_base_url() -> None:
+    """A self-hosted endpoint the compose never passes cannot be reached.
+
+    Every deployment compose lists the backend env key-by-key and declares
+    no ``env_file``, so a setting absent from ``environment:`` keeps its
+    default inside the container (#673), and a selection pointing at an
+    unreachable host fails only at first chat. Ollama is self-hosted, so
+    local development (``docker-compose.yml``) is its primary deployment.
+    """
+    import re
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parents[2]
+    for compose in ("docker-compose.prod.yml", "docker-compose.yml", "docker-compose.coolify.yml"):
+        body = (repo / compose).read_text(encoding="utf-8")
+        after = body.split("\n  backend:", 1)[1]
+        nxt = re.search(r"^  \S", after, re.M)
+        backend = after[: nxt.start()] if nxt else after
+        assert re.search(r"^\s+OLLAMA_BASE_URL:\s*\$\{OLLAMA_BASE_URL:-\}", backend, re.M), (
+            f"{compose} does not forward OLLAMA_BASE_URL"
+        )
+
+
 def test_anthropic_message_mapping_merges_tool_results_into_user_turn() -> None:
     from app.core.llm.anthropic_provider import _to_anthropic_messages
     from app.core.llm.base import ToolUseBlock

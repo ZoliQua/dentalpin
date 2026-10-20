@@ -10,6 +10,7 @@ import type { OrthoCase, OrthoControl, OrthoInstallments, OrthoSettings } from '
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { useActiveModulesState, useModules } from '~~/app/composables/useModules'
 import { orthoMonth } from '../utils/orthoMonth'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{ caseId: string }>()
 
@@ -83,7 +84,7 @@ const schedAmount = ref(0)
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—'
-  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(iso))
+  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(parseDateOnly(iso))
 }
 
 function formatDateTime(iso: string | null): string {

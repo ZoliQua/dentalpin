@@ -4,6 +4,12 @@
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix(#718): the `overdue` filter, the suggested due month and the dashboard
+  month/week windows use the clinic's calendar date instead of the server's.
 - docs(#711): the events doc said the module publishes nothing; it
   publishes `recall.created` (read by activity_journal and
   recall_reminders), `snoozed`, `cancelled` and `completed`.

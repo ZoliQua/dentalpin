@@ -4,6 +4,12 @@
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix(#718): the `overdue` invoice filter compared due dates with the server's
+  date (UTC); it now uses the clinic's calendar (`clinic_today_for`).
 - fix: issuing without an explicit date stamped the **server's** date (UTC)
   on the invoice — tomorrow's date for a UTC-6 clinic from 18:00 local,
   yesterday's for a UTC+2 clinic until 02:00. The issue route now passes the

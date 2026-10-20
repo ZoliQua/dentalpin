@@ -4,6 +4,10 @@
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - fix(#701): `PatientUpdate.status` (inherited by
   `PatientExtendedUpdate`) is capped at the column length (`VARCHAR(20)`)
   instead of 500-ing on the INSERT. The status vocabulary itself is still

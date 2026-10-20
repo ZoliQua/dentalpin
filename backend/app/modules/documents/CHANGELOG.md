@@ -4,6 +4,10 @@
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
 - feat(#657): owns the `documents` GDPR erasure coverage scope
   (`get_erasure_contributors()`). Issued prescriptions, certificates and
   referrals are retained as clinical records (Art. 17(3)(c)/(h)). The
