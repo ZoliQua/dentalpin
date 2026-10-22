@@ -2979,7 +2979,7 @@ async def seed_catalog(
                     TreatmentCatalogItem.internal_code == treatment_data["internal_code"],
                 )
             )
-            if existing.scalar_one_or_none():
+            if existing.scalars().first():  # a deleted row may share the code (#736)
                 continue
 
             if not with_prices:
