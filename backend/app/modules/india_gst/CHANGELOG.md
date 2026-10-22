@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#732): the unregistered-GSTIN banner rendered no close button, so it could not be dismissed. `close-button` / `@close` are Nuxt UI v3; it now binds `close` + `close-icon` and `@update:open`.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi name for the `GST 18%` VAT type; India demo seed supports a New Delhi (state 07) clinic.

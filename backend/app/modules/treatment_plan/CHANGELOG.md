@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#730): the pipeline tab pager never changed page. It used the Nuxt UI v3 `UPagination` binding (`:model-value` / `@update:model-value`, `:page-count`); it now binds `:page` / `@update:page` / `:items-per-page`.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
