@@ -9,7 +9,8 @@
  * appointments gets an explicit "never visited" empty state.
  */
 import type { Appointment, PaginatedResponse, PatientExtended } from '~~/app/types'
-import { parseWallClock } from '~~/app/utils/wallClock'
+import { clinicToday, parseWallClock } from '~~/app/utils/wallClock'
+import { clinicDayOffset } from '../../utils/date'
 
 interface Ctx {
   patient: PatientExtended
@@ -19,6 +20,7 @@ const props = defineProps<{ ctx: Ctx }>()
 
 const { t, locale } = useI18n()
 const api = useApi()
+const { currentClinic } = useClinic()
 
 const patientId = computed(() => props.ctx.patient.id)
 
@@ -40,12 +42,12 @@ const lastVisit = computed<Appointment | null>(() => data.value?.data[0] ?? null
 
 const dayLabel = computed(() => {
   if (!lastVisit.value) return ''
-  const visit = new Date(lastVisit.value.start_time)
-  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
-  const days = Math.round((startOfDay(new Date()) - startOfDay(visit)) / (1000 * 60 * 60 * 24))
+  // The visit's clinic day, not the device's (#738).
+  const days = -clinicDayOffset(lastVisit.value.start_time, clinicToday(currentClinic.value?.timezone))
   if (days === 0) return t('appointments.today', 'Hoy')
   if (days === 1) return t('appointments.yesterday', 'Ayer')
-  return visit.toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
+  return parseWallClock(lastVisit.value.start_time)
+    .toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
 })
 
 const timeLabel = computed(() => {

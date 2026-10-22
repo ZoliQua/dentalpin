@@ -590,7 +590,7 @@ function isInvalidHint(col: ColumnDef): boolean {
                   class="text-caption text-subtle italic px-1"
                 >
                   {{ t('appointments.kanban.nextIn', {
-                    time: new Date(nextForCabinet(entry.cabinet.name)!.start_time)
+                    time: parseWallClock(nextForCabinet(entry.cabinet.name)!.start_time)
                       .toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })
                   }) }}
                 </div>
