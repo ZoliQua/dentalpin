@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- fix(#740): a treatment's price, cost or duration could not be removed.
+  - Clearing the input and saving answered 422: a cleared input sends `""`,
+    and Nuxt UI's `UInput` keeps `""` even for `type="number"`.
+  - An explicit `null` returned 200 but changed nothing, because
+    `update_item` skipped every `None`.
+  - Now `""` reads as `None` on those three fields (create and update),
+    and `update_item` stores an explicit `None` for them
+    (`_CLEARABLE_ITEM_FIELDS`). Any other omitted or `None` field is still
+    left untouched.
 - fix(#736): a deleted treatment frees its internal code. `uq_catalog_item_clinic_code` is now a partial unique index over live rows (`cat_0005`); creating or renaming an item to a deleted item's code used to pass the duplicate check and 500 on the constraint.
 - fix(#730): the Settings → Catalog pager never changed page. It used the Nuxt UI v3 `UPagination` binding (`:model-value` / `@update:model-value`, `:page-count`); v4 emits only `update:page` and pages by `items-per-page` (default 10). Items after the first 20 were only reachable through search.
 
