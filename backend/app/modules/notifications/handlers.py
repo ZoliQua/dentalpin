@@ -81,7 +81,9 @@ class NotificationHandlers:
             async with db.begin_nested():
                 # Get appointment with patient
                 result = await db.execute(
-                    select(Appointment).where(Appointment.id == appointment_id)
+                    select(Appointment).where(
+                        Appointment.clinic_id == clinic_id, Appointment.id == appointment_id
+                    )
                 )
                 appointment = result.scalar_one_or_none()
                 if not appointment:
@@ -90,7 +92,9 @@ class NotificationHandlers:
 
                 # Get patient
                 result = await db.execute(
-                    select(Patient).where(Patient.id == appointment.patient_id)
+                    select(Patient).where(
+                        Patient.clinic_id == clinic_id, Patient.id == appointment.patient_id
+                    )
                 )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
@@ -167,7 +171,9 @@ class NotificationHandlers:
             async with db.begin_nested():
                 # Get appointment
                 result = await db.execute(
-                    select(Appointment).where(Appointment.id == appointment_id)
+                    select(Appointment).where(
+                        Appointment.clinic_id == clinic_id, Appointment.id == appointment_id
+                    )
                 )
                 appointment = result.scalar_one_or_none()
                 if not appointment:
@@ -175,7 +181,9 @@ class NotificationHandlers:
 
                 # Get patient
                 result = await db.execute(
-                    select(Patient).where(Patient.id == appointment.patient_id)
+                    select(Patient).where(
+                        Patient.clinic_id == clinic_id, Patient.id == appointment.patient_id
+                    )
                 )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
@@ -242,7 +250,9 @@ class NotificationHandlers:
 
             async with db.begin_nested():
                 # Get patient
-                result = await db.execute(select(Patient).where(Patient.id == patient_id))
+                result = await db.execute(
+                    select(Patient).where(Patient.clinic_id == clinic_id, Patient.id == patient_id)
+                )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
                     return
@@ -304,13 +314,19 @@ class NotificationHandlers:
 
             async with db.begin_nested():
                 # Get budget with items
-                result = await db.execute(select(Budget).where(Budget.id == budget_id))
+                result = await db.execute(
+                    select(Budget).where(Budget.clinic_id == clinic_id, Budget.id == budget_id)
+                )
                 budget = result.scalar_one_or_none()
                 if not budget:
                     return
 
                 # Get patient
-                result = await db.execute(select(Patient).where(Patient.id == budget.patient_id))
+                result = await db.execute(
+                    select(Patient).where(
+                        Patient.clinic_id == clinic_id, Patient.id == budget.patient_id
+                    )
+                )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
                     return
@@ -396,13 +412,19 @@ class NotificationHandlers:
 
             async with db.begin_nested():
                 # Get invoice with items
-                result = await db.execute(select(Invoice).where(Invoice.id == invoice_id))
+                result = await db.execute(
+                    select(Invoice).where(Invoice.clinic_id == clinic_id, Invoice.id == invoice_id)
+                )
                 invoice = result.scalar_one_or_none()
                 if not invoice:
                     return
 
                 # Get patient
-                result = await db.execute(select(Patient).where(Patient.id == invoice.patient_id))
+                result = await db.execute(
+                    select(Patient).where(
+                        Patient.clinic_id == clinic_id, Patient.id == invoice.patient_id
+                    )
+                )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
                     return
@@ -491,13 +513,19 @@ class NotificationHandlers:
 
             async with db.begin_nested():
                 # Get budget
-                result = await db.execute(select(Budget).where(Budget.id == budget_id))
+                result = await db.execute(
+                    select(Budget).where(Budget.clinic_id == clinic_id, Budget.id == budget_id)
+                )
                 budget = result.scalar_one_or_none()
                 if not budget:
                     return
 
                 # Get patient
-                result = await db.execute(select(Patient).where(Patient.id == budget.patient_id))
+                result = await db.execute(
+                    select(Patient).where(
+                        Patient.clinic_id == clinic_id, Patient.id == budget.patient_id
+                    )
+                )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
                     return
@@ -557,13 +585,19 @@ class NotificationHandlers:
 
             async with db.begin_nested():
                 # Get budget
-                result = await db.execute(select(Budget).where(Budget.id == budget_id))
+                result = await db.execute(
+                    select(Budget).where(Budget.clinic_id == clinic_id, Budget.id == budget_id)
+                )
                 budget = result.scalar_one_or_none()
                 if not budget:
                     return
 
                 # Get patient
-                result = await db.execute(select(Patient).where(Patient.id == budget.patient_id))
+                result = await db.execute(
+                    select(Patient).where(
+                        Patient.clinic_id == clinic_id, Patient.id == budget.patient_id
+                    )
+                )
                 patient = result.scalar_one_or_none()
                 if not _has_contact(patient):
                     logger.info(
