@@ -109,7 +109,8 @@ async function handleEditSave() {
   isSavingEdit.value = true
   const updated = await updateDocument(selectedDocument.value.id, {
     title: editTitle.value.trim(),
-    description: editDescription.value.trim() || undefined,
+    // null (not undefined) so emptying the description clears it.
+    description: editDescription.value.trim() || null,
     document_type: editDocumentType.value
   })
   isSavingEdit.value = false
