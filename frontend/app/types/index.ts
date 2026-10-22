@@ -1052,12 +1052,13 @@ export interface BudgetCreate {
 
 export interface BudgetUpdate {
   valid_from?: string
-  valid_until?: string
-  assigned_professional_id?: string
-  global_discount_type?: DiscountType
-  global_discount_value?: number
-  internal_notes?: string
-  patient_notes?: string
+  // null clears the stored value; omitting the key leaves it untouched.
+  valid_until?: string | null
+  assigned_professional_id?: string | null
+  global_discount_type?: DiscountType | null
+  global_discount_value?: number | null
+  internal_notes?: string | null
+  patient_notes?: string | null
 }
 
 // Workflow
