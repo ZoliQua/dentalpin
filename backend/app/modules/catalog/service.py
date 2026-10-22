@@ -23,6 +23,10 @@ class SessionTemplateError(ValueError):
     """Raised when a session template fails validation (sum mismatch, etc.)."""
 
 
+# Nullable item columns a client can clear by sending ``null``.
+_CLEARABLE_ITEM_FIELDS = frozenset({"default_price", "cost_price", "default_duration_minutes"})
+
+
 def validate_session_template(
     item_total: Decimal | None,
     sessions: list[dict] | None,
@@ -522,13 +526,14 @@ class CatalogService:
         sessions_data = data.pop("sessions", "__not_provided__")
 
         # Determine effective total for sessions validation
-        new_total = data.get("default_price")
-        effective_total = new_total if new_total is not None else item.default_price
+        effective_total = data["default_price"] if "default_price" in data else item.default_price
         if sessions_data != "__not_provided__":
             validate_session_template(effective_total, sessions_data)
 
         for key, value in data.items():
-            if value is not None:
+            # None means "not sent" for every field but the nullable price
+            # and duration, where an explicit None clears the stored value.
+            if value is not None or key in _CLEARABLE_ITEM_FIELDS:
                 setattr(item, key, value)
 
         if odontogram_data:

@@ -3,7 +3,19 @@
 from datetime import date, datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+
+def _blank_is_none(value: object) -> object:
+    """A cleared input sends "" -- for a typed optional field that means "no value".
+
+    Without this, clearing an e-mail, date or number input and saving answers
+    422, so the form cannot be saved until the user types something back.
+    """
+    if isinstance(value, str) and not value.strip():
+        return None
+    return value
+
 
 # --- Medical context -----------------------------------------------------
 
@@ -26,6 +38,10 @@ class MedicalContextBase(BaseModel):
 
     adverse_reactions_to_anesthesia: bool = False
     anesthesia_reaction_details: str | None = Field(default=None, max_length=500)
+
+    _clear_blank = field_validator("pregnancy_week", "inr_value", "last_inr_date", mode="before")(
+        _blank_is_none
+    )
 
 
 class MedicalContextUpdate(MedicalContextBase):
@@ -142,6 +158,8 @@ class SurgicalHistoryCreate(BaseModel):
     # Loose link to an optional medical_reference list item (no DB FK).
     reference_id: UUID | None = None
 
+    _clear_blank = field_validator("surgery_date", mode="before")(_blank_is_none)
+
 
 class SurgicalHistoryUpdate(BaseModel):
     procedure: str | None = Field(default=None, min_length=1, max_length=200)
@@ -168,6 +186,8 @@ class EmergencyContactBase(BaseModel):
     email: EmailStr | None = None
     is_legal_guardian: bool = False
 
+    _clear_blank = field_validator("email", mode="before")(_blank_is_none)
+
 
 class EmergencyContactUpsert(EmergencyContactBase):
     pass
@@ -189,6 +209,8 @@ class LegalGuardianBase(BaseModel):
     email: EmailStr | None = None
     address: str | None = Field(default=None, max_length=200)
     notes: str | None = None
+
+    _clear_blank = field_validator("email", mode="before")(_blank_is_none)
 
 
 class LegalGuardianUpsert(LegalGuardianBase):
@@ -232,6 +254,10 @@ class MedicalHistoryUpdate(BaseModel):
 
     adverse_reactions_to_anesthesia: bool = False
     anesthesia_reaction_details: str | None = Field(default=None, max_length=500)
+
+    _clear_blank = field_validator("pregnancy_week", "inr_value", "last_inr_date", mode="before")(
+        _blank_is_none
+    )
 
 
 class MedicalHistoryResponse(BaseModel):

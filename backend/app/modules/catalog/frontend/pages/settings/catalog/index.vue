@@ -672,10 +672,10 @@ const categoryOptions = computed(() => [
         class="flex justify-center pt-4 border-t border-default mt-4"
       >
         <UPagination
-          :model-value="catalog.currentPage.value"
+          :page="catalog.currentPage.value"
           :total="catalog.totalItems.value"
-          :page-count="catalog.pageSize.value"
-          @update:model-value="handlePageChange"
+          :items-per-page="catalog.pageSize.value"
+          @update:page="handlePageChange"
         />
       </div>
     </UCard>

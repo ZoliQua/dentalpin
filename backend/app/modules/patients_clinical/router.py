@@ -118,7 +118,7 @@ async def list_allergies(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[list[AllergyResponse]]:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    allergies = await PatientsClinicalService.list_allergies(db, patient_id)
+    allergies = await PatientsClinicalService.list_allergies(db, ctx.clinic_id, patient_id)
     return ApiResponse(data=[AllergyResponse.model_validate(a) for a in allergies])
 
 
@@ -200,7 +200,7 @@ async def list_medications(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[list[MedicationResponse]]:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    meds = await PatientsClinicalService.list_medications(db, patient_id)
+    meds = await PatientsClinicalService.list_medications(db, ctx.clinic_id, patient_id)
     return ApiResponse(data=[MedicationResponse.model_validate(m) for m in meds])
 
 
@@ -282,7 +282,7 @@ async def list_systemic_diseases(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[list[SystemicDiseaseResponse]]:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    rows = await PatientsClinicalService.list_systemic_diseases(db, patient_id)
+    rows = await PatientsClinicalService.list_systemic_diseases(db, ctx.clinic_id, patient_id)
     return ApiResponse(data=[SystemicDiseaseResponse.model_validate(r) for r in rows])
 
 
@@ -364,7 +364,7 @@ async def list_surgical_history(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[list[SurgicalHistoryResponse]]:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    rows = await PatientsClinicalService.list_surgical_history(db, patient_id)
+    rows = await PatientsClinicalService.list_surgical_history(db, ctx.clinic_id, patient_id)
     return ApiResponse(data=[SurgicalHistoryResponse.model_validate(r) for r in rows])
 
 
@@ -446,7 +446,7 @@ async def get_emergency_contact(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[EmergencyContactResponse | None]:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    contact = await PatientsClinicalService.get_emergency_contact(db, patient_id)
+    contact = await PatientsClinicalService.get_emergency_contact(db, ctx.clinic_id, patient_id)
     # Archived (soft-deleted) rows stay in the table but read as "no contact".
     if contact is None or contact.status != "active":
         return ApiResponse(data=None)
@@ -484,7 +484,7 @@ async def delete_emergency_contact(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> None:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    contact = await PatientsClinicalService.get_emergency_contact(db, patient_id)
+    contact = await PatientsClinicalService.get_emergency_contact(db, ctx.clinic_id, patient_id)
     if contact is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Emergency contact not found"
@@ -507,7 +507,7 @@ async def get_legal_guardian(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[LegalGuardianResponse | None]:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    guardian = await PatientsClinicalService.get_legal_guardian(db, patient_id)
+    guardian = await PatientsClinicalService.get_legal_guardian(db, ctx.clinic_id, patient_id)
     # Archived (soft-deleted) rows stay in the table but read as "no guardian".
     if guardian is None or guardian.status != "active":
         return ApiResponse(data=None)
@@ -545,7 +545,7 @@ async def delete_legal_guardian(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> None:
     await _ensure_patient(db, ctx.clinic_id, patient_id)
-    guardian = await PatientsClinicalService.get_legal_guardian(db, patient_id)
+    guardian = await PatientsClinicalService.get_legal_guardian(db, ctx.clinic_id, patient_id)
     if guardian is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Legal guardian not found"

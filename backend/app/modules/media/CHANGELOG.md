@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#730): the patient document/photo gallery pager never changed page. It bound `v-model` / `:page-count`; Nuxt UI v4 needs `v-model:page` / `:items-per-page`, so documents after the first 12 were unreachable.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - docs(#711): the events doc said the module publishes nothing; it

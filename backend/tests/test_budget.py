@@ -202,6 +202,66 @@ async def test_update_budget(client: AsyncClient, auth_headers: dict, budget_cli
 
 
 @pytest.mark.asyncio
+async def test_update_budget_clears_discount_dates_and_notes(
+    client: AsyncClient, auth_headers: dict, budget_clinic_setup: dict
+):
+    """Removing a global discount, the expiry date or a note must remove it.
+
+    The edit form sends ``null`` for a cleared field; the service used to skip
+    every ``None``, so the discount stayed applied and the totals unchanged.
+    """
+    created = await client.post(
+        "/api/v1/budget/budgets",
+        json={"patient_id": budget_clinic_setup["patient_id"], "valid_from": "2024-01-01"},
+        headers=auth_headers,
+    )
+    budget_id = created.json()["data"]["id"]
+    url = f"/api/v1/budget/budgets/{budget_id}"
+    await client.post(
+        f"{url}/items",
+        json={"catalog_item_id": budget_clinic_setup["catalog_item_id"], "quantity": 1},
+        headers=auth_headers,
+    )
+    response = await client.put(
+        url,
+        json={
+            "valid_until": "2024-12-31",
+            "global_discount_type": "percentage",
+            "global_discount_value": 10,
+            "internal_notes": "internal",
+            "patient_notes": "for the patient",
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+    discounted_total = float(response.json()["data"]["total"])
+
+    response = await client.put(
+        url,
+        json={
+            "valid_until": None,
+            "global_discount_type": None,
+            "global_discount_value": None,
+            "internal_notes": None,
+            "patient_notes": None,
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["valid_until"] is None
+    assert data["global_discount_type"] is None
+    assert data["global_discount_value"] is None
+    assert data["internal_notes"] is None
+    assert data["patient_notes"] is None
+    assert float(data["total"]) > discounted_total
+
+    # Omitting a key still leaves it alone.
+    response = await client.put(url, json={"patient_notes": "again"}, headers=auth_headers)
+    assert response.json()["data"]["valid_from"] == "2024-01-01"
+
+
+@pytest.mark.asyncio
 async def test_delete_budget(client: AsyncClient, auth_headers: dict, budget_clinic_setup: dict):
     """Test soft-deleting a budget."""
     # Create budget

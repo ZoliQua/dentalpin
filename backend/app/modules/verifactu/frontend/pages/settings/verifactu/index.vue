@@ -304,8 +304,8 @@ onMounted(refresh)
             variant="soft"
             :title="errorMessage"
             class="mt-4"
-            :close="true"
-            @close="errorMessage = null"
+            close
+            @update:open="errorMessage = null"
           />
         </div>
       </div>

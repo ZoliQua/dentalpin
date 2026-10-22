@@ -64,7 +64,7 @@ async def test_delete_archives_row_lists_exclude_get_returns(db_session, test_pa
 
     assert (await get(db_session, test_patient.clinic_id, row_id)) is not None
     assert (await get(db_session, test_patient.clinic_id, row_id)).status == "archived"
-    remaining = await list_all(db_session, test_patient.id)
+    remaining = await list_all(db_session, test_patient.clinic_id, test_patient.id)
     assert all(r.id != row_id for r in remaining)
 
 
@@ -81,6 +81,28 @@ async def test_getters_are_clinic_scoped(db_session, test_patient):
     assert (
         await PatientsClinicalService.get_allergy(db_session, test_patient.clinic_id, row.id)
     ) is not None
+
+
+@pytest.mark.asyncio
+async def test_lists_and_contacts_are_clinic_scoped(db_session, test_patient):
+    """Lists and 1:1 contacts honour the clinic scope too (SEC-06 follow-up)."""
+    await PatientsClinicalService.create_allergy(
+        db_session,
+        test_patient.clinic_id,
+        test_patient.id,
+        {"name": "Penicilina", "severity": "critical"},
+    )
+    await PatientsClinicalService.upsert_emergency_contact(
+        db_session,
+        test_patient.clinic_id,
+        test_patient.id,
+        {"name": "Ana", "phone": "+34111111"},
+    )
+    assert await PatientsClinicalService.list_allergies(db_session, uuid4(), test_patient.id) == []
+    assert (
+        await PatientsClinicalService.get_emergency_contact(db_session, uuid4(), test_patient.id)
+        is None
+    )
 
 
 @pytest.mark.asyncio
@@ -119,7 +141,9 @@ async def test_contact_upsert_revives_archived_row(db_session, test_patient):
     )
     await PatientsClinicalService.delete_emergency_contact(db_session, contact)
     assert (
-        await PatientsClinicalService.get_emergency_contact(db_session, test_patient.id)
+        await PatientsClinicalService.get_emergency_contact(
+            db_session, test_patient.clinic_id, test_patient.id
+        )
     ).status == "archived"
 
     revived = await PatientsClinicalService.upsert_emergency_contact(
@@ -148,7 +172,9 @@ async def test_replace_preserves_history(db_session, test_patient):
         {"allergies": [{"name": "Latex", "severity": "medium"}]},
         None,
     )
-    current = await PatientsClinicalService.list_allergies(db_session, test_patient.id)
+    current = await PatientsClinicalService.list_allergies(
+        db_session, test_patient.clinic_id, test_patient.id
+    )
     assert [a.name for a in current] == ["Latex"]
     # The superseded row survives, archived, instead of being destroyed.
     kept = await PatientsClinicalService.get_allergy(db_session, test_patient.clinic_id, old_row.id)
