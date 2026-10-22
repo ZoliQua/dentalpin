@@ -33,9 +33,10 @@ onMounted(async () => {
     icon="i-lucide-receipt-indian-rupee"
     :title="t('indiaGst.banner.unregisteredTitle')"
     :description="t('indiaGst.banner.unregisteredDescription')"
-    :close-button="{ icon: 'i-lucide-x', color: 'neutral', variant: 'link' }"
+    :close="{ color: 'neutral', variant: 'link' }"
+    close-icon="i-lucide-x"
     class="mb-4"
-    @close="dismissed = true"
+    @update:open="dismissed = true"
   >
     <template #actions>
       <UButton

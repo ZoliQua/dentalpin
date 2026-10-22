@@ -313,6 +313,85 @@ async def test_create_catalog_item_duplicate_code(
     assert response.status_code == 409
 
 
+async def _item_category(client: AsyncClient, auth_headers: dict, key: str) -> str:
+    response = await client.post(
+        "/api/v1/catalog/categories",
+        json={"key": key, "names": {"es": "Cat", "en": "Cat"}},
+        headers=auth_headers,
+    )
+    return response.json()["data"]["id"]
+
+
+@pytest.mark.asyncio
+async def test_deleted_item_code_can_be_reused(
+    client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict
+):
+    """A deleted treatment frees its internal code (#736).
+
+    delete_item is a soft delete with no restore and the duplicate check
+    skips deleted rows; a full unique constraint still counted the row,
+    so the second create raised an unhandled IntegrityError (500).
+    """
+    category_id = await _item_category(client, auth_headers, "reuse_code_category")
+    body = {
+        "category_id": category_id,
+        "internal_code": "REUSE-001",
+        "names": {"es": "Primero", "en": "First"},
+        "vat_type_id": catalog_clinic_setup["vat_exempt_id"],
+        "treatment_scope": "tooth",
+    }
+    first = await client.post("/api/v1/catalog/items", json=body, headers=auth_headers)
+    assert first.status_code == 201
+    deleted = await client.delete(
+        f"/api/v1/catalog/items/{first.json()['data']['id']}", headers=auth_headers
+    )
+    assert deleted.status_code == 204
+
+    second = await client.post(
+        "/api/v1/catalog/items",
+        json={**body, "names": {"es": "Segundo", "en": "Second"}},
+        headers=auth_headers,
+    )
+    assert second.status_code == 201
+    assert second.json()["data"]["internal_code"] == "REUSE-001"
+
+    # The live item holds the code again.
+    third = await client.post("/api/v1/catalog/items", json=body, headers=auth_headers)
+    assert third.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_item_can_take_a_deleted_items_code(
+    client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict
+):
+    """Renaming an item to a deleted item's code is not a conflict (#736)."""
+    category_id = await _item_category(client, auth_headers, "rename_code_category")
+    common = {
+        "category_id": category_id,
+        "vat_type_id": catalog_clinic_setup["vat_exempt_id"],
+        "treatment_scope": "tooth",
+    }
+    gone = await client.post(
+        "/api/v1/catalog/items",
+        json={**common, "internal_code": "OLD-001", "names": {"es": "A", "en": "A"}},
+        headers=auth_headers,
+    )
+    await client.delete(f"/api/v1/catalog/items/{gone.json()['data']['id']}", headers=auth_headers)
+    kept = await client.post(
+        "/api/v1/catalog/items",
+        json={**common, "internal_code": "NEW-001", "names": {"es": "B", "en": "B"}},
+        headers=auth_headers,
+    )
+
+    response = await client.put(
+        f"/api/v1/catalog/items/{kept.json()['data']['id']}",
+        json={"internal_code": "OLD-001"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["data"]["internal_code"] == "OLD-001"
+
+
 @pytest.mark.asyncio
 async def test_get_catalog_item(
     client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict
@@ -397,6 +476,84 @@ async def test_update_catalog_item(
     data = response.json()["data"]
     assert data["names"]["es"] == "Actualizado"
     assert float(data["default_price"]) == 75.00
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("cleared", ["", None], ids=["blank-input", "null"])
+async def test_cleared_price_cost_and_duration_are_stored_empty(
+    client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict, cleared
+):
+    """The item modal resends the whole form: a cleared number input is ""."""
+    cat = await client.post(
+        "/api/v1/catalog/categories",
+        json={"key": f"clear_item_category_{cleared!r}", "names": {"es": "Cat"}},
+        headers=auth_headers,
+    )
+    category_id = cat.json()["data"]["id"]
+    created = await client.post(
+        "/api/v1/catalog/items",
+        json={
+            "category_id": category_id,
+            "internal_code": f"CLR-{cleared!r}",
+            "names": {"es": "Limpieza"},
+            "default_price": 50,
+            "cost_price": 10,
+            "default_duration_minutes": 30,
+        },
+        headers=auth_headers,
+    )
+    item_id = created.json()["data"]["id"]
+
+    response = await client.put(
+        f"/api/v1/catalog/items/{item_id}",
+        json={
+            "names": {"es": "Limpieza"},
+            "default_price": cleared,
+            "cost_price": cleared,
+            "default_duration_minutes": cleared,
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()["data"]
+    assert data["default_price"] is None
+    assert data["cost_price"] is None
+    assert data["default_duration_minutes"] is None
+
+    # A field the client did not send is still left alone.
+    response = await client.put(
+        f"/api/v1/catalog/items/{item_id}",
+        json={"default_price": 40},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+    assert float(response.json()["data"]["default_price"]) == 40
+    assert response.json()["data"]["names"]["es"] == "Limpieza"
+
+
+@pytest.mark.asyncio
+async def test_create_item_with_blank_optional_numbers(
+    client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict
+):
+    cat = await client.post(
+        "/api/v1/catalog/categories",
+        json={"key": "blank_create_category", "names": {"es": "Cat"}},
+        headers=auth_headers,
+    )
+    response = await client.post(
+        "/api/v1/catalog/items",
+        json={
+            "category_id": cat.json()["data"]["id"],
+            "internal_code": "BLANK-001",
+            "names": {"es": "Sin precio"},
+            "default_price": "",
+            "cost_price": "",
+            "default_duration_minutes": "",
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 201, response.text
+    assert response.json()["data"]["default_price"] is None
 
 
 @pytest.mark.asyncio

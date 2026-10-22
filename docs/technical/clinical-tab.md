@@ -392,63 +392,76 @@ const showPlanSelector = computed(() =>
 
 ### 2.5 DiagnosisCTA.vue
 
-**Path:** `frontend/app/components/clinical/DiagnosisCTA.vue`
+**Path:** `backend/app/modules/odontogram/frontend/components/clinical/DiagnosisCTA.vue`
+
+Banner contextual del modo diagnóstico. Sin borradores ofrece crear un plan; con
+uno ofrece continuarlo; con varios muestra un selector. El selector usa la API de
+Nuxt UI v4 (`items` + `value-key`/`label-key`): `options`, `option-attribute` y
+`value-attribute` son props de v3 que v4 ignora, dejan el desplegable vacío y el
+plan no se puede continuar.
 
 ```vue
 <script setup lang="ts">
+import type { TreatmentPlan } from '~~/app/types'
+
 const props = defineProps<{
   draftPlans: TreatmentPlan[]
 }>()
 
 const emit = defineEmits<{
-  'create': []
-  'continue': [planId: string]
+  create: []
+  continue: [planId: string]
 }>()
 
+const { t } = useI18n()
 const selectedDraftId = ref<string>('')
+
+const soleDraft = computed(() =>
+  props.draftPlans.length === 1 ? props.draftPlans[0] : undefined
+)
+
+const draftOptions = computed(() =>
+  props.draftPlans.map(plan => ({
+    label: plan.title || t('treatmentPlans.untitledPlan'),
+    value: plan.id
+  }))
+)
+
+function handleContinue() {
+  if (selectedDraftId.value) emit('continue', selectedDraftId.value)
+}
 </script>
 
 <template>
-  <UCard class="bg-primary-50 dark:bg-primary-900/20 border-primary-200">
-    <div class="flex items-center justify-between">
+  <UCard class="bg-[var(--color-primary-soft)] border-[var(--color-primary)]">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
       <div class="flex items-center gap-2">
-        <UIcon name="i-lucide-lightbulb" class="text-primary-500" />
-        <span>{{ $t('clinical.diagnosis.readyToCreatePlan') }}</span>
+        <UIcon name="i-lucide-lightbulb" class="w-5 h-5 text-primary-accent" />
+        <span class="font-medium">{{ t('clinical.diagnosis.readyToCreatePlan') }}</span>
       </div>
 
-      <!-- Sin borradores: Crear plan -->
-      <UButton
-        v-if="draftPlans.length === 0"
-        color="primary"
-        @click="emit('create')"
-      >
-        {{ $t('clinical.diagnosis.createPlan') }}
+      <!-- Sin borradores: crear plan -->
+      <UButton v-if="draftPlans.length === 0" color="primary" icon="i-lucide-plus" @click="emit('create')">
+        {{ t('clinical.diagnosis.createPlan') }}
       </UButton>
 
-      <!-- 1 borrador: Continuar ese plan -->
-      <UButton
-        v-else-if="draftPlans.length === 1"
-        color="primary"
-        @click="emit('continue', draftPlans[0].id)"
-      >
-        {{ $t('clinical.diagnosis.continuePlan', { name: draftPlans[0].title }) }}
+      <!-- 1 borrador: continuar ese plan -->
+      <UButton v-else-if="soleDraft" color="primary" icon="i-lucide-arrow-right" @click="emit('continue', soleDraft.id)">
+        {{ t('clinical.diagnosis.continuePlan', { name: soleDraft.title || t('treatmentPlans.untitledPlan') }) }}
       </UButton>
 
-      <!-- N borradores: Dropdown -->
+      <!-- N borradores: selector -->
       <div v-else class="flex items-center gap-2">
         <USelectMenu
           v-model="selectedDraftId"
-          :options="draftPlans"
-          option-attribute="title"
-          value-attribute="id"
-          :placeholder="$t('clinical.diagnosis.selectPlan')"
+          :items="draftOptions"
+          value-key="value"
+          label-key="label"
+          :placeholder="t('clinical.diagnosis.selectPlan')"
+          class="w-48"
         />
-        <UButton
-          color="primary"
-          :disabled="!selectedDraftId"
-          @click="emit('continue', selectedDraftId)"
-        >
-          {{ $t('clinical.diagnosis.continue') }}
+        <UButton color="primary" icon="i-lucide-arrow-right" :disabled="!selectedDraftId" @click="handleContinue">
+          {{ t('clinical.diagnosis.continue') }}
         </UButton>
       </div>
     </div>
@@ -943,6 +956,12 @@ Si no existe esta distinción, añadir campo `is_diagnosis: bool` al modelo.
 ---
 
 ## Archivos a Crear (9 componentes)
+
+Nota: este árbol refleja el plan original. El código vive hoy en los layers de
+`odontogram` (`ClinicalModeToggle`, `HistoryMode`, `DiagnosisMode`,
+`DiagnosisCTA`) y `treatment_plan` (`PlansMode`, `PlanDetailView`,
+`PlanTreatmentList`); las rutas `**Path:**` de las secciones 2.1-2.4, 2.6-2.8 y
+3.1 también son históricas. Ver §2.5 para la ruta exacta de `DiagnosisCTA`.
 
 ```
 frontend/app/components/clinical/
