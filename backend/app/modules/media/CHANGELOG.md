@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#743): emptying a document's description in the edit modal kept the
+  old text. The modal sent `|| undefined` (key dropped) and
+  `update_document` skipped every `None`. The modal now sends `null` and
+  the service stores it for `description` (`_CLEARABLE_DOCUMENT_FIELDS`);
+  other `None` / omitted fields are still left untouched.
 - fix(#730): the patient document/photo gallery pager never changed page. It bound `v-model` / `:page-count`; Nuxt UI v4 needs `v-model:page` / `:items-per-page`, so documents after the first 12 were unreachable.
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.

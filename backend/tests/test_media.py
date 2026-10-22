@@ -293,6 +293,18 @@ async def test_update_document(
     assert data["description"] == "Added description"
     assert data["document_type"] == "report"
 
+    # Emptying the description in the edit modal sends null: it must clear it
+    # (#743), while omitted fields stay as they are.
+    response = await client.put(
+        f"/api/v1/media/documents/{document_id}",
+        headers=auth_headers,
+        json={"title": "Updated Title", "description": None},
+    )
+    assert response.status_code == 200
+    data = response.json()["data"]
+    assert data["description"] is None
+    assert data["document_type"] == "report"
+
 
 @pytest.mark.asyncio
 async def test_delete_document(
