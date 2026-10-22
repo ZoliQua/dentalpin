@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix(#736): a deleted treatment frees its internal code. `uq_catalog_item_clinic_code` is now a partial unique index over live rows (`cat_0005`); creating or renaming an item to a deleted item's code used to pass the duplicate check and 500 on the constraint.
 - fix(#730): the Settings → Catalog pager never changed page. It used the Nuxt UI v3 `UPagination` binding (`:model-value` / `@update:model-value`, `:page-count`); v4 emits only `update:page` and pages by `items-per-page` (default 10). Items after the first 20 were only reachable through search.
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
