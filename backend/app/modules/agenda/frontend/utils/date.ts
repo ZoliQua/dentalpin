@@ -46,3 +46,19 @@ export function parseIsoParts(iso: string): IsoParts {
 export function isoPartsToDateKey(parts: IsoParts): string {
   return `${parts.year}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`
 }
+
+/**
+ * Calendar days from ``today`` (``YYYY-MM-DD``, the clinic's — see
+ * ``clinicToday``) to the clinic day an appointment's ``iso`` falls on:
+ * 0 today, 1 tomorrow, -1 yesterday. Reads the wall-clock date off the
+ * ISO string, so it is the day the calendar grid shows on every device.
+ * Counting elapsed milliseconds instead (``ceil(diff / 1 day)``) calls
+ * an appointment later today "tomorrow" (#738).
+ */
+export function clinicDayOffset(iso: string, today: string): number {
+  const a = parseIsoParts(iso)
+  const [y, m, d] = today.split('-').map(Number)
+  return Math.round(
+    (Date.UTC(a.year, a.month - 1, a.day) - Date.UTC(y!, m! - 1, d!)) / 86_400_000
+  )
+}

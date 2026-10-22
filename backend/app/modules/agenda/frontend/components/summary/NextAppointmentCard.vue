@@ -8,7 +8,8 @@
  * with day-relative formatting.
  */
 import type { Appointment, PaginatedResponse, PatientExtended } from '~~/app/types'
-import { parseWallClock } from '~~/app/utils/wallClock'
+import { clinicToday, parseWallClock } from '~~/app/utils/wallClock'
+import { clinicDayOffset } from '../../utils/date'
 
 interface Ctx {
   patient: PatientExtended
@@ -18,6 +19,7 @@ const props = defineProps<{ ctx: Ctx }>()
 
 const { t, locale } = useI18n()
 const api = useApi()
+const { currentClinic } = useClinic()
 
 const patientId = computed(() => props.ctx.patient.id)
 
@@ -25,8 +27,12 @@ const { data, status } = await useAsyncData(
   () => `agenda:summary-card:${patientId.value}`,
   async () => {
     try {
+      // From now on, soonest first: the unfiltered list starts at the
+      // patient's first ever visit, so a long history pushed the next
+      // appointment off the first page (#738).
+      const from = encodeURIComponent(new Date().toISOString())
       return await api.get<PaginatedResponse<Appointment>>(
-        `/api/v1/agenda/appointments?patient_id=${patientId.value}`
+        `/api/v1/agenda/appointments?patient_id=${patientId.value}&start_date=${from}&order=asc&page_size=20`
       )
     } catch {
       return { data: [], total: 0, page: 1, page_size: 20 }
@@ -44,14 +50,19 @@ const upcoming = computed<Appointment | null>(() => {
   return future[0] ?? null
 })
 
+// Calendar days in the clinic's frame, not elapsed time: an appointment
+// later today is "today", whatever the hour (#738).
+const dayOffset = computed<number | null>(() => {
+  if (!upcoming.value) return null
+  return clinicDayOffset(upcoming.value.start_time, clinicToday(currentClinic.value?.timezone))
+})
+
 const dayLabel = computed(() => {
   if (!upcoming.value) return ''
-  const now = new Date()
-  const apt = new Date(upcoming.value.start_time)
-  const days = Math.ceil((apt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  if (days === 0) return t('appointments.today', 'Hoy')
-  if (days === 1) return t('appointments.tomorrow', 'Mañana')
-  return apt.toLocaleDateString(locale.value, { weekday: 'short', day: 'numeric', month: 'short' })
+  if (dayOffset.value === 0) return t('appointments.today', 'Hoy')
+  if (dayOffset.value === 1) return t('appointments.tomorrow', 'Mañana')
+  return parseWallClock(upcoming.value.start_time)
+    .toLocaleDateString(locale.value, { weekday: 'short', day: 'numeric', month: 'short' })
 })
 
 const timeLabel = computed(() => {
@@ -62,11 +73,7 @@ const timeLabel = computed(() => {
   })
 })
 
-const isToday = computed(() => {
-  if (!upcoming.value) return false
-  const days = Math.ceil((new Date(upcoming.value.start_time).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-  return days === 0
-})
+const isToday = computed(() => dayOffset.value === 0)
 
 const href = computed(() => {
   if (!upcoming.value) {

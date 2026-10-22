@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix: the next-recall suggestion now scopes its patient lookup by clinic, so another clinic's patient row is never read. Defence in depth; the row was already discarded before use.
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight

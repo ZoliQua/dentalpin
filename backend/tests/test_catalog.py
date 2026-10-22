@@ -313,6 +313,85 @@ async def test_create_catalog_item_duplicate_code(
     assert response.status_code == 409
 
 
+async def _item_category(client: AsyncClient, auth_headers: dict, key: str) -> str:
+    response = await client.post(
+        "/api/v1/catalog/categories",
+        json={"key": key, "names": {"es": "Cat", "en": "Cat"}},
+        headers=auth_headers,
+    )
+    return response.json()["data"]["id"]
+
+
+@pytest.mark.asyncio
+async def test_deleted_item_code_can_be_reused(
+    client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict
+):
+    """A deleted treatment frees its internal code (#736).
+
+    delete_item is a soft delete with no restore and the duplicate check
+    skips deleted rows; a full unique constraint still counted the row,
+    so the second create raised an unhandled IntegrityError (500).
+    """
+    category_id = await _item_category(client, auth_headers, "reuse_code_category")
+    body = {
+        "category_id": category_id,
+        "internal_code": "REUSE-001",
+        "names": {"es": "Primero", "en": "First"},
+        "vat_type_id": catalog_clinic_setup["vat_exempt_id"],
+        "treatment_scope": "tooth",
+    }
+    first = await client.post("/api/v1/catalog/items", json=body, headers=auth_headers)
+    assert first.status_code == 201
+    deleted = await client.delete(
+        f"/api/v1/catalog/items/{first.json()['data']['id']}", headers=auth_headers
+    )
+    assert deleted.status_code == 204
+
+    second = await client.post(
+        "/api/v1/catalog/items",
+        json={**body, "names": {"es": "Segundo", "en": "Second"}},
+        headers=auth_headers,
+    )
+    assert second.status_code == 201
+    assert second.json()["data"]["internal_code"] == "REUSE-001"
+
+    # The live item holds the code again.
+    third = await client.post("/api/v1/catalog/items", json=body, headers=auth_headers)
+    assert third.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_item_can_take_a_deleted_items_code(
+    client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict
+):
+    """Renaming an item to a deleted item's code is not a conflict (#736)."""
+    category_id = await _item_category(client, auth_headers, "rename_code_category")
+    common = {
+        "category_id": category_id,
+        "vat_type_id": catalog_clinic_setup["vat_exempt_id"],
+        "treatment_scope": "tooth",
+    }
+    gone = await client.post(
+        "/api/v1/catalog/items",
+        json={**common, "internal_code": "OLD-001", "names": {"es": "A", "en": "A"}},
+        headers=auth_headers,
+    )
+    await client.delete(f"/api/v1/catalog/items/{gone.json()['data']['id']}", headers=auth_headers)
+    kept = await client.post(
+        "/api/v1/catalog/items",
+        json={**common, "internal_code": "NEW-001", "names": {"es": "B", "en": "B"}},
+        headers=auth_headers,
+    )
+
+    response = await client.put(
+        f"/api/v1/catalog/items/{kept.json()['data']['id']}",
+        json={"internal_code": "OLD-001"},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["data"]["internal_code"] == "OLD-001"
+
+
 @pytest.mark.asyncio
 async def test_get_catalog_item(
     client: AsyncClient, auth_headers: dict, catalog_clinic_setup: dict

@@ -264,3 +264,41 @@ async def test_suggestion_uses_category_map(
     assert suggestion["reason"] == "hygiene"
     assert suggestion["interval_months"] == 6
     assert suggestion["matched_setting"] is True
+
+
+@pytest.mark.asyncio
+async def test_suggestion_ignores_foreign_patient(
+    client: AsyncClient,
+    auth_headers: dict,
+    test_clinic: Clinic,
+    db_session: AsyncSession,
+):
+    """A suggestion must never be computed for another clinic's patient,
+    even when a matching category mapping exists (audit multi-tenancy)."""
+    from uuid import uuid4
+
+    other_clinic = Clinic(
+        id=uuid4(),
+        name="Other",
+        tax_id="B88888888",
+        address={"street": "x", "city": "y"},
+        settings={},
+    )
+    db_session.add(other_clinic)
+    foreign_patient = Patient(
+        id=uuid4(),
+        clinic_id=other_clinic.id,
+        first_name="Foreign",
+        last_name="Patient",
+        phone="+34600000001",
+    )
+    db_session.add(foreign_patient)
+    await db_session.commit()
+
+    res = await client.get(
+        f"/api/v1/recalls/suggestions/next?patient_id={foreign_patient.id}"
+        f"&treatment_category_key=preventivo",
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
+    assert res.json()["data"] is None

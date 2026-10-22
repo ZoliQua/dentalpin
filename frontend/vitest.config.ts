@@ -22,6 +22,7 @@ export default defineVitestConfig({
     // not be picked up by vitest — doing so throws
     // "Playwright Test did not expect test.describe() to be called here".
     exclude: ['**/node_modules/**', '**/dist/**', 'tests/e2e/**'],
+    setupFiles: ['./tests/setup.ts'],
     environmentOptions: {
       nuxt: {
         mock: {

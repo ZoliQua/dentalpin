@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#738): the patient summary's next-appointment card counted elapsed milliseconds (`ceil(diff / 1 day)`), so an appointment later today read "Mañana" and the card never turned green, and it fetched the patient's whole history oldest first, so a long history pushed the next appointment off the page. It now asks for `start_date=now&order=asc` and labels days with `clinicDayOffset` on the clinic wall-clock; the last-visit card and the kanban "next in cabinet" hour read the clinic wall-clock too.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - docs(#707): the router docstring still said cabinets gate on

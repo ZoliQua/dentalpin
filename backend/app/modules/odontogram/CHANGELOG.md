@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix: the "Continue plan" dropdown on the diagnosis banner rendered empty.
+  `DiagnosisCTA` bound the Nuxt UI v3 `options` / `option-attribute` /
+  `value-attribute` props, which v4 ignores, so with two or more drafts the
+  select had no items and no plan could be continued. It now uses `items`
+  with `value-key` / `label-key`, and a host test scans the odontogram layer
+  for the ignored props.
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
