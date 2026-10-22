@@ -508,9 +508,14 @@ class RecallService:
         suggestion as a recall (via POST /recalls).
         """
         patient = (
-            await db.execute(select(Patient).where(Patient.id == patient_id))
+            await db.execute(
+                select(Patient).where(
+                    Patient.id == patient_id,
+                    Patient.clinic_id == clinic_id,
+                )
+            )
         ).scalar_one_or_none()
-        if not patient or patient.clinic_id != clinic_id:
+        if not patient:
             return None
         if patient.status == "archived" or patient.do_not_contact:
             return None

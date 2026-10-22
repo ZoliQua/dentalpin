@@ -8,6 +8,13 @@
   value, last INR date and surgery date, and the emergency contact's and
   legal guardian's e-mail. A `mode="before"` validator now reads a blank
   string as `None` on exactly those fields.
+- fix(security): the four list helpers (`list_allergies`,
+  `list_medications`, `list_systemic_diseases`, `list_surgical_history`)
+  and both 1:1 getters (`get_emergency_contact`, `get_legal_guardian`)
+  now filter by `clinic_id`, and the bulk replace archives only rows of
+  the caller's clinic. Completes SEC-06 in this module after the five
+  id-only getters were scoped; the routers already verified the parent
+  patient, so this is defence in depth, not a reachable-leak fix.
 
 - docs(#707): CLAUDE.md claimed `/api/v1/patients-clinical/`; the real
   prefix is `/api/v1/patients_clinical/`.

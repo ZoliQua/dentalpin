@@ -78,10 +78,14 @@ class PatientsClinicalService:
     # --- Allergy -------------------------------------------------------
 
     @staticmethod
-    async def list_allergies(db: AsyncSession, patient_id: UUID) -> list[Allergy]:
+    async def list_allergies(db: AsyncSession, clinic_id: UUID, patient_id: UUID) -> list[Allergy]:
         result = await db.execute(
             select(Allergy)
-            .where(Allergy.patient_id == patient_id, Allergy.status == "active")
+            .where(
+                Allergy.clinic_id == clinic_id,
+                Allergy.patient_id == patient_id,
+                Allergy.status == "active",
+            )
             .order_by(Allergy.created_at)
         )
         return list(result.scalars())
@@ -118,10 +122,16 @@ class PatientsClinicalService:
     # --- Medication ----------------------------------------------------
 
     @staticmethod
-    async def list_medications(db: AsyncSession, patient_id: UUID) -> list[Medication]:
+    async def list_medications(
+        db: AsyncSession, clinic_id: UUID, patient_id: UUID
+    ) -> list[Medication]:
         result = await db.execute(
             select(Medication)
-            .where(Medication.patient_id == patient_id, Medication.status == "active")
+            .where(
+                Medication.clinic_id == clinic_id,
+                Medication.patient_id == patient_id,
+                Medication.status == "active",
+            )
             .order_by(Medication.created_at)
         )
         return list(result.scalars())
@@ -162,10 +172,16 @@ class PatientsClinicalService:
     # --- Systemic disease ----------------------------------------------
 
     @staticmethod
-    async def list_systemic_diseases(db: AsyncSession, patient_id: UUID) -> list[SystemicDisease]:
+    async def list_systemic_diseases(
+        db: AsyncSession, clinic_id: UUID, patient_id: UUID
+    ) -> list[SystemicDisease]:
         result = await db.execute(
             select(SystemicDisease)
-            .where(SystemicDisease.patient_id == patient_id, SystemicDisease.status == "active")
+            .where(
+                SystemicDisease.clinic_id == clinic_id,
+                SystemicDisease.patient_id == patient_id,
+                SystemicDisease.status == "active",
+            )
             .order_by(SystemicDisease.created_at)
         )
         return list(result.scalars())
@@ -208,10 +224,16 @@ class PatientsClinicalService:
     # --- Surgical history ----------------------------------------------
 
     @staticmethod
-    async def list_surgical_history(db: AsyncSession, patient_id: UUID) -> list[SurgicalHistory]:
+    async def list_surgical_history(
+        db: AsyncSession, clinic_id: UUID, patient_id: UUID
+    ) -> list[SurgicalHistory]:
         result = await db.execute(
             select(SurgicalHistory)
-            .where(SurgicalHistory.patient_id == patient_id, SurgicalHistory.status == "active")
+            .where(
+                SurgicalHistory.clinic_id == clinic_id,
+                SurgicalHistory.patient_id == patient_id,
+                SurgicalHistory.status == "active",
+            )
             .order_by(SurgicalHistory.created_at)
         )
         return list(result.scalars())
@@ -254,9 +276,14 @@ class PatientsClinicalService:
     # --- Emergency contact (1:1) ---------------------------------------
 
     @staticmethod
-    async def get_emergency_contact(db: AsyncSession, patient_id: UUID) -> EmergencyContact | None:
+    async def get_emergency_contact(
+        db: AsyncSession, clinic_id: UUID, patient_id: UUID
+    ) -> EmergencyContact | None:
         result = await db.execute(
-            select(EmergencyContact).where(EmergencyContact.patient_id == patient_id)
+            select(EmergencyContact).where(
+                EmergencyContact.clinic_id == clinic_id,
+                EmergencyContact.patient_id == patient_id,
+            )
         )
         return result.scalar_one_or_none()
 
@@ -264,7 +291,7 @@ class PatientsClinicalService:
     async def upsert_emergency_contact(
         db: AsyncSession, clinic_id: UUID, patient_id: UUID, data: dict
     ) -> EmergencyContact:
-        existing = await PatientsClinicalService.get_emergency_contact(db, patient_id)
+        existing = await PatientsClinicalService.get_emergency_contact(db, clinic_id, patient_id)
         if existing is None:
             existing = EmergencyContact(patient_id=patient_id, clinic_id=clinic_id, **data)
             db.add(existing)
@@ -285,9 +312,14 @@ class PatientsClinicalService:
     # --- Legal guardian (1:1) ------------------------------------------
 
     @staticmethod
-    async def get_legal_guardian(db: AsyncSession, patient_id: UUID) -> LegalGuardian | None:
+    async def get_legal_guardian(
+        db: AsyncSession, clinic_id: UUID, patient_id: UUID
+    ) -> LegalGuardian | None:
         result = await db.execute(
-            select(LegalGuardian).where(LegalGuardian.patient_id == patient_id)
+            select(LegalGuardian).where(
+                LegalGuardian.clinic_id == clinic_id,
+                LegalGuardian.patient_id == patient_id,
+            )
         )
         return result.scalar_one_or_none()
 
@@ -295,7 +327,7 @@ class PatientsClinicalService:
     async def upsert_legal_guardian(
         db: AsyncSession, clinic_id: UUID, patient_id: UUID, data: dict
     ) -> LegalGuardian:
-        existing = await PatientsClinicalService.get_legal_guardian(db, patient_id)
+        existing = await PatientsClinicalService.get_legal_guardian(db, clinic_id, patient_id)
         if existing is None:
             existing = LegalGuardian(patient_id=patient_id, clinic_id=clinic_id, **data)
             db.add(existing)
@@ -319,10 +351,10 @@ class PatientsClinicalService:
     async def build_medical_history(db: AsyncSession, clinic_id: UUID, patient_id: UUID) -> dict:
         """Return the legacy JSONB-shaped medical history payload."""
         context = await PatientsClinicalService.get_medical_context(db, clinic_id, patient_id)
-        allergies = await PatientsClinicalService.list_allergies(db, patient_id)
-        medications = await PatientsClinicalService.list_medications(db, patient_id)
-        diseases = await PatientsClinicalService.list_systemic_diseases(db, patient_id)
-        surgeries = await PatientsClinicalService.list_surgical_history(db, patient_id)
+        allergies = await PatientsClinicalService.list_allergies(db, clinic_id, patient_id)
+        medications = await PatientsClinicalService.list_medications(db, clinic_id, patient_id)
+        diseases = await PatientsClinicalService.list_systemic_diseases(db, clinic_id, patient_id)
+        surgeries = await PatientsClinicalService.list_surgical_history(db, clinic_id, patient_id)
 
         ctx: dict[str, Any] = {}
         if context is not None:
@@ -355,8 +387,8 @@ class PatientsClinicalService:
     async def compute_alerts(db: AsyncSession, clinic_id: UUID, patient_id: UUID) -> list[dict]:
         """Compute active alerts from normalized clinical rows."""
         context = await PatientsClinicalService.get_medical_context(db, clinic_id, patient_id)
-        allergies = await PatientsClinicalService.list_allergies(db, patient_id)
-        diseases = await PatientsClinicalService.list_systemic_diseases(db, patient_id)
+        allergies = await PatientsClinicalService.list_allergies(db, clinic_id, patient_id)
+        diseases = await PatientsClinicalService.list_systemic_diseases(db, clinic_id, patient_id)
 
         alerts: list[dict] = []
 
@@ -453,7 +485,11 @@ class PatientsClinicalService:
             (SystemicDisease, "systemic_diseases"),
             (SurgicalHistory, "surgical_history"),
         ):
-            existing = await db.execute(select(table_cls).where(table_cls.patient_id == patient_id))
+            existing = await db.execute(
+                select(table_cls).where(
+                    table_cls.clinic_id == clinic_id, table_cls.patient_id == patient_id
+                )
+            )
             for row in existing.scalars():
                 row.status = "archived"
 

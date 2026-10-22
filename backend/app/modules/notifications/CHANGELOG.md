@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: notification handler row reads now scope their appointment, patient, budget and invoice lookups by the event payload's clinic. Defence in depth; a payload whose clinic did not own the row was still resolved by id alone and could enqueue for the wrong clinic.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix(#614): production with `EMAIL_PROVIDER=console` (or unknown)
