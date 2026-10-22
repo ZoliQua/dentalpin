@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix(#750): removing a plan item that was booked into an appointment
+  answered 500 (`appointment_treatments` references it through an FK
+  without ondelete). While the appointment is live the removal answers
+  409 and asks to unlink it in the appointment first; links to cancelled
+  appointments are removed with the item.
 - fix(#730): the pipeline tab pager never changed page. It used the Nuxt UI v3 `UPagination` binding (`:model-value` / `@update:model-value`, `:page-count`); it now binds `:page` / `@update:page` / `:items-per-page`.
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
