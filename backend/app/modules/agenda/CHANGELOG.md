@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#743): removing the last linked plan treatment from an appointment
+  in the edit modal did nothing -- the modal dropped `planned_item_ids`
+  when the selection was empty, and an omitted key means "keep the
+  links". It now sends `[]` when the appointment being edited had links. Backend
+  behaviour is unchanged; a test now pins that `[]` clears and an
+  omitted key keeps.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - docs(#707): the router docstring still said cabinets gate on
