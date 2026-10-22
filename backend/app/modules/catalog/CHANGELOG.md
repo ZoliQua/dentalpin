@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- fix(#740): a treatment's price, cost or duration could not be removed.
+  - Clearing the input and saving answered 422: a cleared input sends `""`,
+    and Nuxt UI's `UInput` keeps `""` even for `type="number"`.
+  - An explicit `null` returned 200 but changed nothing, because
+    `update_item` skipped every `None`.
+  - Now `""` reads as `None` on those three fields (create and update),
+    and `update_item` stores an explicit `None` for them
+    (`_CLEARABLE_ITEM_FIELDS`). Any other omitted or `None` field is still
+    left untouched.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix(#701): `Category{Create,Update}.icon` is capped at the column
