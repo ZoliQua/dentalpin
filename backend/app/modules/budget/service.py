@@ -276,6 +276,19 @@ async def _validate_professional_in_clinic(
         raise ValueError("Invalid professional for this clinic")
 
 
+# Budget columns that may be cleared with an explicit ``null`` on update.
+_CLEARABLE_BUDGET_FIELDS = frozenset(
+    {
+        "valid_until",
+        "assigned_professional_id",
+        "global_discount_type",
+        "global_discount_value",
+        "internal_notes",
+        "patient_notes",
+    }
+)
+
+
 class BudgetService:
     """Service for budget operations."""
 
@@ -654,7 +667,10 @@ class BudgetService:
             await _validate_professional_in_clinic(db, budget.clinic_id, new_professional)
 
         for key, value in data.items():
-            if value is not None and hasattr(budget, key):
+            # None means "not sent" except on the nullable columns, where an
+            # explicit null clears the value -- removing a discount, an
+            # expiry date or a note must actually remove it (#743).
+            if (value is not None or key in _CLEARABLE_BUDGET_FIELDS) and hasattr(budget, key):
                 setattr(budget, key, value)
 
         # The caller reloads the budget to build the response, but this

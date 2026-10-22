@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- fix(#743): removing a draft budget's global discount, expiry date or
+  notes did not remove them -- the save answered 200 and the discount
+  stayed applied. The edit form sent cleared fields as `undefined`
+  (dropped from the JSON), and `update_budget` skipped every `None`
+  anyway. The form now sends `null`, and `update_budget` stores an
+  explicit `null` on the nullable header columns
+  (`_CLEARABLE_BUDGET_FIELDS`, mirroring the lines'
+  `_CLEARABLE_ITEM_FIELDS`). An omitted key is still left untouched.
+
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
 
 - fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
