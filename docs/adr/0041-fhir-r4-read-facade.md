@@ -1,6 +1,6 @@
 # 0041 — FHIR R4 read-only facade as the public data API
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-10-22
 - **Deciders:** maintainers (@martinezsalmeron, @ZoliQua)
 - **Tags:** interoperability, fhir, api, registry, compliance, architecture
