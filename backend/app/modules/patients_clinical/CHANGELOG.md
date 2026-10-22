@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#740): clearing an optional input and saving answered 422, because a
+  cleared input sends `""` (Nuxt UI's `UInput` keeps `""` even for
+  `type="number"`). Affected: the medical history's pregnancy week, INR
+  value, last INR date and surgery date, and the emergency contact's and
+  legal guardian's e-mail. A `mode="before"` validator now reads a blank
+  string as `None` on exactly those fields.
+
 - docs(#707): CLAUDE.md claimed `/api/v1/patients-clinical/`; the real
   prefix is `/api/v1/patients_clinical/`.
 - fix(#697): the alerts banner's expand/collapse aria-label
