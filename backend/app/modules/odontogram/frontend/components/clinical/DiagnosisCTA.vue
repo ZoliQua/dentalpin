@@ -79,9 +79,9 @@ function handleContinue() {
       >
         <USelectMenu
           v-model="selectedDraftId"
-          :options="draftOptions"
-          option-attribute="label"
-          value-attribute="value"
+          :items="draftOptions"
+          value-key="value"
+          label-key="label"
           :placeholder="t('clinical.diagnosis.selectPlan')"
           class="w-48"
         />
