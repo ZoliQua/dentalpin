@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#740): clearing an optional input and saving answered 422, because a
+  cleared input sends `""` (Nuxt UI's `UInput` keeps `""` even for
+  `type="number"`). Affected: the medical history's pregnancy week, INR
+  value, last INR date and surgery date, and the emergency contact's and
+  legal guardian's e-mail. A `mode="before"` validator now reads a blank
+  string as `None` on exactly those fields.
 - fix(security): the four list helpers (`list_allergies`,
   `list_medications`, `list_systemic_diseases`, `list_surgical_history`)
   and both 1:1 getters (`get_emergency_contact`, `get_legal_guardian`)
