@@ -13,6 +13,8 @@ from alembic import op
 revision: str = "ort_0004"
 down_revision: str | None = "ort_0003"
 branch_labels: str | Sequence[str] | None = None
+# Recreates the FK into treatment_plan's table; same target as ort_0002.
+depends_on: str | Sequence[str] | None = ("tp_0006",)
 
 
 def upgrade() -> None:
