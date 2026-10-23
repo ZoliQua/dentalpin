@@ -193,8 +193,9 @@ async def delete_template(
 async def _ensure_clinic_patient(db: AsyncSession, clinic_id: UUID, patient_id: UUID) -> None:
     """404 unless the patient is this clinic's.
 
-    The preference endpoints create the row on first read, so an unknown id
-    hit the patients FK (500) and another clinic's patient got a row here.
+    The preference endpoints create the row on first read and a reply writes a
+    message row, so an unknown id hit the patients FK (500) and another
+    clinic's patient got a row here.
     """
     from sqlalchemy import select
 
@@ -647,6 +648,7 @@ async def reply_to_conversation(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[ConversationMessageResponse]:
     """Send a free-form reply to the patient (within the 24h session window)."""
+    await _ensure_clinic_patient(db, ctx.clinic_id, patient_id)
     msg = await NotificationGateway.enqueue(
         db,
         ctx.clinic_id,

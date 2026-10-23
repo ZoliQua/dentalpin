@@ -2,8 +2,9 @@
 
 ## Unreleased
 
-- fix(#765): `GET`/`PUT /preferences/patient/{id}` answer 404 unless the
-  patient is the caller's clinic's. An unknown id hit the patients FK
+- fix(#765): `GET`/`PUT /preferences/patient/{id}` and
+  `POST /conversations/{id}/reply` answer 404 unless the patient is the
+  caller's clinic's. An unknown id hit the patients FK
   (500), and another clinic's patient got a row here. Concurrent first
   reads no longer 500: the loser of the
   `uq_notification_pref_clinic_patient` race reads the winner's row.

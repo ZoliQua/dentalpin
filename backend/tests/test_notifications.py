@@ -124,11 +124,12 @@ async def test_get_patient_preferences(
 
 
 @pytest.mark.asyncio
-async def test_patient_preferences_of_an_unknown_or_foreign_patient_answer_404(
+async def test_patient_endpoints_of_an_unknown_or_foreign_patient_answer_404(
     client: AsyncClient, auth_headers: dict, db_session: AsyncSession, test_clinic
 ):
-    """The GET creates the row on first read: an unknown id hit the patients FK
-    (500), and another clinic's patient got a row in this clinic."""
+    """The GET creates the row on first read and a reply writes a message row:
+    an unknown id hit the patients FK (500), and another clinic's patient got
+    a row in this clinic."""
     other = Clinic(id=uuid4(), name="Other", tax_id="B99999999", address={}, settings={})
     db_session.add(other)
     await db_session.flush()
@@ -141,6 +142,12 @@ async def test_patient_preferences_of_an_unknown_or_foreign_patient_answer_404(
         assert (await client.get(url, headers=auth_headers)).status_code == 404
         put = await client.put(url, json={"email_enabled": False}, headers=auth_headers)
         assert put.status_code == 404
+        reply = await client.post(
+            f"/api/v1/notifications/conversations/{patient_id}/reply",
+            json={"channel": "whatsapp", "body": "Hola"},
+            headers=auth_headers,
+        )
+        assert reply.status_code == 404, reply.text
 
     rows = await db_session.scalar(
         select(func.count())
