@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#750): deleting a draft invoice line that had a SAC override (`PUT /india_gst/invoices/{id}`) answered 500. The override row references the line through a deliberately `RESTRICT` FK. `IndiaGstHook.on_draft_item_deleted` now removes the row first.
+
 - fix(#732): the unregistered-GSTIN banner rendered no close button, so it could not be dismissed. `close-button` / `@close` are Nuxt UI v3; it now binds `close` + `close-icon` and `@update:open`.
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.

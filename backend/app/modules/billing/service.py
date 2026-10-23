@@ -15,6 +15,7 @@ from app.core.utils.dates import clinic_today_for
 from app.modules.payments.models import Payment as PaymentModel
 from app.modules.payments.models import Refund as RefundModel
 
+from .hooks import BillingHookRegistry
 from .models import (
     Invoice,
     InvoiceHistory,
@@ -593,6 +594,8 @@ class InvoiceItemService:
     ) -> None:
         """Delete an invoice item."""
         budget_item_id = item.budget_item_id
+        for hook in BillingHookRegistry.get_all().values():
+            await hook.on_draft_item_deleted(item, db)
         await db.delete(item)
         await db.flush()
 
