@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#765): `GET`/`PUT /preferences/patient/{id}` answer 404 unless the
+  patient is the caller's clinic's. An unknown id hit the patients FK
+  (500), and another clinic's patient got a row here. Concurrent first
+  reads no longer 500: the loser of the
+  `uq_notification_pref_clinic_patient` race reads the winner's row.
+
 - fix: notification handler row reads now scope their appointment, patient, budget and invoice lookups by the event payload's clinic. Defence in depth; a payload whose clinic did not own the row was still resolved by id alone and could enqueue for the wrong clinic.
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
