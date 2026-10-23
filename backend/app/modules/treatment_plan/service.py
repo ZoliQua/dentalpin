@@ -15,10 +15,16 @@ from app.core.auth.models import ClinicMembership
 from app.core.events import event_bus
 from app.core.events.types import EventType
 from app.core.i18n_names import catalog_name
+from app.modules.agenda.models import Appointment
 from app.modules.odontogram.models import Treatment
 from app.modules.patients.models import Patient
 
-from .models import PlannedTreatmentItem, PlannedTreatmentItemSession, TreatmentPlan
+from .models import (
+    AppointmentTreatment,
+    PlannedTreatmentItem,
+    PlannedTreatmentItemSession,
+    TreatmentPlan,
+)
 
 
 async def _validate_professional_in_clinic(
@@ -166,6 +172,10 @@ VALID_CLOSURE_REASONS: set[str] = {
 
 class PlanLockedError(ValueError):
     """Raised when a mutation is attempted on a plan locked by an active budget."""
+
+
+class PlanItemBookedError(ValueError):
+    """Raised when removing an item still booked into a non-cancelled appointment."""
 
 
 TERMINAL_BUDGET_STATUSES = frozenset({"cancelled", "rejected", "expired"})
@@ -801,6 +811,27 @@ class TreatmentPlanService:
         item = result.scalar_one_or_none()
         if not item:
             return False
+
+        # ``appointment_treatments`` references the item through a NOT NULL
+        # FK without ondelete, so a booked item failed the DELETE with a 500
+        # (#750). A live booking blocks the removal; links to cancelled
+        # appointments are dead and go with the item.
+        links = (
+            await db.execute(
+                select(AppointmentTreatment, Appointment.status)
+                .join(Appointment, Appointment.id == AppointmentTreatment.appointment_id)
+                .where(
+                    Appointment.clinic_id == clinic_id,
+                    AppointmentTreatment.planned_treatment_item_id == item.id,
+                )
+            )
+        ).all()
+        if any(status != "cancelled" for _, status in links):
+            raise PlanItemBookedError(
+                "Treatment is booked in an appointment; unlink it there first"
+            )
+        for link, _ in links:
+            await db.delete(link)
 
         treatment_id = item.treatment_id
         await db.delete(item)
