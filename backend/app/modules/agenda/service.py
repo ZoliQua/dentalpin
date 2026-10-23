@@ -9,7 +9,7 @@ import re
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -167,6 +167,22 @@ class CabinetService:
             )
 
         return cabinet
+
+    @staticmethod
+    async def has_history(db: AsyncSession, cabinet: Cabinet) -> bool:
+        """Whether any appointment or cabinet event still references the cabinet."""
+        for stmt in (
+            select(Appointment.id).where(Appointment.cabinet_id == cabinet.id),
+            select(AppointmentCabinetEvent.id).where(
+                or_(
+                    AppointmentCabinetEvent.from_cabinet_id == cabinet.id,
+                    AppointmentCabinetEvent.to_cabinet_id == cabinet.id,
+                )
+            ),
+        ):
+            if (await db.execute(stmt.limit(1))).first() is not None:
+                return True
+        return False
 
     @staticmethod
     async def delete_cabinet(db: AsyncSession, cabinet: Cabinet) -> None:
