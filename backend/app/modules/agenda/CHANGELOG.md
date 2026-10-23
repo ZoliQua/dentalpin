@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#750): deleting a cabinet whose appointments were all cancelled
+  answered 500. The guard only counted non-cancelled appointments, while
+  cancelled ones and the cabinet audit trail still reference the row. A
+  cabinet with any history now answers 409 and asks to deactivate it.
 - fix(#743): removing the last linked plan treatment from an appointment
   in the edit modal did nothing -- the modal dropped `planned_item_ids`
   when the selection was empty, and an omitted key means "keep the
