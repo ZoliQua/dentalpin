@@ -689,3 +689,11 @@ async def test_duplicate_membership_rejected_for_control_registration(
     )
     await db_session.commit()
     assert control.id is not None
+
+
+def test_cleared_aligner_number_is_no_value():
+    """A cleared aligner input sends "" -- it means "none", not a 422 (#740)."""
+    assert OrthoControlCreate(aligner_number="").aligner_number is None
+    update = OrthoControlUpdate(aligner_number="")
+    assert update.aligner_number is None
+    assert "aligner_number" in update.model_fields_set

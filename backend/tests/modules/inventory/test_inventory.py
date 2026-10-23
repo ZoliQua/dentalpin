@@ -232,3 +232,21 @@ async def test_items_are_clinic_scoped(db_session: AsyncSession, test_clinic: Cl
 
     rows, total = await InventoryService.list_items(db_session, test_clinic.id)
     assert total == 0
+
+
+@pytest.mark.asyncio
+async def test_cleared_unit_cost_saves_as_empty(db_session: AsyncSession, test_clinic: Clinic):
+    """A cleared cost input sends "" -- it means "no cost", not a 422 (#740)."""
+    created = InventoryItemCreate(name="Gloves", unit_cost="")
+    assert created.unit_cost is None
+
+    item = await InventoryService.create_item(
+        db_session,
+        test_clinic.id,
+        InventoryItemCreate(name="Gloves", unit_cost=Decimal("4.50")),
+        created_by=None,
+    )
+    updated = await InventoryService.update_item(
+        db_session, test_clinic.id, item.id, InventoryItemUpdate(unit_cost="")
+    )
+    assert updated.unit_cost is None
