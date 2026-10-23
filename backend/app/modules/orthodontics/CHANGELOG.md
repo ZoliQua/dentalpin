@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix(#740): a control whose aligner-number input was typed in and then cleared saves. The cleared input sent `""`, which the `int` field answered with 422.
 - fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
   (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
   is UTC midnight and rendered every such date one day early in zones behind

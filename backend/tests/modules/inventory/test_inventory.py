@@ -266,3 +266,21 @@ async def test_delete_item_linked_elsewhere_answers_409(
         db_session, test_clinic.id, InventoryItemCreate(name="Masks"), created_by=None
     )
     await InventoryService.delete_item(db_session, test_clinic.id, unlinked.id)
+
+
+@pytest.mark.asyncio
+async def test_cleared_unit_cost_saves_as_empty(db_session: AsyncSession, test_clinic: Clinic):
+    """A cleared cost input sends "" -- it means "no cost", not a 422 (#740)."""
+    created = InventoryItemCreate(name="Gloves", unit_cost="")
+    assert created.unit_cost is None
+
+    item = await InventoryService.create_item(
+        db_session,
+        test_clinic.id,
+        InventoryItemCreate(name="Gloves", unit_cost=Decimal("4.50")),
+        created_by=None,
+    )
+    updated = await InventoryService.update_item(
+        db_session, test_clinic.id, item.id, InventoryItemUpdate(unit_cost="")
+    )
+    assert updated.unit_cost is None
