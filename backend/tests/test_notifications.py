@@ -1,10 +1,16 @@
 """Tests for the notifications module."""
 
+import asyncio
+from uuid import uuid4
+
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth.models import Clinic
+from app.database import async_session_maker
 from app.modules.notifications.channels import (
     AdapterResult,
     Channel,
@@ -12,9 +18,11 @@ from app.modules.notifications.channels import (
     channel_registry,
 )
 from app.modules.notifications.models import (
+    NotificationPreference,
     NotificationTemplate,
 )
 from app.modules.notifications.service import NotificationService
+from app.modules.patients.models import Patient
 
 
 @pytest_asyncio.fixture
@@ -113,6 +121,59 @@ async def test_get_patient_preferences(
     # Should have default preferences
     assert data["email_enabled"] is True
     assert "preferences" in data
+
+
+@pytest.mark.asyncio
+async def test_patient_endpoints_of_an_unknown_or_foreign_patient_answer_404(
+    client: AsyncClient, auth_headers: dict, db_session: AsyncSession, test_clinic
+):
+    """The GET creates the row on first read and a reply writes a message row:
+    an unknown id hit the patients FK (500), and another clinic's patient got
+    a row in this clinic."""
+    other = Clinic(id=uuid4(), name="Other", tax_id="B99999999", address={}, settings={})
+    db_session.add(other)
+    await db_session.flush()
+    foreign = Patient(id=uuid4(), clinic_id=other.id, first_name="Ana", last_name="Ruiz")
+    db_session.add(foreign)
+    await db_session.commit()
+
+    for patient_id in (uuid4(), foreign.id):
+        url = f"/api/v1/notifications/preferences/patient/{patient_id}"
+        assert (await client.get(url, headers=auth_headers)).status_code == 404
+        put = await client.put(url, json={"email_enabled": False}, headers=auth_headers)
+        assert put.status_code == 404
+        reply = await client.post(
+            f"/api/v1/notifications/conversations/{patient_id}/reply",
+            json={"channel": "whatsapp", "body": "Hola"},
+            headers=auth_headers,
+        )
+        assert reply.status_code == 404, reply.text
+
+    rows = await db_session.scalar(
+        select(func.count())
+        .select_from(NotificationPreference)
+        .where(NotificationPreference.patient_id == foreign.id)
+    )
+    assert rows == 0
+
+
+@pytest.mark.asyncio
+async def test_concurrent_first_reads_share_one_preferences_row(
+    db_session: AsyncSession, test_clinic, test_patient
+):
+    """Two first reads race on uq_notification_pref_clinic_patient; the loser
+    used to raise IntegrityError (500) instead of reading the winner's row."""
+    await db_session.commit()
+
+    async def first_read():
+        async with async_session_maker() as db:
+            prefs = await NotificationService.get_or_create_patient_preferences(
+                db, test_clinic.id, test_patient.id
+            )
+            return prefs.id
+
+    ids = await asyncio.gather(*(first_read() for _ in range(4)))
+    assert len(set(ids)) == 1
 
 
 @pytest.mark.asyncio
