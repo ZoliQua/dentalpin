@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#774): `AppointmentService.transition` locks the appointment row and re-reads its status before the state-machine check. Two check-ins (kiosk and reception) or a double-clicked no-show at the same moment both passed the check on their unlocked copy and wrote two status events and two bus events. The second now gets 409 "already in status"; a concurrent second cancel stays a no-op.
+
 - fix(#750): deleting a cabinet whose appointments were all cancelled
   answered 500. The guard only counted non-cancelled appointments, while
   cancelled ones and the cabinet audit trail still reference the row. A

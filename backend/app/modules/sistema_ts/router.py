@@ -134,6 +134,10 @@ async def get_ts_settings(
     )
 
 
+# Nullable columns: an explicit null clears them; null on the others means "unchanged".
+_CLEARABLE = {"username", "codice_regione", "codice_asl", "codice_ssa", "sync_from"}
+
+
 @router.put("/settings", response_model=ApiResponse[TsSettingsResponse])
 async def update_ts_settings(
     data: TsSettingsUpdate,
@@ -156,9 +160,11 @@ async def update_ts_settings(
         "sync_from",
     ):
         value = getattr(data, field)
-        if value is not None:
+        if value is not None or (field in _CLEARABLE and field in data.model_fields_set):
             setattr(s, field, value)
-    if data.cf_proprietario is not None:
+    if data.cf_proprietario is None and "cf_proprietario" in data.model_fields_set:
+        s.cf_proprietario = None
+    elif data.cf_proprietario is not None:
         cf = normalise_codice_fiscale(data.cf_proprietario)
         if cf is None and not (data.cf_proprietario.isdigit() and len(data.cf_proprietario) == 11):
             raise HTTPException(
@@ -179,12 +185,14 @@ async def update_ts_settings(
         s.certificate_b64 = data.certificate_b64
     if data.clear_certificate:
         s.certificate_b64 = None
+    enabled = s.enabled if data.enabled is None else data.enabled
+    # Also checked on a plain save: clearing the username or owner's codice fiscale.
+    if enabled and not submission_queue.credentials_ok(s):
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Per attivare servono utente, password, pincode e codice fiscale del proprietario.",
+        )
     if data.enabled is not None:
-        if data.enabled and not submission_queue.credentials_ok(s):
-            raise HTTPException(
-                status.HTTP_400_BAD_REQUEST,
-                "Per attivare servono utente, password, pincode e codice fiscale del proprietario.",
-            )
         s.enabled = data.enabled
         if data.enabled:
             s.last_error = None
