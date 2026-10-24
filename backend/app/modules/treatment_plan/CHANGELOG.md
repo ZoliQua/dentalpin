@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#774): confirm, reopen, close, reactivate and the PUT status change lock the plan row (and its linked budget's first, the order a budget transition takes) and re-read the status before checking it. Two confirms at the same moment both passed the draft check on their unlocked plan and both ran: the second now gets "Cannot confirm plan in status 'pending'".
+
 - fix(#750): removing a plan item that was booked into an appointment
   answered 500 (`appointment_treatments` references it through an FK
   without ondelete). While the appointment is live the removal answers
