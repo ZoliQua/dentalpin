@@ -644,6 +644,9 @@ class AppointmentService:
             return await AppointmentService.transition(
                 db, appointment, "cancelled", changed_by=changed_by
             )
+        except AlreadyInStateError:
+            # Cancelled by a concurrent request while this one waited.
+            return appointment
         except InvalidTransitionError:
             # Terminal states (completed / no_show) are not cancellable by
             # contract — surface a 400 at the router layer.
@@ -668,7 +671,12 @@ class AppointmentService:
 
         Raises :class:`AlreadyInStateError` if ``to_status`` equals the
         current status, and :class:`InvalidTransitionError` otherwise.
+
+        The row is locked and its status re-read first: the caller loaded it
+        without a lock, so two requests at once (a double click, kiosk and
+        reception) both passed the check and wrote two status events (#774).
         """
+        await db.refresh(appointment, attribute_names=["status"], with_for_update=True)
         from_status = appointment.status
 
         if to_status == from_status:
