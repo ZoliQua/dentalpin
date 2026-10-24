@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#774): send, accept (staff, in-clinic and the public link), reject, cancel and renegotiate now lock the budget row and re-read its status before checking the transition. Two accepts at the same moment both passed the check on the unlocked copy: two signatures on one budget and `budget.accepted` published twice. The second request now waits and gets the normal "cannot … from status" answer.
+
 - fix(#759): only an unlinked draft quote can be deleted now; anything
   else answers 409. Deleting a sent or accepted plan quote hid it while
   the plan kept pointing at it, locked by a quote nobody could open, and
