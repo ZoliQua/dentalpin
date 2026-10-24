@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#770): two budgets created at the same moment in one clinic answered 500 (`uq_budget_clinic_number_version`). `BudgetNumberService.generate_number` was `max()+1` with no lock; it now takes a per-clinic transaction advisory lock first, so allocations serialise until commit.
+
 - fix(#759): only an unlinked draft quote can be deleted now; anything
   else answers 409. Deleting a sent or accepted plan quote hid it while
   the plan kept pointing at it, locked by a quote nobody could open, and
