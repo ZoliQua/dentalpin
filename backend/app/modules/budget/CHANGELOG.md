@@ -4,6 +4,8 @@
 
 - fix(#779): the public link's expiry (`meta`, detail, `verify_public_access`), the resend draft's `valid_from` and the number's year now use the clinic's day (`clinic_today_for`). They read the server's UTC day, so from 18:00 in a UTC-6 clinic a quote on its last valid day already answered "expired".
 
+- fix(#774): send, accept (staff, in-clinic and the public link), reject, cancel and renegotiate now lock the budget row and re-read its status before checking the transition. Two accepts at the same moment both passed the check on the unlocked copy: two signatures on one budget and `budget.accepted` published twice. The second request now waits and gets the normal "cannot … from status" answer.
+
 - fix(#770): two budgets created at the same moment in one clinic answered 500 (`uq_budget_clinic_number_version`). `BudgetNumberService.generate_number` was `max()+1` with no lock; it now takes a per-clinic transaction advisory lock first, so allocations serialise until commit.
 
 - fix(#759): only an unlinked draft quote can be deleted now; anything
