@@ -100,6 +100,16 @@ class BudgetNumberService:
         current_year = (await clinic_today_for(db, clinic_id)).year
         year_prefix = f"{prefix}-{current_year}-"
 
+        # Serialise allocation per clinic until this transaction ends, so the
+        # next allocation reads the number this one commits (#770). Without
+        # it two concurrent creates read the same max and the second insert
+        # hits uq_budget_clinic_number_version.
+        await db.execute(
+            select(
+                func.pg_advisory_xact_lock(func.hashtextextended(f"budget_number:{clinic_id}", 0))
+            )
+        )
+
         # Find the highest number for this year
         result = await db.execute(
             select(func.max(Budget.budget_number)).where(
