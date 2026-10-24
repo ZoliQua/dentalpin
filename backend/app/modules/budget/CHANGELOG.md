@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#759): only an unlinked draft quote can be deleted now; anything
+  else answers 409. Deleting a sent or accepted plan quote hid it while
+  the plan kept pointing at it, locked by a quote nobody could open, and
+  re-confirming the plan relinked the deleted row. The re-confirm lookup
+  in `create_from_plan_snapshot` now skips deleted rows, so plans already
+  in that state recover. The list shows the delete button on drafts only.
+
 - fix(#743): removing a draft budget's global discount, expiry date or
   notes did not remove them -- the save answered 200 and the discount
   stayed applied. The edit form sent cleared fields as `undefined`

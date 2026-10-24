@@ -290,6 +290,29 @@ async def test_delete_budget(client: AsyncClient, auth_headers: dict, budget_cli
     assert get_response.status_code == 404
 
 
+@pytest.mark.asyncio
+async def test_delete_refuses_a_budget_that_left_draft(
+    client: AsyncClient, auth_headers: dict, budget_clinic_setup: dict
+):
+    """Past draft a quote is a record (sent, signed, cancelled): it stays visible."""
+    create_response = await client.post(
+        "/api/v1/budget/budgets",
+        json={"patient_id": budget_clinic_setup["patient_id"], "valid_from": "2024-01-01"},
+        headers=auth_headers,
+    )
+    budget_id = create_response.json()["data"]["id"]
+    cancelled = await client.post(
+        f"/api/v1/budget/budgets/{budget_id}/cancel", json={}, headers=auth_headers
+    )
+    assert cancelled.status_code == 200, cancelled.text
+
+    response = await client.delete(f"/api/v1/budget/budgets/{budget_id}", headers=auth_headers)
+    assert response.status_code == 409, response.text
+
+    still_there = await client.get(f"/api/v1/budget/budgets/{budget_id}", headers=auth_headers)
+    assert still_there.status_code == 200
+
+
 # ============================================================================
 # Budget Item Tests
 # ============================================================================
