@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#768): every `SELECT … FOR UPDATE` in this module now re-reads the locked row (`populate_existing`). A locking select on a row already in the session returned the cached instance with its pre-lock values. A guard test now enforces this across the tree.
+
 - fix(#750): removing a plan item that was booked into an appointment
   answered 500 (`appointment_treatments` references it through an FK
   without ondelete). While the appointment is live the removal answers

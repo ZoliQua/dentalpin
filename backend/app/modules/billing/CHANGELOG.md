@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#768): the row locks in invoice numbering now re-read the locked row (`populate_existing`). A `SELECT … FOR UPDATE` on a row already in the session returned the cached instance with its pre-lock values: a second invoice issued at the same moment got the same number and answered 500.
+
 - fix(#750): `BillingComplianceHook.on_draft_item_deleted` (default no-op). `InvoiceItemService.delete_item` calls it on every registered hook before the DELETE, so a compliance module can remove its own per-line rows. India GST's draft SAC override made deleting that line answer 500.
 
 - fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
