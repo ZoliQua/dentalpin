@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#779): the plan number's year is the clinic's year, not the server's UTC year (New Year's Eve gave the wrong year).
+
 - fix(#750): removing a plan item that was booked into an appointment
   answered 500 (`appointment_treatments` references it through an FK
   without ondelete). While the appointment is live the removal answers

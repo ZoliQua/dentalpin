@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#779): the public link's expiry (`meta`, detail, `verify_public_access`), the resend draft's `valid_from` and the number's year now use the clinic's day (`clinic_today_for`). They read the server's UTC day, so from 18:00 in a UTC-6 clinic a quote on its last valid day already answered "expired".
+
 - fix(#759): only an unlinked draft quote can be deleted now; anything
   else answers 409. Deleting a sent or accepted plan quote hid it while
   the plan kept pointing at it, locked by a quote nobody could open, and
