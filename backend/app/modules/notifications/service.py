@@ -317,8 +317,13 @@ class NotificationService:
         )
 
         for key, value in data.items():
-            if value is not None:
-                setattr(prefs, key, value)
+            if value is None:
+                continue
+            if key == "preferences":
+                # Merge, never replace: recording one opt-out must not
+                # discard the patient's other recorded choices (#683).
+                value = {**(prefs.preferences or {}), **value}
+            setattr(prefs, key, value)
 
         await db.commit()
         await db.refresh(prefs)

@@ -13,6 +13,11 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **A per-type notification opt-out with a misspelt key was stored and
+  ignored** (#683). The keys are now a closed list, so an unknown one is a
+  422; saving one opt-out keeps the patient's other recorded choices; and
+  `recall_reminder`, `budget_reminder` and `invoice_sent` are part of the
+  default record.
 - **Dates showed one day early in the Americas.** `new Date('2026-10-20')`
   is UTC midnight per spec, so in any zone behind UTC every date-only field
   (invoice and due dates, quote validity, payment dates, dates of birth, a
