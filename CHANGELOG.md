@@ -13,6 +13,12 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **The first invoice of a new year could not be issued** (#689). A
+  series with `reset_yearly` (the default) restarts at 1 every January,
+  but the fiscal backstop index made the sequential unique over the
+  series' whole life, so on 1 January issuing answered 500. Invoices now
+  store their `fiscal_year` and the sequential is unique per series and
+  year (migration `bil_0006`).
 - **Dates showed one day early in the Americas.** `new Date('2026-10-20')`
   is UTC midnight per spec, so in any zone behind UTC every date-only field
   (invoice and due dates, quote validity, payment dates, dates of birth, a

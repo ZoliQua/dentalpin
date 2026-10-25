@@ -142,7 +142,7 @@ class InvoiceNumberService:
         clinic_id: UUID,
         series_id: UUID,
         today: date | None = None,
-    ) -> tuple[str, int]:
+    ) -> tuple[str, int, int]:
         """Generate the next invoice number for a series.
 
         Handles yearly reset if configured.
@@ -155,10 +155,12 @@ class InvoiceNumberService:
                 goes into the number. Defaults to the server's date.
 
         Returns:
-            Tuple of (invoice_number, sequential_number)
+            Tuple of (invoice_number, sequential_number, fiscal_year). The
+            sequential is unique per (series, fiscal_year): a
+            ``reset_yearly`` series starts again at 1 each year.
 
         Example:
-            "FAC-2024-0001", 1
+            "FAC-2024-0001", 1, 2024
         """
         # Get series with lock for update
         result = await db.execute(
@@ -193,7 +195,7 @@ class InvoiceNumberService:
 
         await db.flush()
 
-        return invoice_number, sequential_number
+        return invoice_number, sequential_number, current_year
 
 
 class InvoiceSeriesService:
@@ -343,15 +345,17 @@ class InvoiceSeriesService:
     ) -> InvoiceSeries:
         """Reset series counter to a new number.
 
-        Validates that new_number > max(sequential_number) for invoices in this series.
+        Validates that new_number > max(sequential_number) for invoices in this
+        series — within the current year when the series resets yearly, since
+        last year's sequentials no longer compete with this year's.
         """
-        # Find max sequential_number for invoices in this series
-        max_result = await db.execute(
-            select(func.max(Invoice.sequential_number)).where(
-                Invoice.series_id == series.id,
-                Invoice.clinic_id == series.clinic_id,
-            )
+        query = select(func.max(Invoice.sequential_number)).where(
+            Invoice.series_id == series.id,
+            Invoice.clinic_id == series.clinic_id,
         )
+        if series.reset_yearly:
+            query = query.where(Invoice.fiscal_year == series.last_reset_year)
+        max_result = await db.execute(query)
         max_sequential = max_result.scalar() or 0
 
         if new_number <= max_sequential:

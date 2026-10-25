@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#689): the first invoice of a new year on a `reset_yearly` series (the default) answered 500. `generate_number` restarts the counter at 1 each year, while `bil_0005` made `(series_id, sequential_number)` unique over the series' lifetime. The invoice now stores the year its sequential was drawn in (`fiscal_year`, the year the rendered number carries), and migration `bil_0006` backfills it (from the number, else the issue date) and replaces the backstop with `(series_id, fiscal_year, sequential_number)` `NULLS NOT DISTINCT`. `POST /series/{id}/reset` compares the new counter against this year's highest sequential on a yearly series, not against every year's. `generate_number` returns the year as a third value. A backdated `issue_date` still draws from the current year's counter; that policy is unchanged.
+
 - fix(#769): an invoice could be credited any number of times; two full credit notes both issued. Creating or issuing a credit note now checks that all live credit notes of the invoice (drafts included, voided/deleted not) stay within its total, under a lock on the original invoice row, and answers 400 with the amount still creditable. The cap is on the total: a credit-note line has no link to its original line.
 
 - fix(#750): `BillingComplianceHook.on_draft_item_deleted` (default no-op). `InvoiceItemService.delete_item` calls it on every registered hook before the DELETE, so a compliance module can remove its own per-line rows. India GST's draft SAC override made deleting that line answer 500.
