@@ -13,6 +13,13 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **The recalls dashboard counted a different month on each host** (#684).
+  `completed_this_month` and `conversion_rate` bounded the month with naive
+  datetimes, which the driver reads in the app process's zone, so the same
+  data answered 1 on a UTC container and 3 on a Europe/Madrid one. The month
+  is now the clinic's (`Clinic.timezone`), on every host. The new
+  `clinic_zone` / `clinic_zone_for` helpers in `app/core/utils/dates.py`
+  return the clinic's zone for bounds like these.
 - **Dates showed one day early in the Americas.** `new Date('2026-10-20')`
   is UTC midnight per spec, so in any zone behind UTC every date-only field
   (invoice and due dates, quote validity, payment dates, dates of birth, a
