@@ -10,6 +10,7 @@ from sqlalchemy.orm import joinedload
 
 from app.core.auth.models import ClinicMembership
 from app.core.list_query import parse_sort
+from app.core.utils.dates import clinic_today_for
 from app.modules.catalog.models import TreatmentCatalogItem, VatType
 
 from .models import Budget, BudgetHistory, BudgetItem
@@ -19,6 +20,10 @@ from .schemas import TreatmentPlanBrief
 
 class PlanOwnsLinesError(ValueError):
     """The quote is linked to a treatment plan; its lines are managed there (issue #176)."""
+
+
+class BudgetNotDeletableError(ValueError):
+    """Only an unlinked draft can be deleted; anything else is cancelled instead."""
 
 
 async def lookup_linked_plan(
@@ -94,6 +99,16 @@ class BudgetNumberService:
         """
         current_year = datetime.now(UTC).year
         year_prefix = f"{prefix}-{current_year}-"
+
+        # Serialise allocation per clinic until this transaction ends, so the
+        # next allocation reads the number this one commits (#770). Without
+        # it two concurrent creates read the same max and the second insert
+        # hits uq_budget_clinic_number_version.
+        await db.execute(
+            select(
+                func.pg_advisory_xact_lock(func.hashtextextended(f"budget_number:{clinic_id}", 0))
+            )
+        )
 
         # Find the highest number for this year
         result = await db.execute(
@@ -275,6 +290,19 @@ async def _validate_professional_in_clinic(
         raise ValueError("Invalid professional for this clinic")
 
 
+# Budget columns that may be cleared with an explicit ``null`` on update.
+_CLEARABLE_BUDGET_FIELDS = frozenset(
+    {
+        "valid_until",
+        "assigned_professional_id",
+        "global_discount_type",
+        "global_discount_value",
+        "internal_notes",
+        "patient_notes",
+    }
+)
+
+
 class BudgetService:
     """Service for budget operations."""
 
@@ -344,7 +372,7 @@ class BudgetService:
             conditions.append(Budget.valid_until >= valid_until_after)
 
         if expired is not None:
-            today = date.today()
+            today = await clinic_today_for(db, clinic_id)
             if expired:
                 conditions.append(Budget.valid_until.isnot(None))
                 conditions.append(Budget.valid_until < today)
@@ -393,7 +421,7 @@ class BudgetService:
                 joinedload(Budget.creator),
                 joinedload(Budget.assigned_professional),
             )
-            .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT))
+            .order_by(parse_sort(sort, _SORT_ALLOW, _SORT_DEFAULT), Budget.id)
             .offset(offset)
             .limit(page_size)
         )
@@ -551,6 +579,7 @@ class BudgetService:
                     "WHERE tp.id = :plan_id "
                     "  AND tp.clinic_id = :clinic_id "
                     "  AND b.status NOT IN ('cancelled', 'rejected', 'expired') "
+                    "  AND b.deleted_at IS NULL "
                     "LIMIT 1"
                 ),
                 {"plan_id": plan_id_raw, "clinic_id": clinic_id},
@@ -562,7 +591,7 @@ class BudgetService:
 
         clinic_settings = await _resolve_clinic_settings(db, clinic_id)
         validity_days = int(clinic_settings.get("budget_expiry_days", DEFAULT_BUDGET_VALIDITY_DAYS))
-        today = date.today()
+        today = await clinic_today_for(db, clinic_id)
 
         budget_number = await BudgetNumberService.generate_number(db, clinic_id)
         public_auth_method = await BudgetWorkflowService.resolve_public_auth_method(
@@ -653,7 +682,10 @@ class BudgetService:
             await _validate_professional_in_clinic(db, budget.clinic_id, new_professional)
 
         for key, value in data.items():
-            if value is not None and hasattr(budget, key):
+            # None means "not sent" except on the nullable columns, where an
+            # explicit null clears the value -- removing a discount, an
+            # expiry date or a note must actually remove it (#743).
+            if (value is not None or key in _CLEARABLE_BUDGET_FIELDS) and hasattr(budget, key):
                 setattr(budget, key, value)
 
         # The caller reloads the budget to build the response, but this
@@ -688,7 +720,23 @@ class BudgetService:
         budget: Budget,
         deleted_by: UUID,
     ) -> None:
-        """Soft delete a budget."""
+        """Soft delete a draft budget.
+
+        A quote that left draft is paper the patient has seen or signed, and
+        a plan-linked one is the plan's quote: deleting either hid it while
+        the plan kept pointing at it — locked by an accepted quote nobody
+        could open. Those are cancelled instead.
+        """
+        if budget.status != "draft":
+            raise BudgetNotDeletableError(
+                f"Only draft budgets can be deleted; this one is '{budget.status}'"
+            )
+        plan = await lookup_linked_plan(db, budget.clinic_id, budget.id)
+        if plan is not None:
+            raise BudgetNotDeletableError(
+                f"This quote belongs to plan {plan.plan_number}; reopen the plan instead"
+            )
+
         budget.deleted_at = datetime.now(UTC)
 
         # Add history entry
@@ -816,7 +864,7 @@ class BudgetService:
             version=next_version,
             parent_budget_id=source_budget.id,
             status="draft",
-            valid_from=date.today(),
+            valid_from=await clinic_today_for(db, source_budget.clinic_id),
             valid_until=source_budget.valid_until,
             created_by=created_by,
             assigned_professional_id=source_budget.assigned_professional_id,

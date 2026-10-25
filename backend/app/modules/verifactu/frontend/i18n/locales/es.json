@@ -246,6 +246,7 @@
       "subtitle": "Historial inmutable de registros enviados a la AEAT.",
       "filterState": "Estado",
       "filterTipo": "Tipo",
+      "all": "Todos",
       "columns": {
         "createdAt": "Fecha",
         "tipoFactura": "Tipo",

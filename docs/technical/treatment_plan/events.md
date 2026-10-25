@@ -1,6 +1,6 @@
 ---
 module: treatment_plan
-last_verified_commit: 6c91240
+last_verified_commit: 27442250
 ---
 
 # Treatment Plan — events
@@ -19,6 +19,7 @@ Per-module slice of [`docs/events-catalog.md`](../../events-catalog.md)
 | `treatment_plan.reactivated` | closed → draft | Subscriber: `patient_timeline`. |
 | `treatment_plan.treatment_added` | A `PlannedTreatmentItem` is added to a plan via `POST /treatment-plans/{id}/items`. | `plan_id`, `item_id`, `treatment_id`, `clinic_id`, `patient_id`, `budget_id` (nullable), `catalog_item_id` (nullable), `tooth_number` (nullable), `surfaces` (nullable), `unit_price` (nullable, decimal-as-string), `assigned_professional_id` (nullable, snapshot of the doctor responsible for this line). |
 | `treatment_plan.treatment_removed` | Item removed | Includes `budget_id`. Subscriber: `budget`. |
+| `treatment_plan.items_reordered` | `reorder_items` — `PUT /treatment-plans/{id}/items/reorder`. | `clinic_id`, `plan_id`, `item_ids` (new order) | — |
 | `treatment_plan.treatment_completed` | Item finalized (all sessions terminal, ≥1 completed) | Audit/recall path only — carries **no price**; earned-ledger generation moved to `item_session_completed` with the multi-session feature. Subscribers: `patient_timeline`, `recalls`. |
 | `treatment_plan.item_session_completed` | One session of a plan item marked done (single-session items publish it once on completion) | `plan_id`, `item_id`, `session_id`, `sequence`, `label`, `amount`, `treatment_id`, `patient_id`, `completed_by`, `occurred_at`. Consumed by `payments` (earned row, idempotent on `(treatment_id, session_id)`). |
 | `treatment_plan.budget_sync_requested` | Manual resync | Snapshot payload includes full `items[]`. Subscriber: `budget`. |

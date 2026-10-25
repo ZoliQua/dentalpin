@@ -7,6 +7,7 @@
 import type { Prescription, PrescriptionItem, PrescriptionTemplate } from '../../composables/usePrescriptions'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorDetail } from '~~/app/utils/error'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const { t, locale } = useI18n()
 const { can } = usePermissions()
@@ -48,7 +49,7 @@ function fail(e: unknown) {
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—'
-  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(iso))
+  return new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(parseDateOnly(iso))
 }
 
 async function refresh() {

@@ -16,6 +16,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -207,7 +208,16 @@ class TreatmentCatalogItem(Base, TimestampMixin):
     )
 
     __table_args__ = (
-        UniqueConstraint("clinic_id", "internal_code", name="uq_catalog_item_clinic_code"),
+        # Partial: a deleted item frees its code. delete_item is a soft delete
+        # with no restore, and get_item_by_code (the 409 pre-check) skips
+        # deleted rows — a full constraint made a re-used code 500 (#736).
+        Index(
+            "uq_catalog_item_clinic_code",
+            "clinic_id",
+            "internal_code",
+            unique=True,
+            postgresql_where=text("deleted_at IS NULL"),
+        ),
         Index("idx_catalog_items_clinic", "clinic_id"),
         Index("idx_catalog_items_category", "category_id"),
         Index("idx_catalog_items_active", "clinic_id", "is_active"),

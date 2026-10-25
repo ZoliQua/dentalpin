@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix(#703): `mc_0002` makes `created_at` / `updated_at` NOT NULL.
+  `mc_0001` created them with a `now()` server default but without
+  `nullable=False`, while `TimestampMixin` declares both as
+  `Mapped[datetime]` — this table was one of the two places in the schema
+  where the column could hold NULL against a response schema that types
+  it as a required `datetime`.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

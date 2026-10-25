@@ -43,7 +43,7 @@ class TimelineService:
         result = await db.execute(
             select(PatientTimeline)
             .where(*conditions)
-            .order_by(PatientTimeline.occurred_at.desc())
+            .order_by(PatientTimeline.occurred_at.desc(), PatientTimeline.id)
             .offset(offset)
             .limit(page_size)
         )

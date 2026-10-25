@@ -78,6 +78,11 @@ that event was never published.
   documents don't count). Call it after any mutation of a line carrying
   `budget_item_id` — `create_from_budget`, void/delete, item edits and
   credit notes already do. Never `+=`/`-=` it by hand (issue #175).
+- **"Today" is the clinic's, never the server's.** The server runs on
+  UTC; an invoice's default `issue_date` and the year in its number come
+  from `clinic_today(ctx.clinic.timezone)` (`app/core/utils/dates.py`),
+  passed into `issue_invoice(today=…)` and on to `generate_number`. Keep
+  the two on the same value — the number embeds the year.
 - **Compliance hooks live in compliance modules**, not here. The
   `verifactu` module attaches via `BillingComplianceHook` on
   `invoice.issued` to chain into AEAT. Don't import verifactu from

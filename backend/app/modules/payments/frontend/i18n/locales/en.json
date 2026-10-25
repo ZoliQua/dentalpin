@@ -218,7 +218,6 @@
           "in_progress": "In progress"
         },
         "rowMenu": {
-          "detail": "View detail",
           "refund": "Refund",
           "reallocate": "Assign to quote…"
         }

@@ -73,7 +73,7 @@ async def _fetch_invoices(
         select(Invoice)
         .where(*_invoice_conditions(clinic_id, date_from, date_to))
         .options(selectinload(Invoice.items))
-        .order_by(Invoice.issue_date)
+        .order_by(Invoice.issue_date, Invoice.id)
     )
     if page is not None and page_size is not None:
         query = query.offset((page - 1) * page_size).limit(page_size)

@@ -5,7 +5,19 @@ from decimal import Decimal
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+def _blank_is_none(value: object) -> object:
+    """A cleared input sends "" (Nuxt UI keeps "" even for ``type="number"``).
+
+    For an optional price or duration that means "no value", not a malformed
+    number -- without this, clearing the field and saving answers 422.
+    """
+    if isinstance(value, str) and not value.strip():
+        return None
+    return value
+
 
 # ============================================================================
 # VAT Type Schemas
@@ -74,7 +86,7 @@ class CategoryCreate(BaseModel):
     descriptions: dict[str, str] | None = None
     parent_id: UUID | None = None
     display_order: int = 0
-    icon: str | None = None
+    icon: str | None = Field(default=None, max_length=50)
 
 
 class CategoryUpdate(BaseModel):
@@ -85,7 +97,7 @@ class CategoryUpdate(BaseModel):
     descriptions: dict[str, str] | None = None
     parent_id: UUID | None = None
     display_order: int | None = None
-    icon: str | None = None
+    icon: str | None = Field(default=None, max_length=50)
     is_active: bool | None = None
 
 
@@ -213,6 +225,10 @@ class CatalogItemCreate(BaseModel):
     # Session template (optional). Empty list and None both mean single-session.
     sessions: list[CatalogItemSessionInput] | None = None
 
+    _clear_blank = field_validator(
+        "default_price", "cost_price", "default_duration_minutes", mode="before"
+    )(_blank_is_none)
+
 
 class CatalogItemUpdate(BaseModel):
     """Schema for updating a catalog item."""
@@ -255,6 +271,10 @@ class CatalogItemUpdate(BaseModel):
     # Session template. When provided (even as empty list) the server
     # atomically replaces the stored template.
     sessions: list[CatalogItemSessionInput] | None = None
+
+    _clear_blank = field_validator(
+        "default_price", "cost_price", "default_duration_minutes", mode="before"
+    )(_blank_is_none)
 
 
 class CatalogItemResponse(BaseModel):

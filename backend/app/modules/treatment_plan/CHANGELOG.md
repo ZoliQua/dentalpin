@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+- fix(#774): confirm, reopen, close, reactivate and the PUT status change lock the plan row (and its linked budget's first, the order a budget transition takes) and re-read the status before checking it. Two confirms at the same moment both passed the draft check on their unlocked plan and both ran: the second now gets "Cannot confirm plan in status 'pending'".
+
+- fix(#770): **Generate budget** clicked twice at the same moment created two budgets for one plan (or answered 500). The route now locks and re-reads the plan's `budget_id` before checking it, so the second click answers 400 "Plan already has a budget linked".
+
+- fix(#750): removing a plan item that was booked into an appointment
+  answered 500 (`appointment_treatments` references it through an FK
+  without ondelete). While the appointment is live the removal answers
+  409 and asks to unlink it in the appointment first; links to cancelled
+  appointments are removed with the item.
+- fix(#730): the pipeline tab pager never changed page. It used the Nuxt UI v3 `UPagination` binding (`:model-value` / `@update:model-value`, `:page-count`); it now binds `:page` / `@update:page` / `:items-per-page`.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix(#718): `valid_from` on a plan-generated quote and the auto-close cron's
+  threshold use each clinic's calendar date instead of the server's (UTC).
+- docs(#711): `treatment_plan.items_reordered` was missing from the
+  Published table.
+- docs(#707): CLAUDE.md claimed the routes mount at
+  `/api/v1/treatment-plans/`, which answers nothing — the prefix is
+  `/api/v1/treatment_plan/` and the paths listed under it are relative,
+  so the detail endpoint is `/api/v1/treatment_plan/treatment-plans/{id}`.
+  That reading is what produced the broken call fixed in #699.
+- fix(#699): the post-visit "mark the leftover linked treatments
+  performed" prompt (#207) listed nothing, ever. It fetched the
+  appointment detail from `/api/v1/appointments/{id}`; agenda mounts that
+  route under its own prefix (`/api/v1/agenda/appointments/{id}`), so the
+  404 landed in the component's `catch` and it rendered its empty state
+  after every completed appointment.
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - refactor: the nine `event_bus.publish` call sites that named their event

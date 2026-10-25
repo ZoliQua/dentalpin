@@ -11,9 +11,11 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from app.core.i18n_names import catalog_name
 from app.core.list_query import parse_sort
+from app.core.utils.dates import clinic_today_for
 from app.modules.payments.models import Payment as PaymentModel
 from app.modules.payments.models import Refund as RefundModel
 
+from .hooks import BillingHookRegistry
 from .models import (
     Invoice,
     InvoiceHistory,
@@ -139,6 +141,7 @@ class InvoiceNumberService:
         db: AsyncSession,
         clinic_id: UUID,
         series_id: UUID,
+        today: date | None = None,
     ) -> tuple[str, int]:
         """Generate the next invoice number for a series.
 
@@ -148,6 +151,8 @@ class InvoiceNumberService:
             db: Database session
             clinic_id: Clinic ID
             series_id: Series ID
+            today: The clinic's calendar date (``clinic_today``); its year
+                goes into the number. Defaults to the server's date.
 
         Returns:
             Tuple of (invoice_number, sequential_number)
@@ -172,7 +177,7 @@ class InvoiceNumberService:
         if not series.is_active:
             raise ValueError(f"Series {series.prefix} is not active")
 
-        current_year = date.today().year
+        current_year = (today or date.today()).year
 
         # Check for yearly reset
         if series.reset_yearly and series.last_reset_year != current_year:
@@ -589,6 +594,8 @@ class InvoiceItemService:
     ) -> None:
         """Delete an invoice item."""
         budget_item_id = item.budget_item_id
+        for hook in BillingHookRegistry.get_all().values():
+            await hook.on_draft_item_deleted(item, db)
         await db.delete(item)
         await db.flush()
 
@@ -692,7 +699,7 @@ class InvoiceService:
             conditions.append(Invoice.due_date <= due_to)
 
         if overdue:
-            today = date.today()
+            today = await clinic_today_for(db, clinic_id)
             conditions.append(
                 and_(
                     Invoice.due_date < today,
@@ -763,7 +770,7 @@ class InvoiceService:
                 joinedload(Invoice.patient),
                 joinedload(Invoice.creator),
             )
-            .order_by(parse_sort(sort, _INVOICE_SORT_ALLOW, _INVOICE_SORT_DEFAULT))
+            .order_by(parse_sort(sort, _INVOICE_SORT_ALLOW, _INVOICE_SORT_DEFAULT), Invoice.id)
             .offset((page - 1) * page_size)
             .limit(page_size)
         )

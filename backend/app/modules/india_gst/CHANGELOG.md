@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- fix(#750): deleting a draft invoice line that had a SAC override (`PUT /india_gst/invoices/{id}`) answered 500. The override row references the line through a deliberately `RESTRICT` FK. `IndiaGstHook.on_draft_item_deleted` now removes the row first.
+
+- fix(#740): clearing the turnover threshold in settings removes it. The cleared input sent `""`, which the `Decimal` field answered with 422; an explicit `null` was skipped and the old value stayed.
+
+- fix(#732): the unregistered-GSTIN banner rendered no close button, so it could not be dismissed. `close-button` / `@close` are Nuxt UI v3; it now binds `close` + `close-icon` and `@update:open`.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer; Hindi name for the `GST 18%` VAT type; India demo seed supports a New Delhi (state 07) clinic.
 
 - refactor(#611): `_csv_cell` moved to `app/core/csv_safety.py` and is now

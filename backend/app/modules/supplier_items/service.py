@@ -137,7 +137,7 @@ class SupplierItemService:
         if inventory_item_id is not None:
             stmt = stmt.where(SupplierItem.inventory_item_id == inventory_item_id)
 
-        stmt = stmt.order_by(Contact.name.asc(), InventoryItem.name.asc())
+        stmt = stmt.order_by(Contact.name.asc(), InventoryItem.name.asc(), SupplierItem.id)
 
         total_stmt = select(func.count()).select_from(stmt.subquery())
         total = (await db.execute(total_stmt)).scalar_one()

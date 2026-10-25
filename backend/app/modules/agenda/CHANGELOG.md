@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+- fix(#774): `AppointmentService.transition` locks the appointment row and re-reads its status before the state-machine check. Two check-ins (kiosk and reception) or a double-clicked no-show at the same moment both passed the check on their unlocked copy and wrote two status events and two bus events. The second now gets 409 "already in status"; a concurrent second cancel stays a no-op.
+
+- fix(#750): deleting a cabinet whose appointments were all cancelled
+  answered 500. The guard only counted non-cancelled appointments, while
+  cancelled ones and the cabinet audit trail still reference the row. A
+  cabinet with any history now answers 409 and asks to deactivate it.
+- fix(#743): removing the last linked plan treatment from an appointment
+  in the edit modal did nothing -- the modal dropped `planned_item_ids`
+  when the selection was empty, and an omitted key means "keep the
+  links". It now sends `[]` when the appointment being edited had links. Backend
+  behaviour is unchanged; a test now pins that `[]` clears and an
+  omitted key keeps.
+- fix(#738): the patient summary's next-appointment card counted elapsed milliseconds (`ceil(diff / 1 day)`), so an appointment later today read "Mañana" and the card never turned green, and it fetched the patient's whole history oldest first, so a long history pushed the next appointment off the page. It now asks for `start_date=now&order=asc` and labels days with `clinicDayOffset` on the clinic wall-clock; the last-visit card and the kanban "next in cabinet" hour read the clinic wall-clock too.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- docs(#707): the router docstring still said cabinets gate on
+  `admin.clinic.write` "until Etapa B.2 chunk 3" — they have gated on
+  `agenda.cabinets.{read,write}` since that chunk landed. The permissions
+  doc gets the five cabinet endpoints, and the one route that gates
+  outside this namespace on purpose (`PATCH /appointment-treatments/{id}`
+  → `clinical_notes.notes.write`, issue #60) is now written down.
+- fix(#701): `AppointmentUpdate.status` is capped at the column length
+  (`VARCHAR(20)`); an over-long value was a 500 from the INSERT instead
+  of a 422. The status vocabulary itself is still `str` — that is #679.
+- fix(#695): the appointment badge in the patient file's **Citas** list
+  showed `appointments.checked_in` / `appointments.in_treatment` instead
+  of a label. `AppointmentsMode.vue` read the flat `appointments.<status>`
+  namespace — a stale duplicate of `appointments.status.*` that never grew
+  the two waiting-room statuses — while its own colour helper already
+  handled them. It now uses `useAppointmentStatus().statusLabel`, the
+  canonical source every other view already shares, and the duplicate is
+  gone from the host locales (the cancel toast reads
+  `appointments.status.cancelled`, the same string in all 12).
+
 - feat(#480, ADR 0037): `source` claim on check-in tokens. Counter QRs
   (`source=counter`, the staff mint default) auto-submit; mailed reminder
   links (`source=reminder`, minted by the notification sweep with a

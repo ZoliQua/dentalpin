@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- fix(#774): issue and cancel lock the prescription row and re-read it before checking its status. Two issues at once both passed the draft check, ran the country hook twice and published `prescription.issued` twice; the second now answers 422 (409 for cancel).
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix(#705): the printed prescription date rendered `issued_at` (a
+  `timestamptz`, so UTC) without converting, so a prescription issued
+  after midnight clinic-local carried the previous day's date; the
+  fallback used the server's naive clock. Both now use the clinic
+  timezone, which the router passes into the PDF data.
+
 - fix(#269 follow-up): the prescriber license caption follows the
   clinic country when it has its own term (Mexico: "Cédula
   profesional" instead of the es default "N.º de colegiado"), in the

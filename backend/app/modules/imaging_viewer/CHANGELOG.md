@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix(#679): `list_rvg_imports.status` is typed with a new
+  `RvgImportStatus` Literal, so an unrecognized queue status is rejected by
+  name instead of reporting an empty approval queue — which reads as
+  "nothing is waiting".
+- fix(#677): the tool parameters `patient_id`, `document_id` and `study_id`
+  are typed `UUID` instead of `str`.
+  The tool schema now advertises `format: uuid`, and a malformed id is
+  rejected by `tool_registry.call`'s validation step naming the parameter,
+  rather than reaching the handler and raising `badly formed hexadecimal
+  UUID string`, which named nothing.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 
 - fix: the queue list stays visible when the counts call fails (counts

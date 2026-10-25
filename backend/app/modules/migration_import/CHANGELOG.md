@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix(#701): `MappingDecisionPatch.operator_action` (20) and
+  `operator_target_category_key` (50) are capped at their column lengths
+  instead of 500-ing on the INSERT.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - test(#552): branch-scoped uninstall round-trip test (heads, branch downgrade, reinstall).
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).

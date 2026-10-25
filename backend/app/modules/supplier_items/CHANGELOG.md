@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix(#677): the tool parameters `supplier_id`, `inventory_item_id` and
+  `link_id` are typed `UUID` instead of `str`.
+  The tool schema now advertises `format: uuid`, and a malformed id is
+  rejected by `tool_registry.call`'s validation step naming the parameter,
+  rather than reaching the handler and raising `badly formed hexadecimal
+  UUID string`, which named nothing.
+
 - Fix: `GET /api/v1/supplier_items` returned 500 (the router passed the joined `Contact`/`InventoryItem` rows where the response schema expects their names).
 
 - Initial module (roadmap issue #227-2): supplier <-> inventory item link

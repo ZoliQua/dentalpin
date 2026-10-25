@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+- fix: the "Continue plan" dropdown on the diagnosis banner rendered empty.
+  `DiagnosisCTA` bound the Nuxt UI v3 `options` / `option-attribute` /
+  `value-attribute` props, which v4 ignores, so with two or more drafts the
+  select had no items and no plan could be continued. It now uses `items`
+  with `value-key` / `label-key`, and a host test scans the odontogram layer
+  for the ignored props.
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix: the chart showed at most 50 treatments per patient. `fetchTreatments`
+  sent no `page_size`, so the list endpoint's default (50, newest first)
+  applied and a long-standing patient's oldest rows — the initial charting —
+  dropped off the teeth. It now walks every page at the endpoint's cap (100).
+- fix(#701): `ToothInput.role` (20) and `TreatmentCreate.clinical_type`
+  / `source_module` (30) are capped at their column lengths instead of
+  500-ing on the INSERT.
+- fix(#697): the diagnosis notes FAB's aria-label
+  (`clinical.diagnosis.openNotes`) existed in no locale file, so screen
+  readers got the hardcoded Spanish "Notas" in every language. Added to
+  all 12 host locales as the action it performs ("Open notes" /
+  "Abrir notas").
+
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 
 - fix(#522): `TimelineSlider` compared the last history date against the UTC

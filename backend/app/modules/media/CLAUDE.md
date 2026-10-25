@@ -53,10 +53,13 @@ through `attachment_registry`.
 
 ## Events emitted
 
-- `document.uploaded` — every upload. Photos / X-rays are skipped here
-  so the timeline doesn't show a duplicate row alongside `photo.uploaded`.
+- `document.uploaded` — every upload, photos and X-rays included. The
+  de-duplication is the *subscriber's*: `patient_timeline` drops
+  `media_kind` `photo`/`xray` here because `media.photo_uploaded` gives
+  them their own card.
 - `document.deleted`
-- `document.archived`
+- `document.archived` is declared in `EventType` but **not published**: the
+  `patient.archived` cascade soft-archives documents without an event.
 - `media.photo_uploaded` — photo-aware variant fired alongside
   `document.uploaded` whenever `media_kind ∈ {photo, xray}`.
 - `media.attachment_linked` / `media.attachment_unlinked`

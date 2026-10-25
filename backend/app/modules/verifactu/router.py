@@ -425,7 +425,7 @@ async def list_records(
     rows = await db.execute(
         select(VerifactuRecord)
         .where(*conditions)
-        .order_by(VerifactuRecord.created_at.desc())
+        .order_by(VerifactuRecord.created_at.desc(), VerifactuRecord.id)
         .offset((page - 1) * page_size)
         .limit(page_size)
     )

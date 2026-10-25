@@ -42,7 +42,8 @@ services:
       # Docker's default address pools (the proxy container's network).
       # Swarm/k8s (10.0.0.0/8) or a PaaS edge must set their own value.
       FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1,::1,172.16.0.0/12,192.168.0.0/16}
-      # `console` logs the whole message and reports it sent (#614).
+      # `console` never delivers: in production it logs metadata only,
+      # reports the send failed and logs an ERROR naming this remedy (#614).
       EMAIL_PROVIDER: ${EMAIL_PROVIDER:-console}
       EMAIL_ENABLED: ${EMAIL_ENABLED:-true}
       EMAIL_SMTP_HOST: ${EMAIL_SMTP_HOST:-smtp.gmail.com}
@@ -68,6 +69,14 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
+      # Output ceiling per assistant turn (tokens); forwarded so the
+      # value in .env reaches the container instead of the 4096 default.
+      COPILOT_MAX_TOKENS: ${COPILOT_MAX_TOKENS:-4096}
+      # Self-hosted Ollama endpoint (#332). No bundled Ollama service: run
+      # one and point this at it (e.g. http://192.168.1.20:11434, a host
+      # reachable from the container). Leave empty for the provider's
+      # built-in default.
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-}
       # Seeds the demo clinic on first boot. Leave at 0 for a real clinic.
       SEED_ON_STARTUP: ${SEED_ON_STARTUP:-0}
       SEED_LANG: ${SEED_LANG:-es}

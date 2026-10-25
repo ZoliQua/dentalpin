@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix(#679): the `list_gdpr_requests` agent tool types `status` and
+  `request_type` with the module's own `RequestStatus` / `RequestType`
+  aliases — the ones `GET /requests` has always used — so an unrecognized
+  value is rejected by name instead of filtering the register down to
+  `{"total": 0}`. Both parameters also gained the description they were
+  missing: the agent was being shown a bare string with no vocabulary at
+  all. `create_gdpr_request.request_type` is typed the same way, moving its
+  failure from the service to the chokepoint.
+- fix(#677): the tool parameter `patient_id` is typed `UUID` instead of
+  `str` on all four tools that take it.
+  The tool schema now advertises `format: uuid`, and a malformed id is
+  rejected by `tool_registry.call`'s validation step naming the parameter,
+  rather than reaching the handler and raising `badly formed hexadecimal
+  UUID string`, which named nothing.
+
 - fix(#562 S2): the consent ledger answers "what is the state now", the
   breach register carries the Art. 34 record, and the filters stop
   accepting free text.

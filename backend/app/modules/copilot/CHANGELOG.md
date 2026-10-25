@@ -2,6 +2,53 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+- feat(#332): Ollama LLM provider adapter (self-hosted, local, no API key)
+  over its OpenAI-compatible endpoint. `OLLAMA_SPEC` declares
+  `needs_api_key=False`, a nullable `api_key_setting` and a new
+  `base_url_setting` (`OLLAMA_BASE_URL`, default `http://ollama:11434`,
+  `/v1` appended by the adapter) the factory now threads into
+  `ProviderConfig`. `COPILOT_MODEL_CHAT_OLLAMA` default `llama3.1:8b`;
+  spec registered from `on_activate`. No bridge, settings or UI change.
+  The mandatory PHI redactor still runs upstream (the local-tier
+  redaction relaxation from the #332 brief stays deferred), and save-time
+  validation stays key-only: Ollama is not probed for reachability or
+  model tool support (the brief's tool-use-incapable 422 stays deferred
+  too). The endpoint is deployment-level (`OLLAMA_BASE_URL`), not
+  per-clinic (the brief's per-clinic `base_url` stays deferred). Since the
+  endpoint is the only one that can be dropped rather than unkeyed, the
+  adapter wraps its stream and re-raises a connection failure as an
+  `LLMConfigError` naming `OLLAMA_BASE_URL` (the setting) and the dialed
+  URL, reporting a stall (`APITimeoutError`, the subclass) as a timeout
+  rather than an unreachable host, instead of the SDK's bare
+  `Connection error.`
+
+- fix(#701): `SettingsUpdate.model` (100) and `provider` (20) are capped
+  at their column lengths. `provider` was already rejected by the
+  provider registry with a 400; `model` is free text and a long one hit
+  the INSERT as a 500.
+
+- fix(#687): the redaction boundary stops leaking names and contact details
+  under keys its denylist did not list. `professional_name` and
+  `created_by_name` (staff are data subjects too — the same columns are
+  tokenized when returned as `first_name`/`last_name`), `recipient_email`,
+  `billing_email`, `filename` / `original_filename` (an RVG is filed as
+  `Surname_Firstname_date.dcm`, which is the identity the module's own
+  matcher scores on) and `suggested_patient_id` are now covered. A value the
+  symbol table already holds is tokenized under *any* key, so one payload
+  can no longer send the same address as a token under `email` and verbatim
+  under `recipient_email`. Guarded by
+  `tests/test_redaction_key_coverage.py`, which walks every module's tool
+  results rather than a restated list.
+- fix(#332): `COPILOT_MAX_TOKENS` was declared in `Settings` and read
+  nowhere, while `drive_turn` and `resume_turn` each hardcoded
+  `max_tokens=4096`, so the setting an operator could change did
+  nothing. Both call sites read it now. It is documented in
+  `.env.example` and `.env.prod.example`, and forwarded by
+  `docker-compose.yml` and `docker-compose.prod.yml` - the backend
+  service lists its environment explicitly, so documenting the key
+  without forwarding it would have left the operator's change inside
+  the container's 4096 default.
 - fix: the Coolify stack forwarded no LLM API key, so the copilot raised
   `LLMConfigError` on every request there whatever the operator
   configured. `docker-compose.coolify.yml` now maps every provider key
@@ -11,7 +58,9 @@
   and `tests/test_copilot_compose_wiring.py` derives the required keys
   from the registered provider specs so the two stacks cannot drift
   apart again. `COPILOT_PROVIDER_DEFAULT` and `COPILOT_MAX_TOKENS` are
-  forwarded there too, for the same reason.
+  forwarded there too, for the same reason. The guard also covers a
+  keyless provider's endpoint setting (`OLLAMA_BASE_URL`), which fails
+  the same way when it is not forwarded.
 - feat(#332): OpenRouter + Groq LLM provider adapters, same subclass shape
   as Gemini over their OpenAI-compatible endpoints (`OPENROUTER_API_KEY` /
   `GROQ_API_KEY` + per-provider default models, specs registered from

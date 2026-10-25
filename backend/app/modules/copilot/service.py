@@ -444,7 +444,7 @@ class ConversationService:
                 await db.execute(
                     select(CopilotConversation)
                     .where(*conditions)
-                    .order_by(CopilotConversation.updated_at.desc())
+                    .order_by(CopilotConversation.updated_at.desc(), CopilotConversation.id)
                     .limit(page_size)
                     .offset((page - 1) * page_size)
                 )

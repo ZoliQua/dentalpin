@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+- fix(#769): an invoice could be credited any number of times; two full credit notes both issued. Creating or issuing a credit note now checks that all live credit notes of the invoice (drafts included, voided/deleted not) stay within its total, under a lock on the original invoice row, and answers 400 with the amount still creditable. The cap is on the total: a credit-note line has no link to its original line.
+
+- fix(#750): `BillingComplianceHook.on_draft_item_deleted` (default no-op). `InvoiceItemService.delete_item` calls it on every registered hook before the DELETE, so a compliance module can remove its own per-line rows. India GST's draft SAC override made deleting that line answer 500.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix(#718): the `overdue` invoice filter compared due dates with the server's
+  date (UTC); it now uses the clinic's calendar (`clinic_today_for`).
+- fix: issuing without an explicit date stamped the **server's** date (UTC)
+  on the invoice — tomorrow's date for a UTC-6 clinic from 18:00 local,
+  yesterday's for a UTC+2 clinic until 02:00. The issue route now passes the
+  clinic's calendar date (`app.core.utils.dates.clinic_today`), and the
+  workflow uses it for both the default `issue_date` and the year in the
+  number, so the two always agree. `InvoiceIssueRequest.issue_date` is now
+  optional (`None` = the clinic's today).
+- docs(#711): `docs/technical/billing/events.md` said the module publishes
+  no events; it publishes `invoice.issued`, `invoice.paid` (read by
+  verifactu) and `invoice.sent`. The Published table now lists all three
+  with trigger, payload and subscribers.
+- fix(#701): `InvoiceItemCreate.internal_code` (50),
+  `InvoiceItem{Create,Update}.vat_exempt_reason` (200) and
+  `InvoiceSeries{Create,Update}.description` (200) now carry the
+  `max_length` their columns have. A longer value reached the INSERT and
+  came back as a 500 (`StringDataRightTruncation`) instead of a 422 — the
+  exemption reason and the pasted internal code are the realistic ones.
+
 - fix: a duplicate invoice-series prefix is a 409 instead of a 500.
   Neither `POST /series` nor `PUT /series/{id}` caught the
   `uq_invoice_series_clinic_prefix` violation, so creating a series twice

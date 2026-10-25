@@ -2,6 +2,60 @@
 
 ## Unreleased
 
+- fix(#774): send, accept (staff, in-clinic and the public link), reject, cancel and renegotiate now lock the budget row and re-read its status before checking the transition. Two accepts at the same moment both passed the check on the unlocked copy: two signatures on one budget and `budget.accepted` published twice. The second request now waits and gets the normal "cannot … from status" answer.
+
+- fix(#770): two budgets created at the same moment in one clinic answered 500 (`uq_budget_clinic_number_version`). `BudgetNumberService.generate_number` was `max()+1` with no lock; it now takes a per-clinic transaction advisory lock first, so allocations serialise until commit.
+
+- fix(#759): only an unlinked draft quote can be deleted now; anything
+  else answers 409. Deleting a sent or accepted plan quote hid it while
+  the plan kept pointing at it, locked by a quote nobody could open, and
+  re-confirming the plan relinked the deleted row. The re-confirm lookup
+  in `create_from_plan_snapshot` now skips deleted rows, so plans already
+  in that state recover. The list shows the delete button on drafts only.
+
+- fix(#743): removing a draft budget's global discount, expiry date or
+  notes did not remove them -- the save answered 200 and the discount
+  stayed applied. The edit form sent cleared fields as `undefined`
+  (dropped from the JSON), and `update_budget` skipped every `None`
+  anyway. The form now sends `null`, and `update_budget` stores an
+  explicit `null` on the nullable header columns
+  (`_CLEARABLE_BUDGET_FIELDS`, mirroring the lines'
+  `_CLEARABLE_ITEM_FIELDS`). An omitted key is still left untouched.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix(#718): "today" is the clinic's calendar date, not the server's (UTC):
+  the `expired` list filter, the expiry check, `valid_from` on plan-generated
+  and duplicated quotes, and the reminder cron's milestone dates (now
+  computed per clinic).
+- fix(#705): the quote PDF footer printed `00:00` on every document —
+  `date.today().strftime("%d/%m/%Y %H:%M")`, the same line #204 fixed in
+  `billing/pdf.py` — and the signed-quote audit line rendered
+  `BudgetSignature.signed_at` (a `timestamptz`, so UTC) directly, so a
+  patient who signed at 01:15 in Madrid read "23:15" next to their
+  signature. Both, plus the quote date, now go through
+  `ZoneInfo(clinic.timezone)` like billing does.
+- fix(#701): `SignatureCreate.signed_by_email` is capped at the column
+  length (`VARCHAR(255)`) instead of 500-ing on the INSERT.
+- fix(#699): the budgets list could not label a pre-selected professional
+  filter — `professionalResolver` read `GET /api/v1/auth/users/{id}`,
+  which does not exist (the users router has PUT/DELETE for an id, and
+  GET only as a list). It now resolves the name from
+  `GET /api/v1/auth/professionals`, the endpoint the same page already
+  reads under the same permission.
+- fix: the `budget.get_budget` agent tool failed on every budget that has
+  a line item. It read `BudgetItem.description`, a column that does not
+  exist — the line's name lives on its catalog item — so the copilot got
+  `ok=False` with a raw `AttributeError` string instead of the quote. The
+  existing tool test used an empty draft budget, which is the one case
+  that never reaches the serialisation branch. Now resolved through the
+  shared `catalog_name()` helper, like the PDF does, and the test carries
+  a real line.
+
 - fix: resending a terminal budget twice returned 500. `clone_to_new_draft`
   took the new version from the row it was cloning (`version + 1`) while
   `BudgetService.duplicate_budget` took it from `max(version)`, so the

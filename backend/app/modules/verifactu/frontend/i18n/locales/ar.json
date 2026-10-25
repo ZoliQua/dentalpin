@@ -240,6 +240,7 @@
       "subtitle": "سجل غير قابل للتغيير للسجلات المُرسلة إلى AEAT.",
       "filterState": "الحالة",
       "filterTipo": "النوع",
+      "all": "الكل",
       "columns": {
         "createdAt": "التاريخ",
         "tipoFactura": "النوع",

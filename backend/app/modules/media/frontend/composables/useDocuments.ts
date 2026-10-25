@@ -169,7 +169,7 @@ export function useDocuments() {
       console.error('Error fetching document blob:', error)
       toast.add({
         title: t('common.error'),
-        description: t('documents.viewError', 'Error loading document'),
+        description: t('documents.viewError'),
         color: 'error'
       })
       return null
@@ -198,7 +198,8 @@ export function useDocuments() {
 
   async function updateDocument(
     documentId: string,
-    data: { title?: string, description?: string, document_type?: DocumentType }
+    // description: null clears it; an omitted key leaves it untouched.
+    data: { title?: string, description?: string | null, document_type?: DocumentType }
   ): Promise<Document | null> {
     try {
       const response = await api.put<ApiResponse<Document>>(

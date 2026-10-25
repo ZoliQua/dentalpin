@@ -73,6 +73,10 @@ None.
   VAT, names, duration, sessions and `is_active` are clinic-owned and
   editable. Rows are per-clinic and downstream consumers snapshot the
   price, so editing it never rewrites history (#237).
+- **`update_item` treats `None` as "not sent"** except for the nullable
+  `default_price`, `cost_price` and `default_duration_minutes`
+  (`_CLEARABLE_ITEM_FIELDS`), where an explicit `null` (or a cleared
+  input's `""`, read as `None` by the schema) clears the value (#740).
 - **Categories are mandatory on items** (`category_id` NOT NULL). Anything
   that can leave a clinic with zero categories blocks treatment creation —
   keep the seed endpoint and the categories UI working.

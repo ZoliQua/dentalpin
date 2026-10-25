@@ -112,7 +112,7 @@ class InvoiceSeriesCreate(BaseModel):
 
     prefix: str = Field(min_length=1, max_length=20)
     series_type: SeriesType
-    description: str | None = None
+    description: str | None = Field(default=None, max_length=200)
     reset_yearly: bool = True
     is_default: bool = False
 
@@ -121,7 +121,7 @@ class InvoiceSeriesUpdate(BaseModel):
     """Schema for updating an invoice series."""
 
     prefix: str | None = Field(default=None, min_length=1, max_length=20)
-    description: str | None = None
+    description: str | None = Field(default=None, max_length=200)
     reset_yearly: bool | None = None
     is_default: bool | None = None
     is_active: bool | None = None
@@ -162,7 +162,7 @@ class InvoiceItemCreate(BaseModel):
 
     # For manual items
     description: str = Field(min_length=1, max_length=500)
-    internal_code: str | None = None
+    internal_code: str | None = Field(default=None, max_length=50)
     catalog_item_id: UUID | None = None
 
     # Pricing
@@ -175,7 +175,7 @@ class InvoiceItemCreate(BaseModel):
 
     # VAT
     vat_type_id: UUID | None = None
-    vat_exempt_reason: str | None = None
+    vat_exempt_reason: str | None = Field(default=None, max_length=200)
 
     # Dental context
     tooth_number: int | None = Field(default=None, ge=11, le=85)
@@ -205,7 +205,7 @@ class InvoiceItemUpdate(BaseModel):
 
     # VAT
     vat_type_id: UUID | None = None
-    vat_exempt_reason: str | None = None
+    vat_exempt_reason: str | None = Field(default=None, max_length=200)
 
     # Display
     display_order: int | None = None
@@ -542,7 +542,8 @@ class InvoiceListResponse(BaseModel):
 class InvoiceIssueRequest(BaseModel):
     """Schema for issuing an invoice."""
 
-    issue_date: date = Field(default_factory=date.today)
+    # None = the clinic's today, resolved by the route (``clinic_today``).
+    issue_date: date | None = None
 
 
 class CreditNoteItemSelect(BaseModel):

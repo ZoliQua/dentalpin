@@ -240,6 +240,7 @@
       "subtitle": "Cronologia immutabile delle registrazioni inviate all'AEAT.",
       "filterState": "Stato",
       "filterTipo": "Tipo",
+      "all": "Tutti",
       "columns": {
         "createdAt": "Data",
         "tipoFactura": "Tipo",

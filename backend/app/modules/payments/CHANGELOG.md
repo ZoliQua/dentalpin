@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix: date-only fields (`YYYY-MM-DD`) are parsed as local midnight
+  (`parseDateOnly`, host `utils/wallClock.ts`) instead of `new Date(s)`, which
+  is UTC midnight and rendered every such date one day early in zones behind
+  UTC — all of the Americas.
+- fix: the patient ledger's row menu offered **View detail**, a link to
+  `/payments/{id}` — a page no layer has, so it opened the 404 screen. The
+  item and its `rowMenu.detail` key are gone; the trigger's aria-label is
+  now `common.actions`, and a row whose role can neither reassign nor
+  refund no longer shows an empty menu.
+- docs: the `reports.categories` row in CLAUDE.md said the card renders on `/reports`; it has not since the dashboard moved to native drill-down chips (reports/CHANGELOG.md). Marked dormant, with the successor slot named. No code change — the chip itself is hardcoded by `reports` and still appears.
+
 - feat(i18n): Hindi (`hi`) locale for the module's frontend layer.
 - chore(#557): slot/settings permission gates now reference PERMISSIONS constants (no behavior change).
 

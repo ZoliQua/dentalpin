@@ -570,7 +570,9 @@ async function handleSave() {
       cabinet: cabinetValue,
       start_time: startTime,
       end_time: endTime,
-      planned_item_ids: selectedTreatments.value.length > 0
+      // An omitted key keeps the existing links, so when the user removed
+      // the last linked item on edit, [] has to be sent to unlink it (#743).
+      planned_item_ids: selectedTreatments.value.length > 0 || props.appointment?.treatments?.length
         ? selectedTreatments.value.map(t => t.id)
         : undefined
     }
@@ -640,7 +642,7 @@ async function handleCancel() {
     await cancelAppointment(props.appointment.id)
     toast.add({
       title: t('common.success'),
-      description: t('appointments.cancelled'),
+      description: t('appointments.status.cancelled'),
       color: 'success'
     })
     emit('cancelled', props.appointment.id)

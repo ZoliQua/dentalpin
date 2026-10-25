@@ -10,6 +10,7 @@ import type { InfoItem } from '~~/app/components/shared/EntityInfoCard.vue'
 import { errorMessage } from '~~/app/utils/error'
 import PublicBudgetLinkCard from '../../components/budget/PublicBudgetLinkCard.vue'
 import BudgetSignatureCard from '../../components/budget/BudgetSignatureCard.vue'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const route = useRoute()
 const router = useRouter()
@@ -176,13 +177,14 @@ async function saveEdits() {
   try {
     await updateBudget(currentBudget.value.id, {
       valid_from: editForm.valid_from || undefined,
-      valid_until: editForm.valid_until || undefined,
-      global_discount_type: (editForm.global_discount_type as 'percentage' | 'absolute') || undefined,
+      // null (not undefined) so a cleared field is cleared, not left as is.
+      valid_until: editForm.valid_until || null,
+      global_discount_type: (editForm.global_discount_type as 'percentage' | 'absolute') || null,
       global_discount_value: editForm.global_discount_value
         ? parseFloat(editForm.global_discount_value)
-        : undefined,
-      internal_notes: editForm.internal_notes || undefined,
-      patient_notes: editForm.patient_notes || undefined
+        : null,
+      internal_notes: editForm.internal_notes || null,
+      patient_notes: editForm.patient_notes || null
     })
 
     toast.add({
@@ -421,7 +423,7 @@ async function handleDownloadPDF() {
 const { format: formatMoney } = useCurrency()
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(locale.value)
+  return parseDateOnly(dateStr).toLocaleDateString(locale.value)
 }
 
 const statusChips = computed<EntityChip[]>(() => {

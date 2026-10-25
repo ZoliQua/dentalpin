@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth.dependencies import ClinicContext, get_clinic_context, require_permission
 from app.core.pdf_locales import PDF_LOCALE_PATTERN
 from app.core.schemas import ApiResponse, PaginatedApiResponse
+from app.core.utils.dates import clinic_today
 from app.database import get_db
 from app.modules.budget.service import lookup_linked_plan
 from app.modules.payments.schemas import PaymentResponse
@@ -670,7 +671,12 @@ async def issue_invoice(
                     return await hook.on_invoice_issued(inv, db_session)
 
         invoice = await InvoiceWorkflowService.issue_invoice(
-            db, invoice, ctx.user_id, issue_date=data.issue_date, hook_callback=hook_callback
+            db,
+            invoice,
+            ctx.user_id,
+            issue_date=data.issue_date,
+            hook_callback=hook_callback,
+            today=clinic_today(ctx.clinic.timezone),
         )
 
         # For credit notes, execute the credit note hook after issue

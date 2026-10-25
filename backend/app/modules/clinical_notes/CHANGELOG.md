@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- fix(#699): `linkAttachment` / `unlinkAttachment` posted to
+  `/api/v1/clinical_notes/attachments`, which does not exist — this
+  module exposes only the note-aware read, while media owns the rows and
+  the write endpoints (and grants `attachments.write` to every role).
+  Both now call `/api/v1/media/attachments`. No caller in the tree today,
+  so nothing user-visible changed.
+
 - feat(#657): owns the `clinical_notes` GDPR erasure coverage scope
   (`get_erasure_contributors()`). Notes are retained as health-care
   records (Art. 17(3)(c)/(h)) and their prose is never redacted. One of

@@ -9,6 +9,7 @@
  */
 
 import type { OdontogramHistoryEntry } from '~~/app/types'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 const props = defineProps<{
   patientId: string
@@ -49,7 +50,7 @@ const historyLoading = ref(false)
 // Format viewing date for display
 const formattedViewingDate = computed(() => {
   if (!viewingDate.value) return t('common.today')
-  return new Date(viewingDate.value).toLocaleDateString()
+  return parseDateOnly(viewingDate.value).toLocaleDateString()
 })
 
 // Changes at the currently selected date

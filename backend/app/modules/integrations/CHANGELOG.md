@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix(#750): deleting a webhook subscription that had fired at least once answered 500, because `webhook_deliveries.subscription_id` has no `ondelete`. The subscription's deliveries are now deleted with it.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
 ### CI hygiene (ruff 0.16.5 drift)
 
 - Reformatted the two multi-line `client.get(...)` calls in

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PaymentMethod, PaymentRecord, PaginatedResponse } from '~~/app/types'
 import { PERMISSIONS } from '~~/app/config/permissions'
+import { parseDateOnly } from '~~/app/utils/wallClock'
 
 /**
  * /payments — list page.
@@ -238,7 +239,7 @@ function allocationBreakdown(p: PaymentRecord): Array<{ label: string, amount: s
 
 function formatDate(s: string | undefined): string {
   if (!s) return '—'
-  return new Date(s).toLocaleDateString(locale.value)
+  return parseDateOnly(s).toLocaleDateString(locale.value)
 }
 </script>
 

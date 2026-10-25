@@ -2,7 +2,7 @@
 import type { BudgetListItem, BudgetStatus, ApiResponse, PaginatedResponse } from '~~/app/types'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
-import { toISODate } from '~~/app/utils/wallClock'
+import { parseDateOnly, toISODate } from '~~/app/utils/wallClock'
 
 /**
  * /budgets — list page.
@@ -239,13 +239,18 @@ async function professionalFetcher(query: string) {
 }
 
 async function professionalResolver(id: string) {
+  // There is no `GET /auth/users/{id}`; the professionals list is the
+  // endpoint this page already reads (and the one the permission covers),
+  // and a clinic has a handful of them.
   try {
-    const res = await api.get<{ data: { id: string, first_name: string, last_name: string } }>(
-      `/api/v1/auth/users/${id}`
+    const res = await api.get<{ data: Array<{ id: string, first_name: string, last_name: string }> }>(
+      '/api/v1/auth/professionals'
     )
+    const match = res.data.find(p => p.id === id)
+    if (!match) return null
     return {
-      id: res.data.id,
-      label: `${res.data.first_name} ${res.data.last_name}`.trim()
+      id: match.id,
+      label: `${match.first_name} ${match.last_name}`.trim()
     }
   } catch {
     return null
@@ -255,7 +260,7 @@ async function professionalResolver(id: string) {
 // --- Row helpers ---------------------------------------------------------
 function formatDate(s: string | undefined | null): string {
   if (!s) return '—'
-  return new Date(s).toLocaleDateString(locale.value)
+  return parseDateOnly(s).toLocaleDateString(locale.value)
 }
 
 function patientName(p: PatientBrief | undefined): string {
@@ -266,7 +271,7 @@ function patientName(p: PatientBrief | undefined): string {
 function validityBadge(b: BudgetListItem): { label: string, color: 'success' | 'warning' | 'error' | 'neutral' } | null {
   if (!b.valid_until) return null
   const today = new Date()
-  const until = new Date(b.valid_until)
+  const until = parseDateOnly(b.valid_until)
   const diff = Math.floor((until.getTime() - today.getTime()) / (24 * 3600 * 1000))
   if (diff < 0) return { label: t('budget.validity.expired'), color: 'error' }
   if (diff <= 7) return { label: t('budget.validity.expiresIn', { days: diff }), color: 'warning' }
@@ -458,7 +463,7 @@ async function handleDelete(b: BudgetListItem, ev: Event) {
               @click="handleDownloadPDF(b, $event)"
             />
             <UButton
-              v-if="can(PERMISSIONS.budget.admin)"
+              v-if="b.status === 'draft' && can(PERMISSIONS.budget.admin)"
               variant="ghost"
               color="error"
               icon="i-lucide-trash-2"

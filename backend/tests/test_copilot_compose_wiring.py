@@ -49,13 +49,17 @@ def _forwarded_keys(compose_name: str) -> set[str]:
 
 
 def _api_key_settings() -> set[str]:
-    """Every ``*_API_KEY`` setting a built-in provider spec names.
+    """Every ``*_API_KEY`` and base-URL setting a built-in provider spec names.
 
     Read from the registry the copilot module populates, so this follows
     the providers instead of restating them.
     """
     CopilotModule().on_activate()
-    keys = {spec.api_key_setting for spec in llm_provider_registry.list() if spec.api_key_setting}
+    specs = llm_provider_registry.list()
+    keys = {spec.api_key_setting for spec in specs if spec.api_key_setting}
+    # A keyless provider (Ollama) is configured by its endpoint instead,
+    # and that setting has the same failure mode when it is not forwarded.
+    keys |= {spec.base_url_setting for spec in specs if spec.base_url_setting}
     # Sanity floor: an empty or near-empty set would make the assertions
     # below pass vacuously, which is what a guard like this rots into.
     assert len(keys) >= 3, f"provider key set looks wrong: {sorted(keys)}"

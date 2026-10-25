@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import func, select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.email import EmailResult, email_service
@@ -97,7 +98,7 @@ class NotificationService:
 
         # Get items
         query = select(NotificationTemplate).order_by(
-            NotificationTemplate.template_key, NotificationTemplate.locale
+            NotificationTemplate.template_key, NotificationTemplate.locale, NotificationTemplate.id
         )
         for condition in conditions:
             query = query.where(condition)
@@ -284,12 +285,21 @@ class NotificationService:
         if prefs:
             return prefs
 
-        # Create default preferences
+        # Create default preferences. Two first reads for the same patient
+        # (two tabs, an inbound message) race on
+        # uq_notification_pref_clinic_patient; the loser reads the winner's row.
         prefs = NotificationPreference(
             clinic_id=clinic_id,
             patient_id=patient_id,
         )
-        db.add(prefs)
+        try:
+            async with db.begin_nested():
+                db.add(prefs)
+        except IntegrityError:
+            existing = await NotificationService.get_patient_preferences(db, clinic_id, patient_id)
+            if existing is None:
+                raise
+            return existing
         await db.commit()
         await db.refresh(prefs)
         return prefs
@@ -575,7 +585,9 @@ class NotificationService:
         total = total_result.scalar() or 0
 
         # Get items
-        query = select(CommunicationMessage).order_by(CommunicationMessage.created_at.desc())
+        query = select(CommunicationMessage).order_by(
+            CommunicationMessage.created_at.desc(), CommunicationMessage.id
+        )
         for condition in conditions:
             query = query.where(condition)
 

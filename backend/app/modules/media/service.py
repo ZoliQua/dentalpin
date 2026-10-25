@@ -24,6 +24,9 @@ from .storage import get_storage_backend
 from .thumbnails import is_thumbnailable, store_thumbnails
 from .validation import get_file_extension
 
+# Document columns that may be cleared with an explicit ``null`` on update.
+_CLEARABLE_DOCUMENT_FIELDS = frozenset({"description"})
+
 
 class DocumentService:
     """CRUD + storage for documents (the file-level concerns)."""
@@ -73,7 +76,7 @@ class DocumentService:
             select(Document)
             .where(*conditions)
             .options(selectinload(Document.uploader))
-            .order_by(Document.created_at.desc())
+            .order_by(Document.created_at.desc(), Document.id)
             .offset(offset)
             .limit(page_size)
         )
@@ -204,7 +207,9 @@ class DocumentService:
         data: dict,
     ) -> Document:
         for key, value in data.items():
-            if value is not None:
+            # None means "not sent" except on the nullable description, where
+            # an explicit null clears it (#743).
+            if value is not None or key in _CLEARABLE_DOCUMENT_FIELDS:
                 setattr(document, key, value)
         await db.flush()
         await db.refresh(document, ["uploader"])
@@ -340,6 +345,7 @@ class PhotoService:
             .order_by(
                 func.coalesce(Document.captured_at, Document.created_at).desc(),
                 Document.created_at.desc(),
+                Document.id,
             )
             .offset(offset)
             .limit(page_size)

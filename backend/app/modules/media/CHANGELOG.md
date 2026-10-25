@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- fix(#743): emptying a document's description in the edit modal kept the
+  old text. The modal sent `|| undefined` (key dropped) and
+  `update_document` skipped every `None`. The modal now sends `null` and
+  the service stores it for `description` (`_CLEARABLE_DOCUMENT_FIELDS`);
+  other `None` / omitted fields are still left untouched.
+- fix(#730): the patient document/photo gallery pager never changed page. It bound `v-model` / `:page-count`; Nuxt UI v4 needs `v-model:page` / `:items-per-page`, so documents after the first 12 were unreachable.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- docs(#711): the events doc said the module publishes nothing; it
+  publishes seven events, now tabled. CLAUDE.md also put the
+  photo/X-ray de-duplication in the publisher — it lives in
+  `patient_timeline`'s handler, `document.uploaded` fires for every upload
+  — and listed `document.archived` as emitted while nothing publishes it.
+- fix(#697): the upload controls' "Change" button and the "Optional"
+  field hint, and the photo/document/attachment toasts, existed in no
+  locale file — the hardcoded default message rendered for every
+  language (`Cambiar`, `Opcional`, "Error loading photos"). The keys
+  (`actions.change`, `common.optional`, `documents.viewError`,
+  `attachments.linkError`, `photoGallery.{fetchError,uploadError,uploadSuccess}`)
+  are now in all 12 host locales and the defaults are dropped.
+
 - fix(#631): the document card's view tooltip used `common.view`, which
   exists in no locale file, so it rendered the key string; it now reuses
   `common.viewDetails`, matching the button's own `aria-label`. The

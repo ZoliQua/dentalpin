@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+- fix(#765): `GET`/`PUT /preferences/patient/{id}` and
+  `POST /conversations/{id}/reply` answer 404 unless the patient is the
+  caller's clinic's. An unknown id hit the patients FK
+  (500), and another clinic's patient got a row here. Concurrent first
+  reads no longer 500: the loser of the
+  `uq_notification_pref_clinic_patient` race reads the winner's row.
+
+- fix: notification handler row reads now scope their appointment, patient, budget and invoice lookups by the event payload's clinic. Defence in depth; a payload whose clinic did not own the row was still resolved by id alone and could enqueue for the wrong clinic.
+
+- fix(#723): the paginated list query now ends its `order_by` on the primary key. Rows that tied on the sort column (same date, name or timestamp) were cut from different orderings on each page, so some appeared twice and others on no page.
+
+- fix(#614): production with `EMAIL_PROVIDER=console` (or unknown)
+  boots normally but delivers nothing loudly - resolving the provider
+  logs an ERROR, the console provider writes metadata-only lines (masked
+  recipient, no subject/body/names) and reports sends as failed so the UI
+  stops claiming delivery. `EMAIL_ENABLED=false` is a real opt-out: the
+  send path returns SKIPPED without resolving the per-clinic provider or
+  touching the network, and the gateway records SKIPPED as a skip (no
+  retry, no `notification.failed`) instead of collapsing it into a
+  failure. The public demo runs production, so it reports those sends as
+  failed too.
+  `.env.prod.example` documents the SMTP section.
 - feat(#480, ADR 0037): the appointment reminder sweep mints a
   `source=reminder` check-in token (valid until the end of the
   appointment's clinic-local day) and passes `checkin_url` into the
