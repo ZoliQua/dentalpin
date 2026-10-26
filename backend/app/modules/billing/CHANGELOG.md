@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#768): the row locks in invoice numbering now re-read the locked row (`populate_existing`). A `SELECT … FOR UPDATE` on a row already in the session returned the cached instance with its pre-lock values: a second invoice issued at the same moment got the same number and answered 500.
+
 - fix(#743): removing the discount of a draft invoice line in the edit modal did nothing. The modal sent `discount_type: undefined` for the "-" option, which drops the key, so the backend kept the old discount. It now sends `null`.
 - fix(#769): an invoice could be credited any number of times; two full credit notes both issued. Creating or issuing a credit note now checks that all live credit notes of the invoice (drafts included, voided/deleted not) stay within its total, under a lock on the original invoice row, and answers 400 with the amount still creditable. The cap is on the total: a credit-note line has no link to its original line.
 
