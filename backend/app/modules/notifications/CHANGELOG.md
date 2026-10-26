@@ -12,6 +12,7 @@
   `recall_reminder` and `invoice_sent` had no key). A test keeps every
   `notification_type="..."` call site and the clinic defaults inside the
   vocabulary.
+- fix(#768): every `SELECT … FOR UPDATE` in this module now re-reads the locked row (`populate_existing`). A locking select on a row already in the session returned the cached instance with its pre-lock values. A guard test now enforces this across the tree.
 
 - fix(#765): `GET`/`PUT /preferences/patient/{id}` and
   `POST /conversations/{id}/reply` answer 404 unless the patient is the

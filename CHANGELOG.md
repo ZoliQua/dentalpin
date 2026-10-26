@@ -18,6 +18,19 @@ frontend as a Nuxt layer under its own Python package.
   422; saving one opt-out keeps the patient's other recorded choices; and
   `recall_reminder`, `budget_reminder` and `invoice_sent` are part of the
   default record.
+- **The recalls dashboard counted a different month on each host** (#684).
+  `completed_this_month` and `conversion_rate` bounded the month with naive
+  datetimes, which the driver reads in the app process's zone, so the same
+  data answered 1 on a UTC container and 3 on a Europe/Madrid one. The month
+  is now the clinic's (`Clinic.timezone`), on every host. The new
+  `clinic_zone` / `clinic_zone_for` helpers in `app/core/utils/dates.py`
+  return the clinic's zone for bounds like these.
+- **The first invoice of a new year could not be issued** (#689). A
+  series with `reset_yearly` (the default) restarts at 1 every January,
+  but the fiscal backstop index made the sequential unique over the
+  series' whole life, so on 1 January issuing answered 500. Invoices now
+  store their `fiscal_year` and the sequential is unique per series and
+  year (migration `bil_0006`).
 - **Dates showed one day early in the Americas.** `new Date('2026-10-20')`
   is UTC midnight per spec, so in any zone behind UTC every date-only field
   (invoice and due dates, quote validity, payment dates, dates of birth, a
@@ -40,6 +53,19 @@ frontend as a Nuxt layer under its own Python package.
   everywhere keeps parity) nor the literal-key resolver (#631, dynamic keys
   are out of its scope) can see this class.
 
+- **The AI copilot could never be configured on the Coolify stack.**
+  `docker-compose.coolify.yml` forwarded no LLM key at all — not
+  `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`,
+  `OPENROUTER_API_KEY` or `GROQ_API_KEY` — while
+  `docker-compose.prod.yml` forwarded them. Neither file uses
+  `env_file`, `CopilotSettings` stores provider and model but no key, and
+  `copilot/bridge.py` resolves the key from deployment settings alone, so
+  on Coolify every copilot request raised `LLMConfigError` regardless of
+  what the operator set. Every provider key plus
+  `COPILOT_PROVIDER_DEFAULT` is now forwarded, `.env.prod.example`
+  names them, and a guard (`backend/tests/test_copilot_compose_wiring.py`)
+  reads the keys off the registered provider specs so a new provider
+  fails until both stacks forward it.
 - **26 UI strings showed the i18n key instead of a message** (#631).
   `errors.loadFailed`, `errors.createFailed`, `errors.updateFailed` and
   `errors.deleteFailed` existed in no locale file, so a clinic saw a toast

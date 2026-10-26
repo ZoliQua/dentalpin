@@ -214,11 +214,16 @@ class InvoiceWorkflowService:
                 series_id = series.id
 
             # Generate number
-            invoice_number, sequential_number = await InvoiceNumberService.generate_number(
+            (
+                invoice_number,
+                sequential_number,
+                fiscal_year,
+            ) = await InvoiceNumberService.generate_number(
                 db, invoice.clinic_id, series_id, today=today
             )
             invoice.invoice_number = invoice_number
             invoice.sequential_number = sequential_number
+            invoice.fiscal_year = fiscal_year
             invoice.series_id = series_id
 
         previous_status = invoice.status
