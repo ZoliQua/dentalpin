@@ -23,16 +23,23 @@ from __future__ import annotations
 import ipaddress
 import logging
 import socket
+from urllib.parse import urlparse
 
 import pytest
 
+from app.config import settings
 from app.core.auth.models import Clinic
 from tests.test_scheduled_jobs_run import _JOBS
 
 
 @pytest.fixture
 def no_outbound_network(monkeypatch):
-    """Allow loopback and Unix sockets (the test database) and nothing else."""
+    """Allow loopback, Unix sockets and the test database's host, nothing else.
+
+    In docker-compose the database is ``db`` (a bridge address, not loopback).
+    """
+    db_host = urlparse(settings.DATABASE_URL).hostname or "localhost"
+    db_addresses = {info[4][0] for info in socket.getaddrinfo(db_host, None)}
     real_connect = socket.socket.connect
 
     def guarded(sock, address):
@@ -42,7 +49,7 @@ def no_outbound_network(monkeypatch):
                 loopback = ipaddress.ip_address(host).is_loopback
             except ValueError:
                 loopback = host == "localhost"
-            if not loopback:
+            if not loopback and host not in db_addresses:
                 raise AssertionError(f"scheduled job tried to connect to {address!r}")
         return real_connect(sock, address)
 
