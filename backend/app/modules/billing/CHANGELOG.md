@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix(#743): removing the discount of a draft invoice line in the edit modal did nothing. The modal sent `discount_type: undefined` for the "-" option, which drops the key, so the backend kept the old discount. It now sends `null`.
 - fix(#769): an invoice could be credited any number of times; two full credit notes both issued. Creating or issuing a credit note now checks that all live credit notes of the invoice (drafts included, voided/deleted not) stay within its total, under a lock on the original invoice row, and answers 400 with the amount still creditable. The cap is on the total: a credit-note line has no link to its original line.
 
 - fix(#750): `BillingComplianceHook.on_draft_item_deleted` (default no-op). `InvoiceItemService.delete_item` calls it on every registered hook before the DELETE, so a compliance module can remove its own per-line rows. India GST's draft SAC override made deleting that line answer 500.
