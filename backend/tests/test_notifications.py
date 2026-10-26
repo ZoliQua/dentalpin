@@ -1,6 +1,8 @@
 """Tests for the notifications module."""
 
 import asyncio
+import re
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -18,6 +20,8 @@ from app.modules.notifications.channels import (
     channel_registry,
 )
 from app.modules.notifications.models import (
+    NOTIFICATION_TYPES,
+    ClinicNotificationSettings,
     NotificationPreference,
     NotificationTemplate,
 )
@@ -197,6 +201,62 @@ async def test_update_patient_preferences(
 
     assert data["email_enabled"] is False
     assert data["preferences"]["appointment_reminder"] is False
+
+
+@pytest.mark.asyncio
+async def test_a_misspelt_notification_type_is_rejected_not_stored(
+    client: AsyncClient, auth_headers: dict, test_patient
+):
+    """An absent key reads as consent, so a stored ``recal_reminder: false``
+    answered 200 and never blocked a recall reminder (#683)."""
+    url = f"/api/v1/notifications/preferences/patient/{test_patient.id}"
+    for key in ("recal_reminder", "Recall_Reminder"):
+        response = await client.put(url, json={"preferences": {key: False}}, headers=auth_headers)
+        assert response.status_code == 422, (key, response.text)
+
+    stored = (await client.get(url, headers=auth_headers)).json()["data"]["preferences"]
+    assert "recal_reminder" not in stored and "Recall_Reminder" not in stored
+
+
+@pytest.mark.asyncio
+async def test_a_per_type_opt_out_keeps_the_other_recorded_choices(
+    client: AsyncClient, auth_headers: dict, db_session: AsyncSession, test_clinic, test_patient
+):
+    """A PUT used to replace the whole dict: recording one opt-out discarded
+    the others. And the opt-out it records is the one the gate reads."""
+    url = f"/api/v1/notifications/preferences/patient/{test_patient.id}"
+    first = {"preferences": {"budget_reminder": False}}
+    assert (await client.put(url, json=first, headers=auth_headers)).status_code == 200
+    second = {"preferences": {"recall_reminder": False}}
+    response = await client.put(url, json=second, headers=auth_headers)
+    assert response.status_code == 200
+
+    stored = response.json()["data"]["preferences"]
+    assert stored["budget_reminder"] is False
+    assert stored["recall_reminder"] is False
+    assert stored["appointment_reminder"] is True
+
+    for notification_type in ("budget_reminder", "recall_reminder"):
+        verdict = await NotificationService.should_send_notification(
+            db_session, test_clinic.id, notification_type, test_patient.id
+        )
+        assert verdict == (False, f"patient_opted_out_of_{notification_type}")
+
+
+def test_every_enqueued_type_is_in_the_vocabulary():
+    """Every ``notification_type="..."`` the backend enqueues has a key a
+    patient can opt out of, and the clinic defaults cover the same set."""
+    app_root = Path(__file__).resolve().parents[1] / "app"
+    used = {
+        match
+        for path in app_root.rglob("*.py")
+        for match in re.findall(r'notification_type="([a-z_]+)"', path.read_text())
+    }
+    assert used, "found no enqueue call sites; the pattern is stale"
+    assert used <= set(NOTIFICATION_TYPES), used - set(NOTIFICATION_TYPES)
+
+    clinic_defaults = ClinicNotificationSettings.__table__.c.settings.default.arg(None)
+    assert set(clinic_defaults) == set(NOTIFICATION_TYPES)
 
 
 @pytest.mark.asyncio

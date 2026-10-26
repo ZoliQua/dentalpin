@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- fix(#683): a patient's per-type opt-out is keyed by a closed
+  vocabulary. `NotificationType` (`models.py`) lists the nine types the
+  product enqueues; `PUT /preferences/patient/{id}` answers 422 for any
+  other key, where a misspelt one used to return 200 and never block
+  anything (an absent key reads as consent). The PUT merges
+  `preferences` into the stored dict instead of replacing it, and the
+  default record now carries all nine types (`budget_reminder`,
+  `recall_reminder` and `invoice_sent` had no key). A test keeps every
+  `notification_type="..."` call site and the clinic defaults inside the
+  vocabulary.
+- fix(#768): every `SELECT … FOR UPDATE` in this module now re-reads the locked row (`populate_existing`). A locking select on a row already in the session returned the cached instance with its pre-lock values. A guard test now enforces this across the tree.
+
 - fix(#765): `GET`/`PUT /preferences/patient/{id}` and
   `POST /conversations/{id}/reply` answer 404 unless the patient is the
   caller's clinic's. An unknown id hit the patients FK
