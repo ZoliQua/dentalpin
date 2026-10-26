@@ -13,6 +13,9 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **"Load default catalog" failed for a clinic with its own VAT type at a
+  preset rate.** A second 0% type next to the seeded exempt one made
+  `POST /catalog/seed` answer 500; the seed now reuses the system type.
 - **A per-type notification opt-out with a misspelt key was stored and
   ignored** (#683). The keys are now a closed list, so an unknown one is a
   422; saving one opt-out keeps the patient's other recorded choices; and
