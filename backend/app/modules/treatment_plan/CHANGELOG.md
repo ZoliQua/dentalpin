@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- fix(#779): the plan number's year is the clinic's year, not the server's UTC year (New Year's Eve gave the wrong year).
+- fix(#768): every `SELECT … FOR UPDATE` in this module now re-reads the locked row (`populate_existing`). A locking select on a row already in the session returned the cached instance with its pre-lock values. A guard test now enforces this across the tree.
+
 - fix(#774): confirm, reopen, close, reactivate and the PUT status change lock the plan row (and its linked budget's first, the order a budget transition takes) and re-read the status before checking it. Two confirms at the same moment both passed the draft check on their unlocked plan and both ran: the second now gets "Cannot confirm plan in status 'pending'".
 
 - fix(#770): **Generate budget** clicked twice at the same moment created two budgets for one plan (or answered 500). The route now locks and re-reads the plan's `budget_id` before checking it, so the second click answers 400 "Plan already has a budget linked".
