@@ -13,6 +13,11 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **A per-type notification opt-out with a misspelt key was stored and
+  ignored** (#683). The keys are now a closed list, so an unknown one is a
+  422; saving one opt-out keeps the patient's other recorded choices; and
+  `recall_reminder`, `budget_reminder` and `invoice_sent` are part of the
+  default record.
 - **The recalls dashboard counted a different month on each host** (#684).
   `completed_this_month` and `conversion_rate` bounded the month with naive
   datetimes, which the driver reads in the app process's zone, so the same
