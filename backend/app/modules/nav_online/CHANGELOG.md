@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- fix(#779): the fallback `issue_date` of a queued record is the clinic's day, not the server's UTC day.
 - fix(#768): every `SELECT … FOR UPDATE` in this module now re-reads the locked row (`populate_existing`). A locking select on a row already in the session returned the cached instance with its pre-lock values. A guard test now enforces this across the tree.
 
 - fix(#743): emptying the tax number, technical user login or developer contact in the settings now clears it. The page sent `null`, and the router skipped every `null` as "not sent", so the old value came back. A save that would leave an enabled clinic without complete credentials now answers 400. Before, that was checked only when enabling.
