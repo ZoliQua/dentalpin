@@ -271,15 +271,26 @@ async def test_a_per_type_opt_out_holds_on_a_forced_send(
     assert msg.error_message == "patient_opted_out_of_appointment_reminder"
 
 
+# Enqueued types that are not notifications a patient opts out of. A
+# conversation reply answers a message the patient sent, inside the 24h
+# session window; the channel toggles and do_not_contact still gate it.
+NOT_OPT_OUTABLE = {"reply"}
+
+# ``enqueue(db, clinic_id, "type", ...)``: the type as the third positional.
+_POSITIONAL_TYPE = re.compile(r'NotificationGateway\.enqueue\(\s*[\w.]+,\s*[\w.]+,\s*"([a-z_]+)"')
+
+
 def test_every_enqueued_type_is_in_the_vocabulary():
-    """Every ``notification_type="..."`` the backend enqueues has a key a
-    patient can opt out of, and the clinic defaults cover the same set."""
+    """Every type the backend enqueues, by keyword or positionally, has a key
+    a patient can opt out of, and the clinic defaults cover the same set."""
     app_root = Path(__file__).resolve().parents[1] / "app"
-    used = {
-        match
-        for path in app_root.rglob("*.py")
-        for match in re.findall(r'notification_type="([a-z_]+)"', path.read_text())
-    }
+    used = set()
+    for path in app_root.rglob("*.py"):
+        source = path.read_text()
+        used |= set(re.findall(r'notification_type="([a-z_]+)"', source))
+        used |= set(_POSITIONAL_TYPE.findall(source))
+    assert NOT_OPT_OUTABLE <= used, "an allowlisted type is no longer enqueued; drop it"
+    used -= NOT_OPT_OUTABLE
     assert used, "found no enqueue call sites; the pattern is stale"
     assert used <= set(NOTIFICATION_TYPES), used - set(NOTIFICATION_TYPES)
 
