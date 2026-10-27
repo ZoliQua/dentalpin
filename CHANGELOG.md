@@ -13,6 +13,11 @@ frontend as a Nuxt layer under its own Python package.
 
 ### Fixed
 
+- **A patient's opt-out from appointment reminders was ignored** (#683).
+  Reminders, and staff sends of quotes and invoices, are forced sends, and
+  the per-type opt-out was only checked for unforced ones. It now blocks
+  every send, and the patient card has a switch per message type, so the
+  opt-out can be recorded without calling the API by hand.
 - **"Load default catalog" failed for a clinic with its own VAT type at a
   preset rate.** A second 0% type next to the seeded exempt one made
   `POST /catalog/seed` answer 500; the seed now reuses the system type.

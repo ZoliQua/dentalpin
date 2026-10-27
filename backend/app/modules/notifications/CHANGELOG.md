@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- fix(#683): a patient's per-type opt-out now holds under `force_send`.
+  The gateway checked it only inside the non-forced branch, and the
+  appointment-reminder cron, the manual reminder and the staff budget and
+  invoice sends all pass `force_send=True`, so an `appointment_reminder`,
+  `budget_sent` or `invoice_sent` opt-out never applied. Like
+  `do_not_contact` and the channel toggles, it now blocks every send;
+  `force_send` still bypasses the clinic's `enabled` / `auto_send` gate.
+- feat(#683): the patient card's notification preferences list one switch
+  per notification type under the channel switches, from the same list
+  the clinic settings page renders. A switch writes one key (the PUT
+  merges). A backend test keeps that list equal to `NotificationType`.
+
 - fix(#683): a patient's per-type opt-out is keyed by a closed
   vocabulary. `NotificationType` (`models.py`) lists the nine types the
   product enqueues; `PUT /preferences/patient/{id}` answers 422 for any
