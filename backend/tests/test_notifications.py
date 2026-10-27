@@ -19,6 +19,7 @@ from app.modules.notifications.channels import (
     SendStatus,
     channel_registry,
 )
+from app.modules.notifications.gateway import NotificationGateway
 from app.modules.notifications.models import (
     NOTIFICATION_TYPES,
     ClinicNotificationSettings,
@@ -243,6 +244,33 @@ async def test_a_per_type_opt_out_keeps_the_other_recorded_choices(
         assert verdict == (False, f"patient_opted_out_of_{notification_type}")
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("force_send", [False, True])
+async def test_a_per_type_opt_out_holds_on_a_forced_send(
+    db_session: AsyncSession, test_clinic, test_patient, force_send
+):
+    """The reminder cron and staff sends pass force_send, which skipped the
+    whole preference check: an appointment_reminder opt-out never applied.
+    Like do_not_contact and the channel toggles, it now blocks both."""
+    await NotificationService.update_patient_preferences(
+        db_session,
+        test_clinic.id,
+        test_patient.id,
+        {"preferences": {"appointment_reminder": False}},
+    )
+
+    msg = await NotificationGateway.enqueue(
+        db_session,
+        test_clinic.id,
+        "appointment_reminder",
+        context={},
+        patient_id=test_patient.id,
+        force_send=force_send,
+    )
+    assert msg.status == "skipped"
+    assert msg.error_message == "patient_opted_out_of_appointment_reminder"
+
+
 def test_every_enqueued_type_is_in_the_vocabulary():
     """Every ``notification_type="..."`` the backend enqueues has a key a
     patient can opt out of, and the clinic defaults cover the same set."""
@@ -257,6 +285,13 @@ def test_every_enqueued_type_is_in_the_vocabulary():
 
     clinic_defaults = ClinicNotificationSettings.__table__.c.settings.default.arg(None)
     assert set(clinic_defaults) == set(NOTIFICATION_TYPES)
+
+    # The settings page and the patient card both render this list; a type
+    # missing from it has no switch, so the patient cannot opt out of it.
+    composable = (
+        app_root / "modules/notifications/frontend/composables/useNotificationSettings.ts"
+    ).read_text()
+    assert set(re.findall(r"key: '([a-z_]+)'", composable)) == set(NOTIFICATION_TYPES)
 
 
 @pytest.mark.asyncio

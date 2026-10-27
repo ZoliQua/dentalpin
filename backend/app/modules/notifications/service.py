@@ -664,10 +664,17 @@ class NotificationService:
                     return False, "patient_opted_out"
 
                 # Check specific preference
-                if not prefs.preferences.get(notification_type, True):
+                if NotificationService.opted_out_of_type(prefs, notification_type):
                     return False, f"patient_opted_out_of_{notification_type}"
 
         return True, "ok"
+
+    @staticmethod
+    def opted_out_of_type(prefs: NotificationPreference | None, notification_type: str) -> bool:
+        """The patient explicitly declined this type. An absent key is consent."""
+        if prefs is None:
+            return False
+        return not (prefs.preferences or {}).get(notification_type, True)
 
     @staticmethod
     async def test_email_connection(to_email: str) -> EmailResult:
