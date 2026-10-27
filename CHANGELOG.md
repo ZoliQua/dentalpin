@@ -11,6 +11,153 @@ frontend as a Nuxt layer under its own Python package.
 
 ## [Unreleased]
 
+## [2.9.0] - 2026-10-27
+
+Hindi, four more LLM providers for the copilot, kiosk self check-in, and a
+large correctness sweep (concurrency, tenant scoping, clinic-calendar dates,
+422/409 instead of 500). Thanks @ZoliQua, @lamanji, @tresundios and
+@abdd8433.
+
+### Upgrade notes
+
+- **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
+  required. A production boot without it fails fast with an actionable
+  message instead of signing public budget sessions with the staff-JWT
+  `SECRET_KEY`. Blank, whitespace-only, and whitespace-padded values are
+  also refused, so generate a clean value (e.g. `openssl rand -hex 32`)
+  before upgrading; `docker-compose.prod.yml` and
+  `docker-compose.coolify.yml` now both refuse to start without it.
+- **Upgrade note (production):** `AGENDA_PUBLIC_SECRET_KEY` is now
+  required on the same terms: a production boot without a clean value
+  fails fast instead of signing QR check-in tokens with the staff-JWT
+  `SECRET_KEY`. Set it alongside `BUDGET_PUBLIC_SECRET_KEY` (see the note above) before upgrading.
+- **Heads-up (production email):** `EMAIL_PROVIDER=console` (the dev
+  default) delivers nothing (#614). A production instance that never
+  set `EMAIL_PROVIDER` boots normally but logs an ERROR when it first
+  resolves the provider (on the first email, since resolution is lazy),
+  writes metadata-only log lines (no bodies, no names), and reports
+  sends as failed so the UI stops claiming delivery. Set
+  `EMAIL_PROVIDER=smtp` with real credentials, or
+  `EMAIL_ENABLED=false` if the instance sends no mail (sends are then
+  skipped, not retried or reported as failed). The public demo is
+  affected too: it runs production, so it now logs metadata and reports
+  those sends as failed instead of printing the message and reporting it
+  sent.
+
+### Added
+
+- **Copilot: Ollama LLM provider adapter** (self-hosted, local, no API
+  key) over its OpenAI-compatible endpoint. `OLLAMA_SPEC` needs no key
+  and reads its endpoint from a new `base_url_setting`
+  (`OLLAMA_BASE_URL`, default `http://ollama:11434`); the factory threads
+  it into `ProviderConfig`. Per-clinic selection; dev, prod and Coolify
+  compose forward the setting, and an unreachable host raises an
+  `LLMConfigError` naming `OLLAMA_BASE_URL` instead of the SDK's bare
+  `Connection error.`. No bridge, settings or UI change (#332).
+- **Copilot: OpenRouter + Groq LLM provider adapters** over their
+  OpenAI-compatible endpoints (same subclass shape as Gemini;
+  `OPENROUTER_API_KEY` / `GROQ_API_KEY` + per-clinic selection, specs
+  registered from `on_activate`). No bridge, settings or UI change (#332).
+- **Copilot: Gemini LLM provider adapter** over Google's OpenAI-compatible
+  endpoint (same wire format and `openai` tool dialect as the OpenAI
+  provider; `GEMINI_API_KEY` + per-clinic selection, spec registered from
+  `on_activate`). No bridge, settings or UI change (#332).
+- **Hindi (`hi`, हिन्दी) locale** — core app and every module layer,
+  patient email templates, PDF labels (`hi_IN` money/date formatting,
+  Devanagari via Noto Sans Devanagari), and a Hindi demo seed
+  (`--lang hi`): an India GST clinic in New Delhi (GST state 07,
+  GSTIN `07ABCDE1234F1Z2`) with Hindi patient names. `README.hi.md` added.
+  Country-specific compliance modules (`verifactu`, `nav_online`,
+  `sdi_it`, `sistema_ts`) and the Verifactu emails are not translated
+  to Hindi; they fall back to English.
+- **Kiosk self check-in, phase 1** (#480, ADR 0037). A patient checks in
+  from the QR link in their reminder: the token records its source, the
+  reminder carries the link, and check-in only opens within a window
+  around the appointment's start time (#667, thanks @lamanji).
+
+### Changed
+
+- **Upgrade note (production):** `AGENDA_PUBLIC_SECRET_KEY` is now
+  required on the same terms: a production boot without a clean value
+  fails fast instead of signing QR check-in tokens with the staff-JWT
+  `SECRET_KEY`. Set it alongside `BUDGET_PUBLIC_SECRET_KEY` (see its
+  note below) before upgrading.
+- Email templates missing in a locale now fall back to the English
+  template instead of rendering nothing.
+- **GDPR erasure now pulls a contributor registry, not a fan-out** (#546,
+  ADR 0038). `gdpr` calls every registered erasure contributor
+  (`notifications`, `recalls`) inside the erasure transaction and builds
+  the per-scope coverage list (`ErasureCoverage`) from their answers — a
+  scope with no contributor produces no row. `gdpr.erasure.executed` is a
+  post-commit announcement. Fiscal, signature and clinical records stay
+  retained (Art. 17(3)), hardcoded as interim rows until their
+  contributors land. `ErasureResult.coverage_note` is removed in favor of
+  the `coverage` list (no frontend reader affected).
+
+### Security
+
+- **A consent could be recorded against another clinic's patient.**
+  `ConsentService.grant_or_withdraw` built the row straight from the
+  payload id with no patient lookup, so any tenant got a 201 against any
+  patient id — and an unknown id surfaced as a `ForeignKeyViolation`,
+  i.e. a 500 for what is a bad request, with the 201/500 split acting as
+  a cross-tenant patient-existence oracle (#562). Both paths now do a
+  clinic-scoped patient lookup first: unknown or foreign ids answer 404
+  on HTTP and `{"error": "patient not found"}` on the agent tool, before
+  anything is written.
+- **A budget could be assigned a professional from another clinic.**
+  `assigned_professional_id` was a plain FK to `users` with no
+  membership check, so a caller naming a user id from a different clinic
+  had it stored — and the budget then rendered that user's name back. An
+  unknown id surfaced as a `ForeignKeyViolation`, i.e. a 500 for what is
+  a bad request. Both paths now answer 400, on create and on update. The
+  patient on the same route was already checked against the clinic; the
+  professional was not.
+- **The backend no longer trusts `X-Forwarded-For` from any peer** (#623).
+  `backend/Dockerfile` and every compose file ran uvicorn with
+  `--forwarded-allow-ips *`; with `*` uvicorn takes the **leftmost**
+  `X-Forwarded-For` entry, which the client writes. The login rate limit
+  keys on `request.client.host` (`get_remote_address`), so a client
+  sending a fresh header per attempt got a fresh bucket per attempt and
+  the limit stopped existing — and the same value is stored as the
+  session's `client_ip`, so the audit trail could be forged with it.
+  The flag is gone; uvicorn now reads `FORWARDED_ALLOW_IPS`, which every
+  compose file sets to loopback plus Docker's address pools and which
+  deployments override for their own proxy chain
+  (`.env.example`, `docs/user-manual/{en,es}/operations.md` §1).
+  Restricted, uvicorn walks the header right-to-left and stops at the
+  first hop outside the list, so the real client is used whether the
+  proxy overwrites the header or appends to it — the append case is
+  spoofable under `*` even behind a proxy. `_client_ip()` no longer
+  re-parses the header, and the backend logs the effective value at
+  startup (error in production if it is still `*`).
+- **Coolify: trust Traefik's 10.0.x networks** (follow-up to #623).
+  `docker-compose.coolify.yml` now defaults `FORWARDED_ALLOW_IPS` to also
+  include `10.0.0.0/8`. Coolify creates its Docker networks there, so the
+  previous default made every client resolve to Traefik's IP and turned
+  the login rate limit global.
+- **`allowed_tools` is now enforced, not just declared** (#558).
+  `BaseAgent.allowed_tools` existed with zero enforcement references
+  anywhere in `app/`, while `docs/technical/creating-modules.md` told
+  module authors it was "a hard list — the agent cannot invoke anything
+  outside it". `ToolRegistry.call` now checks it as step 2 of its
+  enforcement order (before guardrails, so a call the agent was never
+  allowed to make cannot consume its rate limit or open an approval
+  request) and audits the refusal as `BLOCKED`. The list reaches the
+  chokepoint through the new `AgentContext.allowed_tools`, where `None`
+  means "no subsetting" — what copilot and other conversational
+  surfaces use, so their behaviour is unchanged — and an empty list
+  permits nothing, which is `BaseAgent`'s default.
+- **Tenant scoping closed in four more places:** the recall suggestion
+  patient lookup (#727), `patients_clinical` list helpers, 1:1 getters and
+  bulk archive (#728), and the notification handlers' row reads (#729)
+  now filter by clinic (thanks @lamanji).
+- **Public budget page: per-IP lockout, production-only signing secret,
+  audited accept/reject** (#636), and a minimized pre-verification
+  payload (#647) (thanks @lamanji).
+- **Copilot redaction closes its key gaps** and tokenizes known values
+  wherever they appear in a tool result (#688).
+
 ### Fixed
 
 - **A patient's opt-out from appointment reminders was ignored** (#683).
@@ -60,7 +207,6 @@ frontend as a Nuxt layer under its own Python package.
   closed backend vocabulary) pairs: neither locale parity (a key missing
   everywhere keeps parity) nor the literal-key resolver (#631, dynamic keys
   are out of its scope) can see this class.
-
 - **The AI copilot could never be configured on the Coolify stack.**
   `docker-compose.coolify.yml` forwarded no LLM key at all — not
   `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`,
@@ -99,126 +245,6 @@ frontend as a Nuxt layer under its own Python package.
   the call sites. `key-resolution.test.ts` no longer skips a call that
   passes a default message — the default may stay, the key has to exist —
   which is the follow-up its own docstring asked for.
-
-### Added
-
-- **Copilot: Ollama LLM provider adapter** (self-hosted, local, no API
-  key) over its OpenAI-compatible endpoint. `OLLAMA_SPEC` needs no key
-  and reads its endpoint from a new `base_url_setting`
-  (`OLLAMA_BASE_URL`, default `http://ollama:11434`); the factory threads
-  it into `ProviderConfig`. Per-clinic selection; dev, prod and Coolify
-  compose forward the setting, and an unreachable host raises an
-  `LLMConfigError` naming `OLLAMA_BASE_URL` instead of the SDK's bare
-  `Connection error.`. No bridge, settings or UI change (#332).
-- **Copilot: OpenRouter + Groq LLM provider adapters** over their
-  OpenAI-compatible endpoints (same subclass shape as Gemini;
-  `OPENROUTER_API_KEY` / `GROQ_API_KEY` + per-clinic selection, specs
-  registered from `on_activate`). No bridge, settings or UI change (#332).
-- **Copilot: Gemini LLM provider adapter** over Google's OpenAI-compatible
-  endpoint (same wire format and `openai` tool dialect as the OpenAI
-  provider; `GEMINI_API_KEY` + per-clinic selection, spec registered from
-  `on_activate`). No bridge, settings or UI change (#332).
-- **Hindi (`hi`, हिन्दी) locale** — core app and every module layer,
-  patient email templates, PDF labels (`hi_IN` money/date formatting,
-  Devanagari via Noto Sans Devanagari), and a Hindi demo seed
-  (`--lang hi`): an India GST clinic in New Delhi (GST state 07,
-  GSTIN `07ABCDE1234F1Z2`) with Hindi patient names. `README.hi.md` added.
-  Country-specific compliance modules (`verifactu`, `nav_online`,
-  `sdi_it`, `sistema_ts`) and the Verifactu emails are not translated
-  to Hindi; they fall back to English.
-
-### Changed
-
-- **Upgrade note (production):** `AGENDA_PUBLIC_SECRET_KEY` is now
-  required on the same terms: a production boot without a clean value
-  fails fast instead of signing QR check-in tokens with the staff-JWT
-  `SECRET_KEY`. Set it alongside `BUDGET_PUBLIC_SECRET_KEY` (see its
-  note below) before upgrading.
-
-- Email templates missing in a locale now fall back to the English
-  template instead of rendering nothing.
-
-- **Heads-up (production email):** `EMAIL_PROVIDER=console` (the dev
-  default) delivers nothing (#614). A production instance that never
-  set `EMAIL_PROVIDER` boots normally but logs an ERROR when it first
-  resolves the provider (on the first email, since resolution is lazy),
-  writes metadata-only log lines (no bodies, no names), and reports
-  sends as failed so the UI stops claiming delivery. Set
-  `EMAIL_PROVIDER=smtp` with real credentials, or
-  `EMAIL_ENABLED=false` if the instance sends no mail (sends are then
-  skipped, not retried or reported as failed). The public demo is
-  affected too: it runs production, so it now logs metadata and reports
-  those sends as failed instead of printing the message and reporting it
-  sent.
-
-- **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
-  required. A production boot without it fails fast with an actionable
-  message instead of signing public budget sessions with the staff-JWT
-  `SECRET_KEY`. Blank, whitespace-only, and whitespace-padded values are
-  also refused, so generate a clean value (e.g. `openssl rand -hex 32`)
-  before upgrading; `docker-compose.prod.yml` and
-  `docker-compose.coolify.yml` now both refuse to start without it.
-
-### Security
-
-- **A consent could be recorded against another clinic's patient.**
-  `ConsentService.grant_or_withdraw` built the row straight from the
-  payload id with no patient lookup, so any tenant got a 201 against any
-  patient id — and an unknown id surfaced as a `ForeignKeyViolation`,
-  i.e. a 500 for what is a bad request, with the 201/500 split acting as
-  a cross-tenant patient-existence oracle (#562). Both paths now do a
-  clinic-scoped patient lookup first: unknown or foreign ids answer 404
-  on HTTP and `{"error": "patient not found"}` on the agent tool, before
-  anything is written.
-
-- **A budget could be assigned a professional from another clinic.**
-  `assigned_professional_id` was a plain FK to `users` with no
-  membership check, so a caller naming a user id from a different clinic
-  had it stored — and the budget then rendered that user's name back. An
-  unknown id surfaced as a `ForeignKeyViolation`, i.e. a 500 for what is
-  a bad request. Both paths now answer 400, on create and on update. The
-  patient on the same route was already checked against the clinic; the
-  professional was not.
-
-- **The backend no longer trusts `X-Forwarded-For` from any peer** (#623).
-  `backend/Dockerfile` and every compose file ran uvicorn with
-  `--forwarded-allow-ips *`; with `*` uvicorn takes the **leftmost**
-  `X-Forwarded-For` entry, which the client writes. The login rate limit
-  keys on `request.client.host` (`get_remote_address`), so a client
-  sending a fresh header per attempt got a fresh bucket per attempt and
-  the limit stopped existing — and the same value is stored as the
-  session's `client_ip`, so the audit trail could be forged with it.
-  The flag is gone; uvicorn now reads `FORWARDED_ALLOW_IPS`, which every
-  compose file sets to loopback plus Docker's address pools and which
-  deployments override for their own proxy chain
-  (`.env.example`, `docs/user-manual/{en,es}/operations.md` §1).
-  Restricted, uvicorn walks the header right-to-left and stops at the
-  first hop outside the list, so the real client is used whether the
-  proxy overwrites the header or appends to it — the append case is
-  spoofable under `*` even behind a proxy. `_client_ip()` no longer
-  re-parses the header, and the backend logs the effective value at
-  startup (error in production if it is still `*`).
-- **Coolify: trust Traefik's 10.0.x networks** (follow-up to #623).
-  `docker-compose.coolify.yml` now defaults `FORWARDED_ALLOW_IPS` to also
-  include `10.0.0.0/8`. Coolify creates its Docker networks there, so the
-  previous default made every client resolve to Traefik's IP and turned
-  the login rate limit global.
-
-- **`allowed_tools` is now enforced, not just declared** (#558).
-  `BaseAgent.allowed_tools` existed with zero enforcement references
-  anywhere in `app/`, while `docs/technical/creating-modules.md` told
-  module authors it was "a hard list — the agent cannot invoke anything
-  outside it". `ToolRegistry.call` now checks it as step 2 of its
-  enforcement order (before guardrails, so a call the agent was never
-  allowed to make cannot consume its rate limit or open an approval
-  request) and audits the refusal as `BLOCKED`. The list reaches the
-  chokepoint through the new `AgentContext.allowed_tools`, where `None`
-  means "no subsetting" — what copilot and other conversational
-  surfaces use, so their behaviour is unchanged — and an empty list
-  permits nothing, which is `BaseAgent`'s default.
-
-### Fixed
-
 - **GDPR retention policies can no longer disagree with each other**
   (#562). Two active policies for one (clinic, category) made erasure
   eligibility pick one at random (unordered dict collapse). Creating a
@@ -242,7 +268,6 @@ frontend as a Nuxt layer under its own Python package.
   the only broken path was the documented admin override, and it had no
   test. Found by exercising every mutating endpoint against a seeded
   database.
-
 - **The split-host cookie warning told PaaS operators to set a value
   browsers reject** (#444). `_shared_parent` built `.onrender.com` from
   `app.onrender.com` + `api.onrender.com` — two labels, so it passed the
@@ -253,7 +278,6 @@ frontend as a Nuxt layer under its own Python package.
   at `NUXT_API_PROXY=true` (shipped in 2.8.0 for exactly this shape)
   instead of suggesting they go and buy a domain. A real multi-label
   domain such as `.example.co.uk` is still suggested as before.
-
 - **The help-portal build now fails on a fragment slug collision** and
   warns about a slug the app can never request (#573, partial). Two
   screens whose routes collapse to the same slug used to write the same
@@ -263,26 +287,41 @@ frontend as a Nuxt layer under its own Python package.
   page's help away. The underlying question of how a query-selected
   sub-view gets its own fragment is still open on #573; this only makes
   the two failure modes visible.
-
-### Changed
-
-- **Upgrade note (production):** `BUDGET_PUBLIC_SECRET_KEY` is now
-  required. A production boot without it fails fast with an actionable
-  message instead of signing public budget sessions with the staff-JWT
-  `SECRET_KEY`. Blank, whitespace-only, and whitespace-padded values are
-  also refused, so generate a clean value (e.g. `openssl rand -hex 32`)
-  before upgrading; `docker-compose.prod.yml` and
-  `docker-compose.coolify.yml` now both refuse to start without it.
-
-- **GDPR erasure now pulls a contributor registry, not a fan-out** (#546,
-  ADR 0038). `gdpr` calls every registered erasure contributor
-  (`notifications`, `recalls`) inside the erasure transaction and builds
-  the per-scope coverage list (`ErasureCoverage`) from their answers — a
-  scope with no contributor produces no row. `gdpr.erasure.executed` is a
-  post-commit announcement. Fiscal, signature and clinical records stay
-  retained (Art. 17(3)), hardcoded as interim rows until their
-  contributors land. `ErasureResult.coverage_note` is removed in favor of
-  the `coverage` list (no frontend reader affected).
+- **Concurrent writes run once.** Budget numbers (#773), budget, agenda,
+  treatment plan, payroll and prescription transitions (#775-#778) and
+  every `SELECT … FOR UPDATE` (#771) now take a row lock that re-reads the
+  row, so two clicks at the same instant no longer double a transition.
+- **Dates follow the clinic's calendar, not the server's.** Invoice
+  dates (#719), every server-side "today" (#720, #780), PDF timestamps
+  (#706) and the agenda's patient summary (#739).
+- **Clearing a field clears it.** Emptying an optional input used to
+  answer 422 or silently keep the old value in patients_clinical,
+  catalog, budget, agenda, media, billing, sdi_it, nav_online,
+  sistema_ts, inventory, orthodontics and india_gst (#741-#749, #757,
+  #767).
+- **Deletes that hit a reference answer 409, not 500** (cabinets,
+  webhook subscriptions, plan items, inventory items, linked orthodontic
+  cases, invoice-series prefixes; #661, #751-#758), and a value wider than
+  its column answers 422 (#702, #764).
+- **Billing and reports:** an invoice cannot be credited past its total
+  (#772); receivables are net of refunds again (#691); Verifactu rounds
+  fiscal amounts like the invoice row (#692) and its ledger filters work
+  (#725); a deleted treatment frees its internal code (#737); only an
+  unlinked draft quote can be deleted (#760); a quote resend takes the
+  next free version (#663).
+- **The treatment-plan auto-close cron never ran** (#628): it queried a
+  column that does not exist and failed silently every night.
+- **Nuxt UI v4 leftovers:** pagination (#730) and dismissible alerts
+  (#732) bind the v4 API; the odontogram diagnosis plan selector uses v4
+  items (#726); the odontogram loads every page of treatments (#717).
+- **The frontend called paths the backend does not mount** (#700); a new
+  test checks every API path against the OpenAPI schema (#710).
+- **Copilot tools:** `get_budget` crashed on any budget with a line item
+  (#675); id parameters are typed as UUID and closed vocabularies as
+  `Literal`, so the chokepoint rejects a bad value by name (#678, #682);
+  `COPILOT_MAX_TOKENS` reaches the bridge (#673).
+- Razorpay shows the real payment method (#653, thanks @abdd8433);
+  prescriptions show a country-aware license caption (#668).
 
 ### Tests
 
@@ -294,7 +333,6 @@ frontend as a Nuxt layer under its own Python package.
   each against a real (empty) schema — a schema-and-import smoke test,
   not behaviour coverage, which is what keeps it at ~12s. Confirmed it
   catches #628's regression when the old query is put back.
-
 - **Four tests read the local clock while the code under test uses UTC**,
   so they pass in CI (UTC) and fail east of UTC for part of every day —
   `test_budget_expired_detail_410`, `test_strip_excludes_appointments_on_other_days`,
@@ -304,7 +342,6 @@ frontend as a Nuxt layer under its own Python package.
   A new `backend-test-east-of-utc` CI job runs the clock-reading tests
   under `TZ=Pacific/Kiritimati` (UTC+14), selecting the files at run time
   so a new test of this shape is covered the day it lands.
-
 - **A typo in a route's permission string now fails CI.** The tool
   registry already guarded this (`test_every_tool_permission_exists`,
   "would otherwise silently always-deny"); routes gate on the same
@@ -312,6 +349,9 @@ frontend as a Nuxt layer under its own Python package.
   for every user, forever, with nothing logged to say the string was the
   problem. The tree is clean today (673 literal call sites, 189 distinct,
   all valid), so `test_route_permissions.py` is purely preventive.
+- Migrations are checked against the schema the models declare (#704); a
+  slot nobody renders fails CI (#694); six removable modules get
+  branch-scoped uninstall round-trips (#646, thanks @lamanji).
 
 ## [2.8.0] - 2026-10-07
 
