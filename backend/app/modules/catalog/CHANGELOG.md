@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- fix(#1240): saving a per-surface item answered 500 (`TypeError: Object of type Decimal is not JSON serializable`). `surface_prices` tier prices are now dumped as strings for the JSONB column, the seeder's format, and a negative tier price is a 422 like `default_price`.
+- fix(#1240): saving a per-surface item answered 500 (`TypeError: Object of type Decimal is not JSON serializable`). `surface_prices` tier prices are now dumped as strings for the JSONB column, the seeder's format, and a negative tier price is a 422 like `default_price`. Tier keys must be exactly "1".."5" and prices fit NUMERIC(10,2) (422 otherwise): a key such as "02" made pricing raise `KeyError`.
 
 - fix(#1178): item price, cost and session price inputs show the clinic currency symbol and the sessions sum uses the clinic currency instead of a literal €.
 
